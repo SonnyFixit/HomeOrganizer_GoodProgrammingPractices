@@ -32,9 +32,9 @@ The project will be implemented using C# and Blazor, with a strong focus on good
 
 Front-end:
 * HTML
-* Bootstrap 
 * CSS 
 * Blazor
+* MudBlazor 
 
 Back-end:
 * C# v 11.0
