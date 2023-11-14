@@ -21,23 +21,16 @@
 @code {
     [Parameter]
     public UserData User { get; set; }
-
-    public override Task SetParametersAsync(ParameterView parameters)
-    {
-        foreach (var item in parameters)
-        {
-            Console.WriteLine(item.Name);
-            Console.WriteLine($"{item.Value}");
-        }
-
-        return base.SetParametersAsync(parameters);
-    }
-
     private string welcome = string.Empty;
-    public void UserLogged()
+
+    protected override Task OnParametersSetAsync()
     {
-        string[] welcoms = new string[] { "Hello", "Welcome", "Good day", "Yo, what's up", " Good to see you", "Welcome back" };
-        welcome = $"{welcoms[Random.Shared.Next(welcoms.Length)]}, {User.Name}!";
+        if (User != null)
+        {
+            string[] welcomes = new string[] { "Hello", "Welcome", "Good day", "Yo, what's up", " Good to see you", "Welcome back" };
+            welcome = $"{welcomes[Random.Shared.Next(welcomes.Length)]}, {User.Name}!";
+        }
+        return base.OnParametersSetAsync();
     }
 
     private void ChangeThemeMode()

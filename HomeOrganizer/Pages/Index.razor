@@ -6,26 +6,41 @@
 <PageTitle> Home Organizer </PageTitle>
 
 <TopBar User="@user" />
-<article class="content px-4">
-    Index content
-</article>
+<MudContainer Class="content px-4" Style="height:90%">
+    @if (user == null)
+    {
+        <MudGrid Justify="Justify.Center" Class="align-content-center" Style="height:100%">
+            <MudItem>
+                <MudPaper Height="140px" Width="140px" Class="align-content-center justify-content-center">
+                    <MudGrid Justify="Justify.Center" Class="align-content-center" Style="height:100%">
+                        <MudItem>
+                            <MudButton OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
+                                LOGIN
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    }
+    else
+    {
+
+    }
+</MudContainer>
 
 @code {
-    UserData? user = null;
+    UserData user;
+    bool autoLoginAdming = true;
 
-    protected override async void OnAfterRender(bool firstRender)
+    private void LoginUser()
     {
-        if (firstRender)
-        {
+        user = new UserData("Admin");
+    }
 
-            await Task.Run(async () =>
-            {
-                await Task.Delay(3000);
-                user = new UserData();
-                Console.WriteLine("Created:" + user.Name);
-            });
-        }
-
-        base.OnAfterRender(firstRender);
+    protected override void OnInitialized()
+    {
+        if (autoLoginAdming) LoginUser();
+        base.OnInitialized();
     }
 }
