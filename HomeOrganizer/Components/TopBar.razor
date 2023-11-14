@@ -1,0 +1,94 @@
+﻿@using HomeOrganizer.Models.User;
+<MudThemeProvider @bind-IsDarkMode="@isDarkMode" Theme="customTheme" />
+
+<MudAppBar Color="Color.Inherit" Fixed="false" Dense="true">
+    <MudButton StartIcon="@Icons.Material.Filled.Home" Color="Color.Inherit" ButtonType="ButtonType.Button" Link="\">
+        <MudText>
+            Home organizer
+        </MudText>
+    </MudButton>
+    @if (User != null)
+    {
+        <MudSpacer />
+        <MudText>
+            @welcome
+        </MudText>
+    }
+    <MudSpacer />
+    <MudIconButton Icon=@themeButtonIcon Color="Color.Tertiary" Class="ma-4" T="bool" OnClick="ChangeThemeMode" Title="Change Theme Button" />
+</MudAppBar>
+
+@code {
+    [Parameter]
+    public UserData User { get; set; }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        foreach (var item in parameters)
+        {
+            Console.WriteLine(item.Name);
+            Console.WriteLine($"{item.Value}");
+        }
+
+        return base.SetParametersAsync(parameters);
+    }
+
+    private string welcome = string.Empty;
+    public void UserLogged()
+    {
+        string[] welcoms = new string[] { "Hello", "Welcome", "Good day", "Yo, what's up", " Good to see you", "Welcome back" };
+        welcome = $"{welcoms[Random.Shared.Next(welcoms.Length)]}, {User.Name}!";
+    }
+
+    private void ChangeThemeMode()
+    {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode)
+        {
+            themeButtonIcon = Icons.Material.Filled.WbSunny;
+        }
+        else
+        {
+            themeButtonIcon = Icons.Material.Filled.NightsStay;
+        }
+    }
+
+    private string themeButtonIcon = Icons.Material.Filled.NightsStay;
+    private bool isDarkMode = false;
+
+    private MudTheme customTheme = new MudTheme()
+        {
+            Palette = new PaletteLight()
+            {
+                // Main colors
+                Primary = Colors.Blue.Lighten1,
+                Secondary = Colors.Teal.Lighten1,
+
+                // Theme icon color...
+                Tertiary = Colors.BlueGrey.Lighten1,
+
+                // Main elements
+                Background = Colors.LightBlue.Lighten4,
+
+
+                // Appbar
+                AppbarBackground = Colors.DeepOrange.Lighten2,
+                AppbarText = Colors.Shades.Black
+            },
+
+            PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Blue.Darken2,
+                Secondary = Colors.Teal.Darken2,
+
+                Tertiary = Colors.Amber.Lighten3,
+            },
+
+            LayoutProperties = new LayoutProperties()
+            {
+                DrawerWidthLeft = "260px",
+                DrawerWidthRight = "300px"
+            }
+        };
+
+}

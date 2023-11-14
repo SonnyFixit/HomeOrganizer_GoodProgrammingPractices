@@ -1,9 +1,31 @@
-﻿@page "/"
+﻿@using HomeOrganizer.Components
+@using HomeOrganizer.Models.User;
 
-<PageTitle>Index</PageTitle>
+@page "/"
 
-<h1>Hello, world!</h1>
+<PageTitle> Home Organizer </PageTitle>
 
-Welcome to your new app.
+<TopBar User="@user" />
+<article class="content px-4">
+    Index content
+</article>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    UserData? user = null;
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            await Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                user = new UserData();
+                Console.WriteLine("Created:" + user.Name);
+            });
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+}
