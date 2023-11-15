@@ -22,5 +22,8 @@
     protected override void OnInitialized()
     {
         feature = new MediaSubscriptions();
+        feature.Data.UserGivenName = "Name from user";
+        feature.Data.UserGivenDescription = "Description from user";
+        feature.Data.IsUsed = true;
     }
 }
