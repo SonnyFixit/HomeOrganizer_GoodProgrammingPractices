@@ -1,9 +1,13 @@
 ﻿@using HomeOrganizer.Models.User;
-<MudThemeProvider @bind-IsDarkMode="@isDarkMode" Theme="customTheme" />
+@implements IDisposable
+@inject UserService userService
+@inject NavigationManager navigationManager
+
+<MudThemeProvider @bind-IsDarkMode="@IsDarkMode" Theme="customTheme" />
 
 <MudAppBar Color="Color.Inherit" Fixed="false" Dense="true">
     <MudPaper Class="mud-theme-transparent" Elevation="0" Style="width:300px">
-        <MudButton StartIcon="@Icons.Material.Filled.Home" Color="Color.Inherit" ButtonType="ButtonType.Button" Href="\">
+        <MudButton StartIcon="@Icons.Material.Filled.Home" Color="Color.Inherit" ButtonType="ButtonType.Button" OnClick="GoHome">
             <MudText>
                 Home organizer
             </MudText>
@@ -21,40 +25,49 @@
     }
     <MudSpacer />
     <MudPaper Class="mud-theme-transparent d-flex justify-end" Elevation="0" Width="300px" Height="100%" Style="line-height:48px">
-        <MudIconButton Icon=@themeButtonIcon Color="Color.Tertiary" T="bool" OnClick="ChangeThemeMode" Title="Change Theme Button" Class="ml-auto align-self-end" />
+
+        <MudToggleIconButton @bind-Toggled="@IsDarkMode"
+                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
+                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
     </MudPaper>
 </MudAppBar>
 
 @code {
-    [Parameter]
     public UserData User { get; set; }
+    public bool IsDarkMode { get; set; } = false;
     private string welcome = string.Empty;
 
-    protected override Task OnParametersSetAsync()
+    private async void HandleUserUpdate()
     {
+        User = userService.LoggedUser;
+
         if (User != null && welcome.Length == 0)
         {
             string[] welcomes = new string[] { "Hello", "Welcome", "Good day", "Yo, what's up", " Good to see you", "Welcome back" };
             welcome = $"{welcomes[Random.Shared.Next(welcomes.Length)]}, {User.Name}!";
         }
-        return base.OnParametersSetAsync();
+
+        StateHasChanged();
     }
 
-    private void ChangeThemeMode()
+    protected override void OnInitialized()
     {
-        isDarkMode = !isDarkMode;
-        if (isDarkMode)
-        {
-            themeButtonIcon = Icons.Material.Filled.WbSunny;
-        }
-        else
-        {
-            themeButtonIcon = Icons.Material.Filled.NightsStay;
-        }
+        User = userService.LoggedUser;
+        userService.OnChange += HandleUserUpdate;
     }
 
-    private string themeButtonIcon = Icons.Material.Filled.NightsStay;
-    private bool isDarkMode = false;
+    private void GoHome()
+    {
+        User.OpenedFeature = null;
+        userService.LoggedUser = User;
+        navigationManager.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        userService.OnChange -= HandleUserUpdate;
+    }
+
 
     private MudTheme customTheme = new MudTheme()
         {

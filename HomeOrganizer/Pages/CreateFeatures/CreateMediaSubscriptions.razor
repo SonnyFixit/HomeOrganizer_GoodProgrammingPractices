@@ -1,0 +1,58 @@
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Communication;
+@using HomeOrganizer.Models.Features;
+@using HomeOrganizer.Models.User;
+
+@inject UserService userService
+@inject NavigationManager navigationManager
+
+@page "/CreateMediaSubscriptions"
+
+@if (User == null)
+{
+    <MudText Typo="Typo.h6">
+        WELCOME NULL???????
+    </MudText>
+}
+else
+{
+    <MudText Typo="Typo.h6">
+        WELCOME @User.Name
+    </MudText>
+    <MudButton OnClick="CreateFeature">
+        <MudText Typo="Typo.button">
+            Create Media Subscriptions Feature Tile
+        </MudText>
+    </MudButton>
+}
+
+@code {
+    private UserData User;
+
+    protected override void OnInitialized()
+    {
+        User = userService.LoggedUser;
+        base.OnInitialized();
+    }
+
+    private void CreateFeature()
+    {
+        // Collect data from form and create feature
+        IFeature feature = new MediaSubscriptions();
+        feature.Data.UserGivenName = "My expensive media";
+        feature.Data.UserGivenDescription = "They are very expensinve and it hurts me :(";
+        feature.Data.IsUsed = true;
+
+        Response addResponse = User.AddFeature(feature);
+        if (addResponse.Status)
+        {
+            User.OpenedFeature = User.Features.Last();
+            userService.LoggedUser = User;
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            // Show message
+        }
+    }
+}

@@ -5,7 +5,7 @@ namespace HomeOrganizer.Common
 {
     public static class FeaturesList
     {
-        public static HashSet<IFeatureData> Features { get; } = new HashSet<IFeatureData>()
+        public static HashSet<IFeature> Features { get; } = new HashSet<IFeature>()
         {
                 new MediaSubscriptions(),
                 new HouseholdBills(),
@@ -14,13 +14,18 @@ namespace HomeOrganizer.Common
                 new CustomFeature(),
         };
 
+        public static IFeature GetFeature(string featureName)
+        {
+            return Features.FirstOrDefault(f => f.Data.Name == featureName);
+        }
+
         public static bool CheckFeatureStatus(string featureName, int userUsage)
         {
-            IFeatureData? featureData = Features.FirstOrDefault(f => f.Name == featureName) ?? throw new Exception($"Cannon identify feature called {featureName}!");
+            IFeature? featureData = Features.FirstOrDefault(f => f.Data.Name == featureName) ?? throw new Exception($"Cannon identify feature called {featureName}!");
 
             if (userUsage == 0) return true;
-            if (featureData.IsReusable) return true;
-            if (!featureData.IsReusable && userUsage == 0) return true;
+            if (featureData.Data.IsReusable) return true;
+            if (!featureData.Data.IsReusable && userUsage == 0) return true;
             return false;
         }
 
@@ -30,7 +35,7 @@ namespace HomeOrganizer.Common
 
             foreach (var feature in Features)
             {
-                usage.Add(feature.Name, 0);
+                usage.Add(feature.Data.Name, 0);
             }
 
             return usage;

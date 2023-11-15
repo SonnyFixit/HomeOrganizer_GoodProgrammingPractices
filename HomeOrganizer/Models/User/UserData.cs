@@ -6,42 +6,69 @@ namespace HomeOrganizer.Models.User
 {
     public class UserData
     {
+        public string Login { get; private set; } = "";
         public string Name { get; private set; } = "";
-        public bool UseDarkTheme { get; private set; } = true;
+        public bool UseDarkTheme { get; set; } = true;
 
-        private Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
-        public List<IFeatureData> Features { get; private set; }
+        private readonly Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
+
+        public IFeature? OpenedFeature { get; set; }
+        public List<IFeature> Features { get; private set; }
 
         public UserData()
         {
-            Features = new List<IFeatureData>();
+            Features = new List<IFeature>();
             featuresUsage = FeaturesList.FeaturesUsage();
         }
 
-        public Response AddFeature(string featureName)
+        public Response AddFeature(IFeature feature)
         {
-            IFeatureData? featureData = FeaturesList.Features.FirstOrDefault(f => f.Name == featureName);
-            if (featureData == null)
+            if (feature == null)
             {
-                return new Response(false, $"Feature {featureName} is unavilable");
+                return new Response(false, $"Feature is unavilable");
             }
 
-            if (!featuresUsage.ContainsKey(featureData.Name))
+            if (!featuresUsage.ContainsKey(feature.Data.Name))
             {
-                return new Response(false, $"User does not contain {featureName}");
+                return new Response(false, $"User does not contain {feature.Data.Name}");
             }
 
-            if (!FeaturesList.CheckFeatureStatus(featureData.Name, featuresUsage[featureData.Name]))
+            if (!FeaturesList.CheckFeatureStatus(feature.Data.Name, featuresUsage[feature.Data.Name]))
             {
-                return new Response(false, $"Cannot create {featureName} feature.");
+                return new Response(false, $"Cannot create {feature.Data.Name} feature.");
             }
 
-            IFeatureData newFeature = featureData.Create();
-            newFeature.IsUsed = true;
+            int featureCounter = 2;
+            string userGivenName = feature.Data.UserGivenName;
+            while (Features.Any(f => f.Data.UserGivenName == feature.Data.UserGivenName))
+            {
+                feature.Data.UserGivenName = $"{userGivenName} - {featureCounter}";
+                featureCounter++;
+            }
 
-            Features.Add(newFeature);
-            featuresUsage[featureData.Name]++;
-            return new Response(true, $"Created {featureName}");
+            Features.Add(feature);
+            featuresUsage[feature.Data.Name]++;
+            return new Response(true, $"Created {feature.Data.Name}");
+        }
+
+        public Response RemoveFeature(IFeature feature)
+        {
+            if (feature == null || feature.Data.Name.Length == 0)
+            {
+                return new Response(false, "Remove feature is unknown");
+            }
+
+            IFeature? featureToDelete = Features.FirstOrDefault(f => f.Data.Name == feature.Data.Name && f.Data.UserGivenName == feature.Data.UserGivenName);
+
+            if (featureToDelete == null)
+            {
+                return new Response(false, $"Features container does not contain feature {feature.Data.Name}, {feature.Data.UserGivenName}");
+            }
+
+            featuresUsage[featureToDelete.Data.Name]--;
+            Features.Remove(featureToDelete);
+
+            return new Response(true, $"Feature {feature.Data.Name}, {feature.Data.UserGivenName} is removed");
         }
 
         public List<string> GetAvailableFeatures()
@@ -62,13 +89,6 @@ namespace HomeOrganizer.Models.User
         {
             UserData admin = new UserData();
             admin.Name = "admin";
-            foreach (var feature in admin.Features)
-            {
-                if (Random.Shared.NextDouble() < 0.99)
-                {
-                    feature.IsUsed = true;
-                }
-            }
 
             return admin;
         }

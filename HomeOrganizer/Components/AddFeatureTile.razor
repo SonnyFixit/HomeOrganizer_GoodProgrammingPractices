@@ -1,6 +1,10 @@
-﻿@using HomeOrganizer.Models.Communication;
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Communication;
 @using HomeOrganizer.Models.Interfaces;
 @using HomeOrganizer.Models.User;
+
+@inject NavigationManager navigationManager
+
 
 @if (UserData == null) return;
 
@@ -29,19 +33,15 @@
 @code {
     [Parameter]
     public UserData UserData { get; set; }
-    [Parameter]
-    public EventCallback<UserData> UserDataChanged { get; set; }
 
     private void AddFeature(string featureName)
     {
-        Response addResponse = UserData.AddFeature(featureName);
-        if (!addResponse.Status)
+        IFeature feature = FeaturesList.GetFeature(featureName);
+        if (feature == null)
         {
-            // Show message
+            return;
         }
-        else
-        {
-            UserDataChanged.InvokeAsync(UserData);
-        }
+
+        navigationManager.NavigateTo($"/Create{feature.Data.PageName}");
     }
 }

@@ -2,18 +2,57 @@
 
 @if (TileData == null) return;
 
-<MudItem xs="6" sm="4" md="3" xl="3" Style="height: 200px">
-    <MudPaper Height="100%" Class="pa-3">
-        <MudText Typo="Typo.h4">
-            @TileData.DisplayName
-        </MudText>
-        <MudText Typo="Typo.body1">
-            @TileData.Description
-        </MudText>
+<MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5">
+    <MudPaper Height="100%" Class="pa-3" Style="cursor: pointer;">
+        <MudGrid>
+            <MudItem xs="10" Class="pb-0 pt-2 justify-content-center align-content-center noSelect" @onclick="OpenFeature">
+                <MudText Typo="Typo.h5">
+                    @TileData.Data.UserGivenName
+                </MudText>
+            </MudItem>
+
+            <MudItem xs="2" Class="pa-0 justify-content-center align-content-center noSelect">
+                <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Class="pa-0">
+                    <MudMenuItem OnClick="RemoveFeature">
+                        Delete
+                    </MudMenuItem>
+                    <MudMenuItem>My account</MudMenuItem>
+                    <MudMenuItem>Logout</MudMenuItem>
+                </MudMenu>
+            </MudItem>
+
+            <MudItem xs="12" Class="pb-0 pt-0 noSelect" @onclick="OpenFeature">
+                <MudText Typo="Typo.caption">
+                    @TileData.Data.Name
+                </MudText>
+            </MudItem>
+
+            <MudItem xs="12" Class="noSelect" Style="height: 100px" @onclick="OpenFeature">
+                <MudText Typo="Typo.body1">
+                    @TileData.Data.UserGivenDescription
+                </MudText>
+            </MudItem>
+        </MudGrid>
     </MudPaper>
 </MudItem>
 
 @code {
     [Parameter]
-    public IFeatureData TileData { get; set; }
+    public IFeature TileData { get; set; }
+
+    [Parameter]
+    public EventCallback<IFeature> OnRemoveFeature { get; set; }
+
+    [Parameter]
+    public EventCallback<IFeature> OnOpenFeature { get; set; }
+
+    private void RemoveFeature()
+    {
+        OnRemoveFeature.InvokeAsync(TileData);
+    }
+
+    private void OpenFeature()
+    {
+        OnOpenFeature.InvokeAsync(TileData);
+    }
 }

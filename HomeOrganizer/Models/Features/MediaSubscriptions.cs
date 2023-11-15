@@ -2,18 +2,23 @@
 
 namespace HomeOrganizer.Models.Features
 {
-    public class MediaSubscriptions : IFeatureData
+    public class MediaSubscriptions : IFeature
     {
-        public string Name { get; } = "Media subscriptions";
-        public string DisplayName { get; set; } = "Media subscriptions";
-
-        public string Description { get; } = "Manage subcriptions for media like Netflix, HBO, Disney etc.";
-        public bool IsUsed { get; set; } = false;
-        public bool IsReusable { get; set; } = false;
-
-        public IFeatureData Create()
+        public FeatureData Data { get; set; } = new FeatureData()
         {
-            return new MediaSubscriptions();
+            PageName = "MediaSubscriptions",
+            Name = "Media subscriptions",
+            Description = "Manage subcriptions for media like Netflix, HBO, Disney etc.",
+            IsReusable = false,
+            IsUsed = false
+        };
+
+        public IFeature Create()
+        {
+            IFeature newFeature = new MediaSubscriptions();
+            newFeature.Data.IsUsed = true;
+
+            return newFeature;
         }
     }
 }

@@ -1,1 +1,69 @@
-﻿
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Communication;
+@using HomeOrganizer.Models.Features;
+@using HomeOrganizer.Models.User;
+
+@inject UserService userService
+@inject NavigationManager navigationManager
+
+@if (MediaSubscriptions == null)
+{
+    <MudPaper>
+        <MudText Typo="Typo.h6">
+            [Media Subscriptions Panel] Whoops... Media subscriptions are unknown!
+        </MudText>
+    </MudPaper>
+    return;
+}
+
+<MudText Typo="Typo.h6">
+    Media subscriptions: @MediaSubscriptions.Data.UserGivenName
+</MudText>
+<MudText Typo="Typo.body1">
+    You have @subscriptionsCount subscriptions!
+</MudText>
+<MudButton OnClick="AddSubscription">
+    <MudText Typo="Typo.button">
+        Add subscription
+    </MudText>
+</MudButton>
+
+@code {
+    [Parameter]
+    public MediaSubscriptions MediaSubscriptions { get; set; }
+
+    private int subscriptionsCount = 0;
+
+    private void AddSubscription()
+    {
+        subscriptionsCount++;
+    }
+
+    //private UserData User;
+
+    //protected override void OnInitialized()
+    //{
+    //    User = userService.LoggedUser;
+    //    base.OnInitialized();
+    //}
+
+    //private void CreateFeature()
+    //{
+    //    // Collect data from form and create feature
+    //    IFeature feature = new Subscriptions();
+    //    feature.Data.UserGivenName = "My expensive media";
+    //    feature.Data.UserGivenDescription = "They are very expensinve and it hurts me :(";
+    //    feature.Data.IsUsed = true;
+
+    //    Response addResponse = User.AddFeature(feature);
+    //    if (addResponse.Status)
+    //    {
+    //        userService.LoggedUser = User;
+    //        navigationManager.NavigateTo("/");
+    //    }
+    //    else
+    //    {
+    //        // Show message
+    //    }
+    //}
+}

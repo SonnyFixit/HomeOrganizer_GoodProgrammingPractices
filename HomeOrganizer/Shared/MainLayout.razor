@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using HomeOrganizer.Components
+@inherits LayoutComponentBase
 
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -8,6 +9,7 @@
 
 <div class="page" style="height:100%">
     <main style="height:100%">
+        <TopBar />
         @Body
     </main>
 </div>

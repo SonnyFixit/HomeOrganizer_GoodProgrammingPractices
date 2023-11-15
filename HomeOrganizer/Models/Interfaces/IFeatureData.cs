@@ -1,13 +1,8 @@
 ﻿namespace HomeOrganizer.Models.Interfaces
 {
-    public interface IFeatureData
+    public interface IFeature
     {
-        public string Name { get; }
-        public string DisplayName { get; set; }
-        public string Description { get; }
-        public bool IsUsed { get; set; }
-        public bool IsReusable { get; set; }
-
-        public IFeatureData Create();
+        public FeatureData Data { get; set; }
+        public IFeature Create();
     }
 }

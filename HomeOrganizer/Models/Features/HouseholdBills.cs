@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using HomeOrganizer.Models.Interfaces;
+﻿using HomeOrganizer.Models.Interfaces;
 
 namespace HomeOrganizer.Models.Features
 {
-    public class HouseholdBills : IFeatureData
+    public class HouseholdBills : IFeature
     {
-        public string Name { get; } = "Household bills";
-        public string DisplayName { get; set; } = "Household bills";
-
-        public string Description { get; } = "Manage bills for your household such as water, electricity etc.";
-        public bool IsUsed { get; set; } = false;
-        public bool IsReusable { get; set; } = false;
-
-        public IFeatureData Create()
+        public FeatureData Data { get; set; } = new FeatureData()
         {
-            return new HouseholdBills();
+            PageName = "Houshold",
+            Name = "Household bills",
+            Description = "Manage bills for your household such as water, electricity etc.",
+            IsReusable = true,
+            IsUsed = false
+        };
+
+        public IFeature Create()
+        {
+            IFeature newFeature = new HouseholdBills();
+            newFeature.Data.IsUsed = true;
+
+            return newFeature;
         }
     }
 }

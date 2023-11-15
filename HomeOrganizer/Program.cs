@@ -1,8 +1,12 @@
+using HomeOrganizer.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<UserService>();
+//builder.Services.AddSingleton<UserService>();
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddHubOptions(options =>

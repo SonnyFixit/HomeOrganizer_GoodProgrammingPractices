@@ -2,17 +2,23 @@
 
 namespace HomeOrganizer.Models.Features
 {
-    public class CarStatus : IFeatureData
+    public class CarStatus : IFeature
     {
-        public string Name { get; } = "Car status";
-        public string DisplayName { get; set; } = "Car status";
-        public string Description { get; } = "Control your car!";
-        public bool IsUsed { get; set; } = false;
-        public bool IsReusable { get; set; } = true;
-
-        public IFeatureData Create()
+        public FeatureData Data { get; set; } = new FeatureData()
         {
-            return new CarStatus();
+            PageName = "CarStatus",
+            Name = "Car status",
+            Description = "Control information about your car",
+            IsReusable = true,
+            IsUsed = false
+        };
+
+        public IFeature Create()
+        {
+            IFeature newFeature = new CarStatus();
+            newFeature.Data.IsUsed = true;
+
+            return newFeature;
         }
     }
 }
