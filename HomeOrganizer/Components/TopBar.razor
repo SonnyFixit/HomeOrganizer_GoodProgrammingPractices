@@ -58,8 +58,11 @@
 
     private void GoHome()
     {
-        User.OpenedFeature = null;
-        userService.LoggedUser = User;
+        if (User != null)
+        {
+            User.OpenedFeature = null;
+            userService.LoggedUser = User;
+        }
         navigationManager.NavigateTo("/");
     }
 

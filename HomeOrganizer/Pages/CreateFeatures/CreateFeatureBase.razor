@@ -1,0 +1,69 @@
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Communication;
+@using HomeOrganizer.Models.Features;
+@using HomeOrganizer.Models.User;
+
+@inject UserService userService
+@inject NavigationManager navigationManager
+
+@page "/CreateFeatureBase/{featureName}"
+
+@if (user == null || feature == null)
+{
+    <MudText Typo="Typo.h6">
+        SOMETHING WENT WRONG???????
+    </MudText>
+}
+else
+{
+    <MudText Typo="Typo.h6">
+        WELCOME @user.Name, ready to create @feature.Data.Name tile?
+    </MudText>
+    <MudButton OnClick="CreateFeature">
+        <MudText Typo="Typo.button">
+            Create Media Subscriptions Feature Tile
+        </MudText>
+    </MudButton>
+}
+
+@code {
+    [Parameter]
+    public string FeatureName { get; set; }
+
+    private UserData user;
+    private IFeature feature;
+
+
+    protected override void OnInitialized()
+    {
+        user = userService.LoggedUser;
+        feature = FeaturesList.CreateFeature(FeatureName);
+
+        base.OnInitialized();
+    }
+
+    private void CreateFeature()
+    {
+        feature.Data.UserGivenName = "Name from user";
+        feature.Data.UserGivenDescription = "Description from user";
+        feature.Data.IsUsed = true;
+
+        // Collect data from form and create feature
+        //IFeature feature = new FeatureThatImplements IFeature();
+        //feature.Data.UserGivenName = "Name from form";
+        //feature.Data.UserGivenDescription = "Description from form";
+        //feature.Data.IsUsed = true;
+
+        Response addResponse = user.AddFeature(feature);
+        if (addResponse.Status)
+        {
+            user.OpenedFeature = user.Features.Last();
+            userService.LoggedUser = user;
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            // Show message
+        }
+    }
+}

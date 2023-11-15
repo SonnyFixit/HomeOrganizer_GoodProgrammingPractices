@@ -1,9 +1,12 @@
 ﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Components.Dialogs;
 @using HomeOrganizer.Models.Communication;
 @using HomeOrganizer.Models.Interfaces;
 @using HomeOrganizer.Models.User;
 
 @inject NavigationManager navigationManager
+@inject IDialogService DialogService
+@inject UserService userService
 
 
 @if (UserData == null) return;
@@ -34,14 +37,33 @@
     [Parameter]
     public UserData UserData { get; set; }
 
-    private void AddFeature(string featureName)
-    {
-        IFeature feature = FeaturesList.GetFeature(featureName);
-        if (feature == null)
-        {
-            return;
-        }
+    //private void AddFeature(string featureName)
+    //{
+    //    var options = new DialogOptions { CloseOnEscapeKey = true };
+    //    var x = DialogService.Show<CreateTileDialog>($"Create {featureName} tile", options);
+    //    //navigationManager.NavigateTo($"/CreateFeatureBase/{featureName}");
+    //}
 
-        navigationManager.NavigateTo($"/Create{feature.Data.PageName}");
+    async Task AddFeature(string featureName)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<CreateTileDialog> { { d => d.FeatureName, featureName } };
+        var dialog = await DialogService.ShowAsync<CreateTileDialog>($"Create {featureName} tile", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (result.Canceled) return;
+        if (result.Data is not IFeature feature) return;
+
+        Response addResponse = UserData.AddFeature(feature);
+        if (addResponse.Status)
+        {
+            UserData.OpenedFeature = feature;
+            userService.LoggedUser = UserData;
+        }
+        else
+        {
+            //warning message
+        }
     }
 }

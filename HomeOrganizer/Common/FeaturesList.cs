@@ -14,9 +14,11 @@ namespace HomeOrganizer.Common
                 new CustomFeature(),
         };
 
-        public static IFeature GetFeature(string featureName)
+        public static IFeature CreateFeature(string featureName)
         {
-            return Features.FirstOrDefault(f => f.Data.Name == featureName);
+            IFeature feature = Features.FirstOrDefault(f => f.Data.Name == featureName);
+            if (feature == null) return null;
+            else return feature.Create();
         }
 
         public static bool CheckFeatureStatus(string featureName, int userUsage)

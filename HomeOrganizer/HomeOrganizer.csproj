@@ -15,6 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="Components\Dialogs\CreateTileDialog.razor" />
 		<None Include="Components\TopBar.razor" />
 	</ItemGroup>
 

@@ -40,10 +40,16 @@ namespace HomeOrganizer.Models.User
 
             int featureCounter = 2;
             string userGivenName = feature.Data.UserGivenName;
-            while (Features.Any(f => f.Data.UserGivenName == feature.Data.UserGivenName))
+            int max = 10;
+            while (Features.Any(f => f.Compare(feature)))
             {
                 feature.Data.UserGivenName = $"{userGivenName} - {featureCounter}";
                 featureCounter++;
+
+                if (featureCounter > max)
+                {
+                    return new Response(false, $"Too many features named {userGivenName}");
+                }
             }
 
             Features.Add(feature);
@@ -58,7 +64,7 @@ namespace HomeOrganizer.Models.User
                 return new Response(false, "Remove feature is unknown");
             }
 
-            IFeature? featureToDelete = Features.FirstOrDefault(f => f.Data.Name == feature.Data.Name && f.Data.UserGivenName == feature.Data.UserGivenName);
+            IFeature? featureToDelete = Features.FirstOrDefault(f => f.Compare(feature));
 
             if (featureToDelete == null)
             {
