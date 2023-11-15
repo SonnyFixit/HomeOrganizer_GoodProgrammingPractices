@@ -5,13 +5,13 @@
 <MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5">
     <MudPaper Height="100%" Class="pa-3" Style="cursor: pointer;">
         <MudGrid>
-            <MudItem xs="10" Class="pb-0 pt-2 justify-content-center align-content-center noSelect" @onclick="OpenFeature">
+            <MudItem xs="10" Class="py-0  d-flex align-center noSelect" @onclick="OpenFeature">
                 <MudText Typo="Typo.h5">
                     @TileData.Data.UserGivenName
                 </MudText>
             </MudItem>
 
-            <MudItem xs="2" Class="pa-0 justify-content-center align-content-center noSelect">
+            <MudItem xs="2" Class="pa-0 d-flex align-center justify-center noSelect">
                 <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft" Class="pa-0">
                     <MudMenuItem OnClick="RemoveFeature">
                         Delete
@@ -20,16 +20,20 @@
                 </MudMenu>
             </MudItem>
 
-            <MudItem xs="12" Class="pb-0 pt-0 noSelect" @onclick="OpenFeature">
+            <MudItem xs="12" Class="pb-0 pt-0 noSelect d-flex align-center" @onclick="OpenFeature">
                 <MudText Typo="Typo.caption">
                     @TileData.Data.Name
                 </MudText>
             </MudItem>
 
-            <MudItem xs="12" Class="noSelect" Style="height: 100px" @onclick="OpenFeature">
+            <MudItem xs="10" Class="noSelect  d-flex align-center" Style="height: 100px" @onclick="OpenFeature">
                 <MudText Typo="Typo.body1">
                     @TileData.Data.UserGivenDescription
                 </MudText>
+            </MudItem>
+
+            <MudItem xs="2" Class="pa-0 d-flex align-center justify-center">
+                <MudIcon Icon="@TileData.Data.Icon" Size="Size.Large" Class="mx-auto" />
             </MudItem>
         </MudGrid>
     </MudPaper>

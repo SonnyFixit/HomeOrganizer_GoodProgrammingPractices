@@ -37,18 +37,11 @@
     [Parameter]
     public UserData UserData { get; set; }
 
-    //private void AddFeature(string featureName)
-    //{
-    //    var options = new DialogOptions { CloseOnEscapeKey = true };
-    //    var x = DialogService.Show<CreateTileDialog>($"Create {featureName} tile", options);
-    //    //navigationManager.NavigateTo($"/CreateFeatureBase/{featureName}");
-    //}
-
     async Task AddFeature(string featureName)
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth = true, MaxWidth = MaxWidth.Medium };
         var parameters = new DialogParameters<CreateTileDialog> { { d => d.FeatureName, featureName } };
-        var dialog = await DialogService.ShowAsync<CreateTileDialog>($"Create {featureName} tile", parameters, options);
+        var dialog = await DialogService.ShowAsync<CreateTileDialog>($"Provide '{featureName}' data", parameters, options);
 
         var result = await dialog.Result;
 

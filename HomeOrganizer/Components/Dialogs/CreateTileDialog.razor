@@ -1,11 +1,38 @@
-﻿@using HomeOrganizer.Models.Features;
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Features;
+@using FluentValidation
+
 <MudDialog>
     <DialogContent>
-        Dialog Content
+        <MudForm Model="@model" @ref="@form" Validation="@(orderValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent>
+                <MudTextField @bind-Value="model.Name"
+                              For="@(() => model.Name)"
+                              Immediate="true"
+                              Label="Name" />
+
+                <MudTextField @bind-Value="model.Description"
+                              For="@(() => model.Description)"
+                              Immediate="true"
+                              Label="Description"
+                              Class="pt-3"
+                              Lines="3" />
+
+                <MudSelect FullWidth="false" T="string" Label="Icon" AnchorOrigin="Origin.BottomCenter" @bind-Value="model.Icon" Immediate="true" For="@(() => model.Icon)" Class="pt-3">
+                    @foreach (var icon in icons)
+                    {
+                        <MudSelectItem Value="@icon">
+                            <MudIcon Icon="@icon" Size="Size.Medium" />
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+
+            </MudCardContent>
+        </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+        <MudButton OnClick="Cancel" EndIcon="@Icons.Material.Filled.Close">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="CreateTile" EndIcon="@Icons.Material.Filled.CreateNewFolder">Add</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -13,17 +40,80 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter]
     public string FeatureName { get; set; }
-
     private IFeature feature;
+
+    MudForm form;
+    ModelFluentValidator orderValidator = new ModelFluentValidator();
+    UserPartFeatureData model = new UserPartFeatureData();
+
+    private class UserPartFeatureData
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Icon { get; set; } = MudBlazor.Icons.Material.Filled.QuestionMark;
+    }
 
     void Submit() => MudDialog.Close(DialogResult.Ok<IFeature>(feature));
     void Cancel() => MudDialog.Cancel();
 
+    private async Task CreateTile()
+    {
+        await form.Validate();
+        if (!form.IsValid) return;
+
+        feature.Data.UserGivenName = model.Name;
+        feature.Data.UserGivenDescription = model.Description;
+        feature.Data.Icon = model.Icon;
+        feature.Data.IsUsed = true;
+
+        MudDialog.Close(DialogResult.Ok<IFeature>(feature));
+    }
+
     protected override void OnInitialized()
     {
-        feature = new MediaSubscriptions();
-        feature.Data.UserGivenName = "Name from user";
-        feature.Data.UserGivenDescription = "Description from user";
-        feature.Data.IsUsed = true;
+        feature = FeaturesList.CreateFeature(FeatureName);
+    }
+
+    public static string[] icons = new string[]
+    {
+        MudBlazor.Icons.Material.Filled.QuestionMark,
+        MudBlazor.Icons.Material.Filled.Favorite,
+        MudBlazor.Icons.Material.Filled.Star,
+        MudBlazor.Icons.Material.Filled.Pets,
+        MudBlazor.Icons.Material.Filled.DirectionsCar,
+        MudBlazor.Icons.Material.Filled.Home,
+        MudBlazor.Icons.Material.Filled.Payments,
+        MudBlazor.Icons.Material.Filled.TagFaces,
+        MudBlazor.Icons.Material.Filled.Warning,
+    };
+
+    /// <summary>
+    /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
+    /// </summary>
+    /// <typeparam name="UserPartFeatureData"></typeparam>
+    private class ModelFluentValidator : AbstractValidator<UserPartFeatureData>
+    {
+        public ModelFluentValidator()
+        {
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .Length(1, 20);
+
+            RuleFor(x => x.Description)
+                .NotEmpty()
+                .Length(1, 100);
+
+            RuleFor(x => x.Icon)
+                .NotEmpty()
+                .Must(x => icons.Contains(x));
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<UserPartFeatureData>.CreateWithOptions((UserPartFeatureData)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
     }
 }

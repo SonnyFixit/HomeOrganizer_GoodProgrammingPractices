@@ -7,6 +7,7 @@
         public string Description { get; init; }
         public string UserGivenName { get; set; } = "UserGivenName";
         public string UserGivenDescription { get; set; } = "My feature about this and that, very helpful!";
+        public string Icon { get; set; } = MudBlazor.Icons.Material.Filled.QuestionMark;
         public bool IsUsed { get; set; }
         public bool IsReusable { get; set; }
 
