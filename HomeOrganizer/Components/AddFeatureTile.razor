@@ -1,0 +1,47 @@
+﻿@using HomeOrganizer.Models.Communication;
+@using HomeOrganizer.Models.Interfaces;
+@using HomeOrganizer.Models.User;
+
+@if (UserData == null) return;
+
+<MudItem xs="6" sm="4" md="3" xl="3" Style="height: 200px">
+    <MudMenu Style="width:100%;" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" Dense="true">
+        <ActivatorContent>
+            <MudPaper Width="200px" Height="100%" Class="pa-3 addFeatureTileContent mx-auto">
+                <MudText Typo="Typo.h1" Align="Align.Center" Class="noSelect" Style="line-height: 150px;">
+                    +
+                </MudText>
+            </MudPaper>
+        </ActivatorContent>
+        <ChildContent>
+            @foreach (var featureName in UserData.GetAvailableFeatures())
+            {
+                <MudMenuItem OnClick="((e)=>{ AddFeature(featureName); })">
+                    @featureName
+                </MudMenuItem>
+            }
+        </ChildContent>
+    </MudMenu>
+</MudItem>
+
+
+
+@code {
+    [Parameter]
+    public UserData UserData { get; set; }
+    [Parameter]
+    public EventCallback<UserData> UserDataChanged { get; set; }
+
+    private void AddFeature(string featureName)
+    {
+        Response addResponse = UserData.AddFeature(featureName);
+        if (!addResponse.Status)
+        {
+            // Show message
+        }
+        else
+        {
+            UserDataChanged.InvokeAsync(UserData);
+        }
+    }
+}

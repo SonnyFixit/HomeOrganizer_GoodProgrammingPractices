@@ -1,1 +1,19 @@
-﻿
+﻿@using HomeOrganizer.Models.Interfaces;
+
+@if (TileData == null) return;
+
+<MudItem xs="6" sm="4" md="3" xl="3" Style="height: 200px">
+    <MudPaper Height="100%" Class="pa-3">
+        <MudText Typo="Typo.h4">
+            @TileData.DisplayName
+        </MudText>
+        <MudText Typo="Typo.body1">
+            @TileData.Description
+        </MudText>
+    </MudPaper>
+</MudItem>
+
+@code {
+    [Parameter]
+    public IFeatureData TileData { get; set; }
+}

@@ -2,20 +2,27 @@
 <MudThemeProvider @bind-IsDarkMode="@isDarkMode" Theme="customTheme" />
 
 <MudAppBar Color="Color.Inherit" Fixed="false" Dense="true">
-    <MudButton StartIcon="@Icons.Material.Filled.Home" Color="Color.Inherit" ButtonType="ButtonType.Button" Link="\">
-        <MudText>
-            Home organizer
-        </MudText>
-    </MudButton>
+    <MudPaper Class="mud-theme-transparent" Elevation="0" Style="width:300px">
+        <MudButton StartIcon="@Icons.Material.Filled.Home" Color="Color.Inherit" ButtonType="ButtonType.Button" Href="\">
+            <MudText>
+                Home organizer
+            </MudText>
+        </MudButton>
+
+    </MudPaper>
     @if (User != null)
     {
         <MudSpacer />
-        <MudText>
-            @welcome
-        </MudText>
+        <MudPaper Class="mud-theme-transparent" Elevation="0" Width="300px" Height="100%" Style="line-height:48px">
+            <MudText Align="Align.Center" Style="line-height:48px">
+                @welcome
+            </MudText>
+        </MudPaper>
     }
     <MudSpacer />
-    <MudIconButton Icon=@themeButtonIcon Color="Color.Tertiary" Class="ma-4" T="bool" OnClick="ChangeThemeMode" Title="Change Theme Button" />
+    <MudPaper Class="mud-theme-transparent d-flex justify-end" Elevation="0" Width="300px" Height="100%" Style="line-height:48px">
+        <MudIconButton Icon=@themeButtonIcon Color="Color.Tertiary" T="bool" OnClick="ChangeThemeMode" Title="Change Theme Button" Class="ml-auto align-self-end" />
+    </MudPaper>
 </MudAppBar>
 
 @code {
@@ -25,7 +32,7 @@
 
     protected override Task OnParametersSetAsync()
     {
-        if (User != null)
+        if (User != null && welcome.Length == 0)
         {
             string[] welcomes = new string[] { "Hello", "Welcome", "Good day", "Yo, what's up", " Good to see you", "Welcome back" };
             welcome = $"{welcomes[Random.Shared.Next(welcomes.Length)]}, {User.Name}!";
