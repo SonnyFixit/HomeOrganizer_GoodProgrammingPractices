@@ -16,18 +16,18 @@ namespace HomeOrganizer.Common
 
         public static IFeature CreateFeature(string featureName)
         {
-            IFeature feature = Features.FirstOrDefault(f => f.Data.Name == featureName);
+            IFeature feature = Features.FirstOrDefault(f => f.FeatureData.Name == featureName);
             if (feature == null) return null;
             else return feature.Create();
         }
 
         public static bool CheckFeatureStatus(string featureName, int userUsage)
         {
-            IFeature? featureData = Features.FirstOrDefault(f => f.Data.Name == featureName) ?? throw new Exception($"Cannon identify feature called {featureName}!");
+            IFeature? featureData = Features.FirstOrDefault(f => f.FeatureData.Name == featureName) ?? throw new Exception($"Cannon identify feature called {featureName}!");
 
             if (userUsage == 0) return true;
-            if (featureData.Data.IsReusable) return true;
-            if (!featureData.Data.IsReusable && userUsage == 0) return true;
+            if (featureData.FeatureData.IsReusable) return true;
+            if (!featureData.FeatureData.IsReusable && userUsage == 0) return true;
             return false;
         }
 
@@ -37,7 +37,7 @@ namespace HomeOrganizer.Common
 
             foreach (var feature in Features)
             {
-                usage.Add(feature.Data.Name, 0);
+                usage.Add(feature.FeatureData.Name, 0);
             }
 
             return usage;

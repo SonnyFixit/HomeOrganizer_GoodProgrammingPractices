@@ -2,13 +2,15 @@
 {
     public interface IFeature
     {
-        public FeatureData Data { get; set; }
+        public FeatureData FeatureData { get; set; }
+        public TileData TileData { get; set; }
+
         public IFeature Create();
 
         public bool Compare(IFeature other)
         {
             if (other == null) return false;
-            return Data.Name == other.Data.Name && Data.UserGivenName == other.Data.UserGivenName;
+            return FeatureData.Name == other.FeatureData.Name && TileData.UserGivenName == other.TileData.UserGivenName;
         }
     }
 }

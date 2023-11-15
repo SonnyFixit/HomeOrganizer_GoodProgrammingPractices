@@ -2,37 +2,42 @@
 @using HomeOrganizer.Models.Features;
 @using FluentValidation
 
-<MudDialog>
+<MudDialog DefaultFocus="DefaultFocus.Element">
     <DialogContent>
         <MudForm Model="@model" @ref="@form" Validation="@(orderValidator.ValidateValue)" ValidationDelay="0">
             <MudCardContent>
                 <MudTextField @bind-Value="model.Name"
                               For="@(() => model.Name)"
                               Immediate="true"
-                              Label="Name" />
+                              Label="Name"
+                              Placeholder="Short and catchy name" />
 
                 <MudTextField @bind-Value="model.Description"
                               For="@(() => model.Description)"
                               Immediate="true"
                               Label="Description"
                               Class="pt-3"
-                              Lines="3" />
+                              Lines="3"
+                              Placeholder="What it is purpose of this feature for you?" />
 
-                <MudSelect FullWidth="false" T="string" Label="Icon" AnchorOrigin="Origin.BottomCenter" @bind-Value="model.Icon" Immediate="true" For="@(() => model.Icon)" Class="pt-3">
+            </MudCardContent>
+            <MudCardContent Style="width:160px; " Class="d-flex align-center justify-center">
+                <MudSelect FullWidth="false" T="string" Label="Icon" AnchorOrigin="Origin.BottomCenter" @bind-Value="model.Icon" Immediate="true" For="@(() => model.Icon)" Class="pt-3 test mx-0">
                     @foreach (var icon in icons)
                     {
                         <MudSelectItem Value="@icon">
-                            <MudIcon Icon="@icon" Size="Size.Medium" />
+                            <MudIcon Icon="@icon" Size="Size.Large" />
                         </MudSelectItem>
                     }
                 </MudSelect>
-
             </MudCardContent>
+
+
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" EndIcon="@Icons.Material.Filled.Close">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="CreateTile" EndIcon="@Icons.Material.Filled.CreateNewFolder">Add</MudButton>
+        <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined" Color="Color.Warning">Cancel</MudButton>
+        <MudButton Color="Color.Success" OnClick="CreateTile" EndIcon="@Icons.Material.Filled.CreateNewFolder" Variant="Variant.Outlined">Add</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -61,12 +66,34 @@
         await form.Validate();
         if (!form.IsValid) return;
 
-        feature.Data.UserGivenName = model.Name;
-        feature.Data.UserGivenDescription = model.Description;
-        feature.Data.Icon = model.Icon;
-        feature.Data.IsUsed = true;
+        feature.TileData.UserGivenName = model.Name;
+        feature.TileData.UserGivenDescription = CheckDescription(model.Description);
+        feature.TileData.Icon = model.Icon;
+        feature.FeatureData.IsUsed = true;
 
         MudDialog.Close(DialogResult.Ok<IFeature>(feature));
+    }
+
+    private string CheckDescription(string description)
+    {
+        if (description.Length <= 30) return description;
+        string newDescription = string.Empty;
+
+        for (int i = 0; i < description.Length; i += 30)
+        {
+            int maxRight = i + 30;
+            if (i + 30 > description.Length)
+            {
+                maxRight = description.Length;
+            }
+
+            string substring = description[i..maxRight];
+            newDescription += substring;
+            if (!substring.Contains(' '))
+                newDescription += " ";
+        }
+
+        return newDescription;
     }
 
     protected override void OnInitialized()

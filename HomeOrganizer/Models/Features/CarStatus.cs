@@ -4,7 +4,7 @@ namespace HomeOrganizer.Models.Features
 {
     public class CarStatus : IFeature
     {
-        public FeatureData Data { get; set; } = new FeatureData()
+        public FeatureData FeatureData { get; set; } = new FeatureData()
         {
             PageName = "CarStatus",
             Name = "Car status",
@@ -13,10 +13,12 @@ namespace HomeOrganizer.Models.Features
             IsUsed = false
         };
 
+        public TileData TileData { get; set; } = new TileData();
+
         public IFeature Create()
         {
             IFeature newFeature = new CarStatus();
-            newFeature.Data.IsUsed = true;
+            newFeature.FeatureData.IsUsed = true;
 
             return newFeature;
         }

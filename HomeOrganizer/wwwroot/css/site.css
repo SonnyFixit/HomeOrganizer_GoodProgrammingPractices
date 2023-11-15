@@ -16,3 +16,14 @@
 .addFeatureList {
     margin-bottom: 20px;
 }
+
+/* Opcjonalnie, aby zwiêkszyæ wielkoœæ samego pola wyboru */
+.test .mud-input .mud-select-input {
+    height: 50px;
+    padding-left: 25%;
+    /*padding: 42px;*/ /* Dowolny padding, aby zwiêkszyæ rozmiar pola wprowadzania */
+}
+
+.test2 .mud-card-content {
+    width: 160px;
+}

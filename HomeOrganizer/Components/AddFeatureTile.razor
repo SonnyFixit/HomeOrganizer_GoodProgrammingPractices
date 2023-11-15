@@ -1,7 +1,6 @@
 ﻿@using HomeOrganizer.Common;
 @using HomeOrganizer.Components.Dialogs;
 @using HomeOrganizer.Models.Communication;
-@using HomeOrganizer.Models.Interfaces;
 @using HomeOrganizer.Models.User;
 
 @inject NavigationManager navigationManager
@@ -11,11 +10,11 @@
 
 @if (UserData == null) return;
 
-<MudItem xs="6" sm="4" md="3" xl="3" Style="height: 200px">
+<MudItem xs="6" sm="4" md="3" xl="3" Style="height: 120px">
     <MudMenu Style="width:100%;" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" Dense="true">
         <ActivatorContent>
-            <MudPaper Width="200px" Height="100%" Class="pa-3 addFeatureTileContent mx-auto">
-                <MudText Typo="Typo.h1" Align="Align.Center" Class="noSelect" Style="line-height: 150px;">
+            <MudPaper Width="180px" Height="100%" Class="pa-3 addFeatureTileContent mx-auto">
+                <MudText Typo="Typo.h1" Align="Align.Center" Class="noSelect" Style="line-height: 60px;">
                     +
                 </MudText>
             </MudPaper>

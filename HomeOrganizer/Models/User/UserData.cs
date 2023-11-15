@@ -28,22 +28,22 @@ namespace HomeOrganizer.Models.User
                 return new Response(false, $"Feature is unavilable");
             }
 
-            if (!featuresUsage.ContainsKey(feature.Data.Name))
+            if (!featuresUsage.ContainsKey(feature.FeatureData.Name))
             {
-                return new Response(false, $"User does not contain {feature.Data.Name}");
+                return new Response(false, $"User does not contain {feature.FeatureData.Name}");
             }
 
-            if (!FeaturesList.CheckFeatureStatus(feature.Data.Name, featuresUsage[feature.Data.Name]))
+            if (!FeaturesList.CheckFeatureStatus(feature.FeatureData.Name, featuresUsage[feature.FeatureData.Name]))
             {
-                return new Response(false, $"Cannot create {feature.Data.Name} feature.");
+                return new Response(false, $"Cannot create {feature.FeatureData.Name} feature.");
             }
 
             int featureCounter = 2;
-            string userGivenName = feature.Data.UserGivenName;
+            string userGivenName = feature.TileData.UserGivenName;
             int max = 10;
             while (Features.Any(f => f.Compare(feature)))
             {
-                feature.Data.UserGivenName = $"{userGivenName} - {featureCounter}";
+                feature.TileData.UserGivenName = $"{userGivenName} - {featureCounter}";
                 featureCounter++;
 
                 if (featureCounter > max)
@@ -52,14 +52,15 @@ namespace HomeOrganizer.Models.User
                 }
             }
 
+            feature.TileData.Position = Features.Count;
             Features.Add(feature);
-            featuresUsage[feature.Data.Name]++;
-            return new Response(true, $"Created {feature.Data.Name}");
+            featuresUsage[feature.FeatureData.Name]++;
+            return new Response(true, $"Created {feature.FeatureData.Name}");
         }
 
         public Response RemoveFeature(IFeature feature)
         {
-            if (feature == null || feature.Data.Name.Length == 0)
+            if (feature == null || feature.FeatureData.Name.Length == 0)
             {
                 return new Response(false, "Remove feature is unknown");
             }
@@ -68,13 +69,22 @@ namespace HomeOrganizer.Models.User
 
             if (featureToDelete == null)
             {
-                return new Response(false, $"Features container does not contain feature {feature.Data.Name}, {feature.Data.UserGivenName}");
+                return new Response(false, $"User does not contain feature {feature.FeatureData.Name}, {feature.TileData.UserGivenName} (which is weird?)");
             }
 
-            featuresUsage[featureToDelete.Data.Name]--;
-            Features.Remove(featureToDelete);
+            featuresUsage[featureToDelete.FeatureData.Name]--;
 
-            return new Response(true, $"Feature {feature.Data.Name}, {feature.Data.UserGivenName} is removed");
+            var sorted = Features.OrderBy(f => f.TileData.Position).ToList();
+            int deletedIndex = sorted.IndexOf(featureToDelete);
+            sorted.Remove(featureToDelete);
+            for (int i = deletedIndex; i < sorted.Count; i++)
+            {
+                sorted[i].TileData.Position--;
+            }
+
+            Features = sorted;
+
+            return new Response(true, $"Feature {feature.FeatureData.Name}, {feature.TileData.UserGivenName} is removed");
         }
 
         public List<string> GetAvailableFeatures()

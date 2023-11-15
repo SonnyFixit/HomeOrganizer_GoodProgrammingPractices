@@ -1,13 +1,14 @@
-﻿@using HomeOrganizer.Models.Interfaces;
+﻿@using HomeOrganizer.Components.Dialogs;
+@inject IDialogService DialogService
 
-@if (TileData == null) return;
+@if (Feature == null) return;
 
 <MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5">
     <MudPaper Height="100%" Class="pa-3" Style="cursor: pointer;">
         <MudGrid>
             <MudItem xs="10" Class="py-0  d-flex align-center noSelect" @onclick="OpenFeature">
                 <MudText Typo="Typo.h5">
-                    @TileData.Data.UserGivenName
+                    @Feature.TileData.UserGivenName [@Feature.TileData.Position]
                 </MudText>
             </MudItem>
 
@@ -22,18 +23,18 @@
 
             <MudItem xs="12" Class="pb-0 pt-0 noSelect d-flex align-center" @onclick="OpenFeature">
                 <MudText Typo="Typo.caption">
-                    @TileData.Data.Name
+                    @Feature.FeatureData.Name
                 </MudText>
             </MudItem>
 
             <MudItem xs="10" Class="noSelect  d-flex align-center" Style="height: 100px" @onclick="OpenFeature">
-                <MudText Typo="Typo.body1">
-                    @TileData.Data.UserGivenDescription
+                <MudText Typo="Typo.body1" Style="text-wrap: wrap;">
+                    @Feature.TileData.UserGivenDescription
                 </MudText>
             </MudItem>
 
-            <MudItem xs="2" Class="pa-0 d-flex align-center justify-center">
-                <MudIcon Icon="@TileData.Data.Icon" Size="Size.Large" Class="mx-auto" />
+            <MudItem xs="2" Class="pa-0 d-flex align-center justify-center" @onclick="OpenFeature">
+                <MudIcon Icon="@Feature.TileData.Icon" Size="Size.Large" Class="mx-auto" />
             </MudItem>
         </MudGrid>
     </MudPaper>
@@ -41,7 +42,7 @@
 
 @code {
     [Parameter]
-    public IFeature TileData { get; set; }
+    public IFeature Feature { get; set; }
 
     [Parameter]
     public EventCallback<IFeature> OnRemoveFeature { get; set; }
@@ -49,13 +50,23 @@
     [Parameter]
     public EventCallback<IFeature> OnOpenFeature { get; set; }
 
-    private void RemoveFeature()
+    private async Task RemoveFeature()
     {
-        OnRemoveFeature.InvokeAsync(TileData);
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<DeleteConfirmDialog> { { f => f.Feature, Feature } };
+        var dialog = await DialogService.ShowAsync<DeleteConfirmDialog>("Confirm", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (result.Canceled) return;
+        if (result.Data is not bool shouldDelete) return;
+        if (!shouldDelete) return;
+
+        await OnRemoveFeature.InvokeAsync(Feature);
     }
 
     private void OpenFeature()
     {
-        OnOpenFeature.InvokeAsync(TileData);
+        OnOpenFeature.InvokeAsync(Feature);
     }
 }

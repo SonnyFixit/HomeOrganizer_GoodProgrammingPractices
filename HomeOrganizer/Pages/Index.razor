@@ -39,10 +39,10 @@ else
         <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
             <MudGrid>
 
-                @foreach (var feature in User.Features)
+                @foreach (var feature in User.Features.OrderBy(f => f.TileData.Position))
                 {
-                    if (feature == null || !feature.Data.IsUsed) continue;
-                    <FeatureTile TileData="@feature" OnRemoveFeature="HandleRemoveFeature" OnOpenFeature="HandleOpenFeature" />
+                    if (feature == null || !feature.FeatureData.IsUsed) continue;
+                    <FeatureTile Feature="@feature" OnRemoveFeature="HandleRemoveFeature" OnOpenFeature="HandleOpenFeature" />
                 }
 
             </MudGrid>
@@ -54,26 +54,30 @@ else
     else
     {
         <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
-            @switch (OpenedFeature.Data.Name)
+            @switch (OpenedFeature.FeatureData.Name)
             {
                 case "Media subscriptions":
                     <MediaSubscriptionsPanel MediaSubscriptions="(OpenedFeature as MediaSubscriptions)" />
                     break;
 
-                @* case "CarStatus":
-    <MediaSubscriptionsPanel MediaSubscriptions="(OpenedFeature as MediaSubscriptions)" />
-    break;*@
-
                 default:
-                    <MudPaper>
-                        <MudText>
-                            [Index] Whoops... Something went really really wrong!
-                            Cannot find feature: @OpenedFeature.Data.Name
-                        </MudText>
-                        <MudButton OnClick="((e)=>{OpenedFeature = null;})">
-                            Clear feature
-                        </MudButton>
+                    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Elevation="0">
+                        <MudPaper Width="500px" Height="200px" Class="pa-4 mt-16">
+                            <MudText Typo="Typo.h6">
+                                Whoops... Something went really really wrong!
+                            </MudText>
+                            <MudText Typo="Typo.body1" Class="mt-3">
+                                Cannot find feature '@OpenedFeature.FeatureData.Name', maybe it is under production?
+                            </MudText>
+                            <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-10" Elevation="0">
+
+                                <MudButton OnClick="((e)=>{OpenedFeature = null;})" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
+                                    Back home
+                                </MudButton>
+                            </MudPaper>
+                        </MudPaper>
                     </MudPaper>
+
                     break;
             }
         </MudContainer>
