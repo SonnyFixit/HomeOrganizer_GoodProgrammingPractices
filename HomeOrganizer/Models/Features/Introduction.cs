@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using HomeOrganizer.Common;
-using HomeOrganizer.Models.Interfaces;
+using HomeOrganizer.Models.Bases;
 
 using MongoDB.Bson.Serialization.Attributes;
 

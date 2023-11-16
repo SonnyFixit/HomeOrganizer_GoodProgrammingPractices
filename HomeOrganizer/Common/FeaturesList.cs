@@ -1,5 +1,5 @@
 ﻿using HomeOrganizer.Models.Features;
-using HomeOrganizer.Models.Interfaces;
+using HomeOrganizer.Models.Bases;
 
 namespace HomeOrganizer.Common
 {

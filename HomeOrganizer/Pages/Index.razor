@@ -1,10 +1,13 @@
 ﻿@using HomeOrganizer.Components
 @using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Components.Errors
 @using HomeOrganizer.Components.Features;
+@using HomeOrganizer.Models.Bases;
 @using HomeOrganizer.Models.Features;
 @using HomeOrganizer.Models.User;
 @using MudBlazor.Services;
 @using MyWebsiteBlazor.Data.Database;
+@using System.Reflection;
 
 @implements IDisposable
 
@@ -17,39 +20,7 @@
 
 @if (User == null)
 {
-    <MudContainer Class="content px-4" Style="height:90%" MaxWidth="MaxWidth.Large">
-
-        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:15%" Elevation="0">
-            <MudPaper Width="300px" Class="pa-4">
-                <MudText Typo="Typo.h6" Align="Align.Center">
-                    Home Organizer
-                </MudText>
-                <MudText Typo="Typo.body1" Class="mt-3" Align="Align.Center">
-                    Login or register account to use our application!
-                </MudText>
-                <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-3" Elevation="0">
-                    <MudStack>
-
-                        <MudTextField @bind-Value="userLogin"
-                                      For="@(() => userLogin)"
-                                      Immediate="true"
-                                      Label="Login"
-                                      Class="pt-3"
-                                      Placeholder="Provide login" />
-                        <MudButton Class="pt-1" OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
-                            Login
-                        </MudButton>
-                        <MudDivider Class="my-10" />
-                        <MudButton OnClick="RegisterUser" EndIcon="@Icons.Material.Filled.PersonAdd" IconColor="Color.Success" Variant="Variant.Outlined">
-                            Register
-                        </MudButton>
-                    </MudStack>
-
-                </MudPaper>
-            </MudPaper>
-        </MudPaper>
-
-    </MudContainer>
+    <WelcomeLoginRegister />
 }
 else
 {
@@ -87,48 +58,28 @@ else
     }
     else
     {
-        @* It need improvements? *@
         <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
-            @switch (User.OpenedFeature.FeatureData.Name)
+
+            @if (selectedType == null)
             {
-                case "Media subscriptions":
-                    <MediaSubscriptionsPanel MediaSubscriptions="(User.OpenedFeature as MediaSubscriptions)" />
-                    break;
-
-                case "Introduction":
-                    <IntroductionPanel Introduction="(User.OpenedFeature as Introduction)" />
-                    break;
-
-                default:
-                    @* <NoFeatureError/> *@
-                    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Elevation="0">
-                        <MudPaper Width="500px" Height="200px" Class="pa-4 mt-16">
-                            <MudText Typo="Typo.h6">
-                                Whoops... Something went really really wrong!
-                            </MudText>
-                            <MudText Typo="Typo.body1" Class="mt-3">
-                                Cannot find feature '@User.OpenedFeature.FeatureData.Name', maybe it is under production?
-                            </MudText>
-                            <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-10" Elevation="0">
-
-                                <MudButton OnClick="((e)=>{User.OpenedFeature = null;})" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
-                                    Back home
-                                </MudButton>
-                            </MudPaper>
-                        </MudPaper>
-                    </MudPaper>
-                    break;
+                <NoFeatureError />
             }
+            else
+            {
+                <DynamicComponent Type="@selectedType" Parameters="@parameters" />
+            }
+
         </MudContainer>
     }
 }
 
 @code {
-    private string userLogin = string.Empty;
-
     bool autoLoginAdming = false;
     protected UserData? User { get; set; }
     protected FeatureBase? DraggedFeature { get; set; }
+
+    private Type? selectedType = null;
+    private Dictionary<string, object>? parameters = new Dictionary<string, object>();
 
     private void HandleRemoveFeature(FeatureBase feature)
     {
@@ -139,11 +90,21 @@ else
     private void HandleOpenFeature(FeatureBase feature)
     {
         User.OpenedFeature = feature;
+        selectedType = Common.PanelManager.GetPanelType(User.OpenedFeature);
+        parameters = new Dictionary<string, object>()
+        {
+            {"FeatureBase", User.OpenedFeature}
+        };
     }
 
     private async void HandleUserUpdate()
     {
         User = userService.LoggedUser;
+        if (User != null && User.OpenedFeature == null)
+        {
+            selectedType = null;
+            parameters = null;
+        }
         StateHasChanged();
     }
 
@@ -152,41 +113,11 @@ else
         userService.OnChange -= HandleUserUpdate;
     }
 
-    private async Task LoginUser()
-    {
-        UserData? registeredUser = await DatabaseHandlerMongoDB.GetUser(userLogin);
-        if (registeredUser == null)
-        {
-            Console.WriteLine("HANDLE NON REGISTERED USER");
-            return;
-        }
-
-        User = registeredUser;
-        userService.LoggedUser = registeredUser;
-    }
-
-    private async Task RegisterUser()
-    {
-        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
-        var dialog = await DialogService.ShowAsync<RegisterUserDialog>("Registration", options);
-
-        var result = await dialog.Result;
-
-        if (result.Canceled) return;
-        if (result.Data is not UserData registeredUser) return;
-
-        await DatabaseHandlerMongoDB.CreateUser(registeredUser);
-        User = registeredUser;
-        userService.LoggedUser = registeredUser;
-        StateHasChanged();
-    }
-
     protected override void OnInitialized()
     {
-        User = userService.LoggedUser;
         userService.OnChange += HandleUserUpdate;
+        User = userService.LoggedUser;
 
-        if (autoLoginAdming && User == null) LoginUser();
         base.OnInitialized();
     }
 

@@ -2,7 +2,7 @@
 
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace HomeOrganizer.Models.Interfaces
+namespace HomeOrganizer.Models.Bases
 {
     [BsonDiscriminator(Required = true, RootClass = true)]
     [BsonKnownTypes(typeof(Introduction), typeof(CarStatus), typeof(PetStatus), typeof(MediaSubscriptions), typeof(HouseholdBills), typeof(CustomFeature))]

@@ -1,4 +1,5 @@
 ﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Bases;
 @using HomeOrganizer.Models.Communication;
 @using HomeOrganizer.Models.Features;
 @using HomeOrganizer.Models.User;
@@ -6,7 +7,7 @@
 @inject UserService userService
 @inject NavigationManager navigationManager
 
-@if (MediaSubscriptions == null)
+@if (mediaSubscriptions == null)
 {
     <MudPaper>
         <MudText Typo="Typo.h6">
@@ -17,7 +18,7 @@
 }
 
 <MudText Typo="Typo.h6">
-    Media subscriptions: @MediaSubscriptions.TileData.UserGivenName
+    Media subscriptions: @mediaSubscriptions.TileData.UserGivenName
 </MudText>
 <MudText Typo="Typo.body1">
     You have @subscriptionsCount subscriptions!
@@ -38,12 +39,22 @@
 
 @code {
     [Parameter]
-    public MediaSubscriptions MediaSubscriptions { get; set; }
+    public FeatureBase? FeatureBase { get; set; }
+    public MediaSubscriptions? mediaSubscriptions = null;
 
     private int subscriptionsCount = 0;
 
     private void AddSubscription()
     {
         subscriptionsCount++;
+    }
+
+    protected override void OnInitialized()
+    {
+        if (FeatureBase == null) return;
+        if (FeatureBase is not MediaSubscriptions receivedFeature) return;
+        mediaSubscriptions = receivedFeature;
+
+        base.OnInitialized();
     }
 }

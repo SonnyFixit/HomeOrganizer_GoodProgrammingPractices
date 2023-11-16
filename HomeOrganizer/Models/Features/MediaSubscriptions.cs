@@ -1,4 +1,4 @@
-﻿using HomeOrganizer.Models.Interfaces;
+﻿using HomeOrganizer.Models.Bases;
 
 namespace HomeOrganizer.Models.Features
 {

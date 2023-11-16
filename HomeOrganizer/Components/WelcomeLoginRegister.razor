@@ -1,0 +1,72 @@
+﻿@using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Models.User;
+@using MyWebsiteBlazor.Data.Database;
+
+@inject UserService userService
+@inject IDialogService dialogService
+
+<MudContainer Class="content px-4" Style="height:90%" MaxWidth="MaxWidth.Large">
+
+    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:15%" Elevation="0">
+        <MudPaper Width="300px" Class="pa-4">
+            <MudText Typo="Typo.h6" Align="Align.Center">
+                Home Organizer
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mt-3" Align="Align.Center">
+                Login or register account to use our application!
+            </MudText>
+            <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-3" Elevation="0">
+                <MudStack>
+
+                    <MudTextField @bind-Value="userLogin"
+                                  For="@(() => userLogin)"
+                                  Immediate="true"
+                                  Label="Login"
+                                  Class="pt-3"
+                                  Placeholder="Provide login"
+                                  OnKeyDown="LoginUser" />
+                    <MudButton Class="pt-1" OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
+                        Login
+                    </MudButton>
+                    <MudDivider Class="my-10" />
+                    <MudButton OnClick="RegisterUser" EndIcon="@Icons.Material.Filled.PersonAdd" IconColor="Color.Success" Variant="Variant.Outlined">
+                        Register
+                    </MudButton>
+                </MudStack>
+
+            </MudPaper>
+        </MudPaper>
+    </MudPaper>
+
+</MudContainer>
+
+@code {
+    private string userLogin = string.Empty;
+
+    private async Task LoginUser()
+    {
+        UserData? registeredUser = await DatabaseHandlerMongoDB.GetUser(userLogin);
+        if (registeredUser == null)
+        {
+            Console.WriteLine("HANDLE NON REGISTERED USER");
+            return;
+        }
+
+        userService.LoggedUser = registeredUser;
+    }
+
+    private async Task RegisterUser()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+        var dialog = await dialogService.ShowAsync<RegisterUserDialog>("Registration", options);
+
+        var result = await dialog.Result;
+
+        if (result.Canceled) return;
+        if (result.Data is not UserData registeredUser) return;
+
+        await DatabaseHandlerMongoDB.CreateUser(registeredUser);
+        userService.LoggedUser = registeredUser;
+        StateHasChanged();
+    }
+}

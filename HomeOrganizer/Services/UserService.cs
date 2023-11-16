@@ -1,4 +1,4 @@
-﻿using HomeOrganizer.Models.Interfaces;
+﻿using HomeOrganizer.Models.Bases;
 using HomeOrganizer.Models.User;
 
 using MyWebsiteBlazor.Data.Database;

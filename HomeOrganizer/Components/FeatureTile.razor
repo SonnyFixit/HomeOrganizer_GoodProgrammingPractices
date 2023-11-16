@@ -1,5 +1,7 @@
 ﻿@using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Models.Bases;
 @using HomeOrganizer.Models.User;
+
 @inject IDialogService DialogService
 @inject UserService userService
 
@@ -50,7 +52,7 @@
 
 @code {
     [Parameter]
-    public FeatureBase Feature { get; set; }
+    public FeatureBase? Feature { get; set; }
 
     [Parameter]
     public EventCallback<FeatureBase> OnRemoveFeature { get; set; }

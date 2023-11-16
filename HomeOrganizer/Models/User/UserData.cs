@@ -1,7 +1,7 @@
 ﻿using HomeOrganizer.Common;
 using HomeOrganizer.Models.Communication;
 using HomeOrganizer.Models.Features;
-using HomeOrganizer.Models.Interfaces;
+using HomeOrganizer.Models.Bases;
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;

@@ -7,7 +7,7 @@ using HomeOrganizer.Models.Communication;
 using HomeOrganizer.Models.User;
 using MongoDB.Bson.Serialization;
 using HomeOrganizer.Models.Features;
-using HomeOrganizer.Models.Interfaces;
+using HomeOrganizer.Models.Bases;
 
 namespace MyWebsiteBlazor.Data.Database
 {
