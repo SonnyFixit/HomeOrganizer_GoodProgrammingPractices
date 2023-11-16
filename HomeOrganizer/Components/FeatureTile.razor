@@ -50,13 +50,13 @@
 
 @code {
     [Parameter]
-    public IFeature Feature { get; set; }
+    public FeatureBase Feature { get; set; }
 
     [Parameter]
-    public EventCallback<IFeature> OnRemoveFeature { get; set; }
+    public EventCallback<FeatureBase> OnRemoveFeature { get; set; }
 
     [Parameter]
-    public EventCallback<IFeature> OnOpenFeature { get; set; }
+    public EventCallback<FeatureBase> OnOpenFeature { get; set; }
 
     private bool dragDropTarget = false;
 

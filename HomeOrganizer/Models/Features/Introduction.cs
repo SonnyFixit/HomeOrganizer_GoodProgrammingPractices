@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 using HomeOrganizer.Common;
 using HomeOrganizer.Models.Interfaces;
 
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace HomeOrganizer.Models.Features
 {
-    public class Introduction : IFeature
+    [BsonIgnoreExtraElements]
+    public class Introduction : FeatureBase
     {
-        public FeatureData FeatureData { get; set; } = new FeatureData()
+        public override FeatureData FeatureData { get; set; } = new FeatureData()
         {
             Name = "Introduction",
             Description = "First user's feature tile to play with and test it",
@@ -20,7 +23,7 @@ namespace HomeOrganizer.Models.Features
             PageName = "Introduction"
         };
 
-        public TileData TileData { get; set; } = new TileData()
+        public override TileData TileData { get; set; } = new TileData()
         {
             Icon = Constants.TileIcons["TagFaces"],
             UserGivenName = "Your first feature",
@@ -28,12 +31,12 @@ namespace HomeOrganizer.Models.Features
             Position = 0,
         };
 
-        public IFeature Create()
+        public override FeatureBase Create()
         {
             return new Introduction();
         }
 
-        public static IFeature CreateNew()
+        public static FeatureBase CreateNew()
         {
             return new Introduction();
         }

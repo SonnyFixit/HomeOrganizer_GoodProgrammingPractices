@@ -3,29 +3,43 @@ using HomeOrganizer.Models.Communication;
 using HomeOrganizer.Models.Features;
 using HomeOrganizer.Models.Interfaces;
 
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace HomeOrganizer.Models.User
 {
+    [BsonIgnoreExtraElements]
     public class UserData
     {
+        [BsonId]
+        public ObjectId Id { get; set; }
+
         public string Login { get; private set; } = "";
         public string Name { get; private set; } = "";
         public bool UseDarkTheme { get; set; } = true;
 
         private readonly Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
 
-        public IFeature? OpenedFeature { get; set; }
-        public List<IFeature> Features { get; set; }
+        public FeatureBase? OpenedFeature { get; set; }
+
+        public List<FeatureBase> Features { get; set; }
 
         public UserData()
         {
-            Features = new List<IFeature>
+            Features = new List<FeatureBase>
             {
                 Introduction.CreateNew()
             };
             featuresUsage = FeaturesList.FeaturesUsage();
         }
 
-        public Response AddFeature(IFeature feature)
+        public void SetRegisterData(string login, string name)
+        {
+            this.Login = login;
+            this.Name = name;
+        }
+
+        public Response AddFeature(FeatureBase feature)
         {
             if (feature == null)
             {
@@ -62,14 +76,14 @@ namespace HomeOrganizer.Models.User
             return new Response(true, $"Created {feature.FeatureData.Name}");
         }
 
-        public Response RemoveFeature(IFeature feature)
+        public Response RemoveFeature(FeatureBase feature)
         {
             if (feature == null || feature.FeatureData.Name.Length == 0)
             {
                 return new Response(false, "Remove feature is unknown");
             }
 
-            IFeature? featureToDelete = Features.FirstOrDefault(f => f.Compare(feature));
+            FeatureBase? featureToDelete = Features.FirstOrDefault(f => f.Compare(feature));
 
             if (featureToDelete == null)
             {

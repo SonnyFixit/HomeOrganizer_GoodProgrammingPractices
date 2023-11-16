@@ -1,13 +1,15 @@
 ﻿@using HomeOrganizer.Components
-@using HomeOrganizer.Components.Errors
-@using HomeOrganizer.Components.Features
+@using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Components.Features;
 @using HomeOrganizer.Models.Features;
 @using HomeOrganizer.Models.User;
 @using MudBlazor.Services;
+@using MyWebsiteBlazor.Data.Database;
 
 @implements IDisposable
 
 @inject UserService userService
+@inject IDialogService DialogService
 
 @page "/"
 
@@ -16,21 +18,36 @@
 @if (User == null)
 {
     <MudContainer Class="content px-4" Style="height:90%" MaxWidth="MaxWidth.Large">
-        @* // Very bad way to do this -> needs better solution!!!
-    // Maybe create component -> login panel? *@
-        <MudGrid Justify="Justify.Center" Class="align-content-center" Style="height:100%">
-            <MudItem>
-                <MudPaper Class="d-flex flex-column align-center justify-center mud-width-full py-8" Height="180px" Width="300px">
-                    <MudText Align="Align.Center" Typo="Typo.body1">
-                        Welcome on Home Organizer,
-                        register account to use our application!
-                    </MudText>
-                    <MudButton OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
-                        LOGIN
-                    </MudButton>
+
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:15%" Elevation="0">
+            <MudPaper Width="300px" Class="pa-4">
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    Home Organizer
+                </MudText>
+                <MudText Typo="Typo.body1" Class="mt-3" Align="Align.Center">
+                    Login or register account to use our application!
+                </MudText>
+                <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-3" Elevation="0">
+                    <MudStack>
+
+                        <MudTextField @bind-Value="userLogin"
+                                      For="@(() => userLogin)"
+                                      Immediate="true"
+                                      Label="Login"
+                                      Class="pt-3"
+                                      Placeholder="Provide login" />
+                        <MudButton Class="pt-1" OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
+                            Login
+                        </MudButton>
+                        <MudDivider Class="my-10" />
+                        <MudButton OnClick="RegisterUser" EndIcon="@Icons.Material.Filled.PersonAdd" IconColor="Color.Success" Variant="Variant.Outlined">
+                            Register
+                        </MudButton>
+                    </MudStack>
+
                 </MudPaper>
-            </MudItem>
-        </MudGrid>
+            </MudPaper>
+        </MudPaper>
 
     </MudContainer>
 }
@@ -107,17 +124,19 @@ else
 }
 
 @code {
-    bool autoLoginAdming = false;
-    protected UserData User { get; set; }
-    protected IFeature DraggedFeature { get; set; }
+    private string userLogin = string.Empty;
 
-    private void HandleRemoveFeature(IFeature feature)
+    bool autoLoginAdming = false;
+    protected UserData? User { get; set; }
+    protected FeatureBase? DraggedFeature { get; set; }
+
+    private void HandleRemoveFeature(FeatureBase feature)
     {
         User.RemoveFeature(feature);
         StateHasChanged();
     }
 
-    private void HandleOpenFeature(IFeature feature)
+    private void HandleOpenFeature(FeatureBase feature)
     {
         User.OpenedFeature = feature;
     }
@@ -133,10 +152,33 @@ else
         userService.OnChange -= HandleUserUpdate;
     }
 
-    private void LoginUser()
+    private async Task LoginUser()
     {
-        User = UserData.CreateAdmin();
-        userService.LoggedUser = User;
+        UserData? registeredUser = await DatabaseHandlerMongoDB.GetUser(userLogin);
+        if (registeredUser == null)
+        {
+            Console.WriteLine("HANDLE NON REGISTERED USER");
+            return;
+        }
+
+        User = registeredUser;
+        userService.LoggedUser = registeredUser;
+    }
+
+    private async Task RegisterUser()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+        var dialog = await DialogService.ShowAsync<RegisterUserDialog>("Registration", options);
+
+        var result = await dialog.Result;
+
+        if (result.Canceled) return;
+        if (result.Data is not UserData registeredUser) return;
+
+        await DatabaseHandlerMongoDB.CreateUser(registeredUser);
+        User = registeredUser;
+        userService.LoggedUser = registeredUser;
+        StateHasChanged();
     }
 
     protected override void OnInitialized()

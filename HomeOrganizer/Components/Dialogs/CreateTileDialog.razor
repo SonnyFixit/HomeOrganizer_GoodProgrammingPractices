@@ -45,7 +45,7 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter]
     public string FeatureName { get; set; }
-    private IFeature feature;
+    private FeatureBase feature;
 
     MudForm form;
     ModelFluentValidator orderValidator = new ModelFluentValidator();
@@ -58,7 +58,6 @@
         public string Icon { get; set; } = MudBlazor.Icons.Material.Filled.QuestionMark;
     }
 
-    void Submit() => MudDialog.Close(DialogResult.Ok<IFeature>(feature));
     void Cancel() => MudDialog.Cancel();
 
     private async Task CreateTile()
@@ -71,7 +70,7 @@
         feature.TileData.Icon = model.Icon;
         feature.FeatureData.IsUsed = true;
 
-        MudDialog.Close(DialogResult.Ok<IFeature>(feature));
+        MudDialog.Close(DialogResult.Ok<FeatureBase>(feature));
     }
 
     private string CheckDescription(string description)

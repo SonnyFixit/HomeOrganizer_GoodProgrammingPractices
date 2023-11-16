@@ -45,7 +45,7 @@
         var result = await dialog.Result;
 
         if (result.Canceled) return;
-        if (result.Data is not IFeature feature) return;
+        if (result.Data is not FeatureBase feature) return;
 
         Response addResponse = UserData.AddFeature(feature);
         if (addResponse.Status)

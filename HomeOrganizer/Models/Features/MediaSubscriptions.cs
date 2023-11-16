@@ -2,9 +2,9 @@
 
 namespace HomeOrganizer.Models.Features
 {
-    public class MediaSubscriptions : IFeature
+    public class MediaSubscriptions : FeatureBase
     {
-        public FeatureData FeatureData { get; set; } = new FeatureData()
+        public override FeatureData FeatureData { get; set; } = new FeatureData()
         {
             PageName = "MediaSubscriptions",
             Name = "Media subscriptions",
@@ -12,16 +12,16 @@ namespace HomeOrganizer.Models.Features
             IsReusable = false,
             IsUsed = false
         };
-        public TileData TileData { get; set; } = new TileData()
+        public override TileData TileData { get; set; } = new TileData()
         {
             Icon = MudBlazor.Icons.Material.Filled.Payments,
             UserGivenName = "Name for media subscriptions",
             UserGivenDescription = "Describe them",
         };
 
-        public IFeature Create()
+        public override FeatureBase Create()
         {
-            IFeature newFeature = new MediaSubscriptions();
+            FeatureBase newFeature = new MediaSubscriptions();
             newFeature.FeatureData.IsUsed = true;
 
             return newFeature;

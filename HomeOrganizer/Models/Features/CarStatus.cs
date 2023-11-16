@@ -2,9 +2,9 @@
 
 namespace HomeOrganizer.Models.Features
 {
-    public class CarStatus : IFeature
+    public class CarStatus : FeatureBase
     {
-        public FeatureData FeatureData { get; set; } = new FeatureData()
+        public override FeatureData FeatureData { get; set; } = new FeatureData()
         {
             PageName = "CarStatus",
             Name = "Car status",
@@ -13,16 +13,16 @@ namespace HomeOrganizer.Models.Features
             IsUsed = false
         };
 
-        public TileData TileData { get; set; } = new TileData()
+        public override TileData TileData { get; set; } = new TileData()
         {
             Icon = MudBlazor.Icons.Material.Filled.DirectionsCar,
             UserGivenName = "Name of your car",
             UserGivenDescription = "Describe your car in few words",
         };
 
-        public IFeature Create()
+        public override FeatureBase Create()
         {
-            IFeature newFeature = new CarStatus();
+            FeatureBase newFeature = new CarStatus();
             newFeature.FeatureData.IsUsed = true;
 
             return newFeature;

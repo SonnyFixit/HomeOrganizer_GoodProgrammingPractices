@@ -7,7 +7,7 @@ namespace HomeOrganizer.Services
     public class UserService
     {
         private UserData? loggedUser;
-        public IFeature DraggedFeatureTile { get; set; }
+        public FeatureBase DraggedFeatureTile { get; set; }
 
         public UserData? LoggedUser
         {

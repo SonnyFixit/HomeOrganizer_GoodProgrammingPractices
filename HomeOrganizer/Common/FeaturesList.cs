@@ -5,7 +5,7 @@ namespace HomeOrganizer.Common
 {
     public static class FeaturesList
     {
-        public static HashSet<IFeature> Features { get; } = new HashSet<IFeature>()
+        public static HashSet<FeatureBase> Features { get; } = new HashSet<FeatureBase>()
         {
                 new Introduction(),
                 new MediaSubscriptions(),
@@ -15,16 +15,16 @@ namespace HomeOrganizer.Common
                 new CustomFeature(),
         };
 
-        public static IFeature CreateFeature(string featureName)
+        public static FeatureBase CreateFeature(string featureName)
         {
-            IFeature feature = Features.FirstOrDefault(f => f.FeatureData.Name == featureName);
+            FeatureBase feature = Features.FirstOrDefault(f => f.FeatureData.Name == featureName);
             if (feature == null) return null;
             else return feature.Create();
         }
 
         public static bool CheckFeatureStatus(string featureName, int userUsage)
         {
-            IFeature? featureData = Features.FirstOrDefault(f => f.FeatureData.Name == featureName) ?? throw new Exception($"Cannon identify feature called {featureName}!");
+            FeatureBase? featureData = Features.FirstOrDefault(f => f.FeatureData.Name == featureName) ?? throw new Exception($"Cannon identify feature called {featureName}!");
 
             if (userUsage == 0) return true;
             if (featureData.FeatureData.IsReusable) return true;

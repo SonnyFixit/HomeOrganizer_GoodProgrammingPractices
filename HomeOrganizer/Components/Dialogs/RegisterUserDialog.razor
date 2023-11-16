@@ -1,0 +1,91 @@
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Features;
+@using FluentValidation
+@using HomeOrganizer.Models.User;
+@using MyWebsiteBlazor.Data.Database;
+
+<MudDialog DefaultFocus="DefaultFocus.FirstChild">
+    <DialogContent>
+        <MudForm Model="@model" @ref="@form" Validation="@(orderValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent>
+                <MudTextField @bind-Value="model.Login"
+                              For="@(() => model.Login)"
+                              Immediate="true"
+                              Label="Login"
+                              Placeholder="Your login" />
+
+                <MudTextField @bind-Value="model.Name"
+                              For="@(() => model.Name)"
+                              Immediate="true"
+                              Label="Name"
+                              Placeholder="How you wanne be called?" />
+
+            </MudCardContent>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined" Color="Color.Warning">Cancel</MudButton>
+        <MudSpacer />
+        <MudButton Color="Color.Success" OnClick="RegisterUser" EndIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Outlined">Register</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    MudForm form;
+    ModelFluentValidator orderValidator = new ModelFluentValidator();
+    UserRegisterModel model = new UserRegisterModel();
+
+    UserData createdUser = new UserData();
+
+    private class UserRegisterModel
+    {
+        public string Login { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task RegisterUser()
+    {
+        await form.Validate();
+        if (!form.IsValid) return;
+
+        createdUser.SetRegisterData(model.Login, model.Name);
+
+        MudDialog.Close(DialogResult.Ok<UserData>(createdUser));
+    }
+
+    /// <summary>
+    /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
+    /// </summary>
+    /// <typeparam name="UserRegisterModel"></typeparam>
+    private class ModelFluentValidator : AbstractValidator<UserRegisterModel>
+    {
+        public ModelFluentValidator()
+        {
+            RuleFor(x => x.Login)
+                .NotEmpty()
+                .MustAsync(async (x, cancel) => await UserDoesNotExist(x)).WithMessage($"User already exists")
+                .Length(3, 30);
+
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .Length(3, 30);
+        }
+
+        private async Task<bool> UserDoesNotExist(string login)
+        {
+            return !await DatabaseHandlerMongoDB.UserExists(login);
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<UserRegisterModel>.CreateWithOptions((UserRegisterModel)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+}

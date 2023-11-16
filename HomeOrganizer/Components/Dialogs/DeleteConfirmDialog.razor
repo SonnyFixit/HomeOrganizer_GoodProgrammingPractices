@@ -13,7 +13,7 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter]
-    public IFeature Feature { get; set; }
+    public FeatureBase Feature { get; set; }
 
     void Delete() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
