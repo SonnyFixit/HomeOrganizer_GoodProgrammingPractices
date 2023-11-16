@@ -128,7 +128,6 @@ namespace MyWebsiteBlazor.Data.Database
         public static async Task<bool> UserExists(string login)
         {
             UserData? registeredUser = await GetUser(login);
-            await Console.Out.WriteLineAsync($"User exists? {registeredUser != null}");
             return registeredUser != null;
         }
 
