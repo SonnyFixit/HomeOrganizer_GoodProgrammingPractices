@@ -4,11 +4,12 @@
 
 @inject UserService userService
 @inject IDialogService dialogService
+@inject ISnackbar snackbar
 
 <MudContainer Class="content px-4" Style="height:90%" MaxWidth="MaxWidth.Large">
 
-    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:15%" Elevation="0">
-        <MudPaper Width="300px" Class="pa-4">
+    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:15%;" Elevation="0">
+        <MudPaper Class="pa-4" Style="width:400px !important;">
             <MudText Typo="Typo.h6" Align="Align.Center">
                 Home Organizer
             </MudText>
@@ -16,7 +17,14 @@
                 Login or register account to use our application!
             </MudText>
             <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-3" Elevation="0">
-                <MudStack>
+                <MudStack Style="width:80%">
+                    @if (userNotFound && showUserNotFound)
+                    {
+                        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="my-2" OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true" CloseIconClicked="(()=>{showUserNotFound = false;})">
+                            User not found! <br>
+                            Click here for quick register
+                        </MudAlert>
+                    }
 
                     <MudTextField @bind-Value="userLogin"
                                   For="@(() => userLogin)"
@@ -24,7 +32,7 @@
                                   Label="Login"
                                   Class="pt-3"
                                   Placeholder="Provide login"
-                                  OnKeyDown="LoginUser" />
+                                  OnKeyDown="OnLoginEnter" />
                     <MudButton Class="pt-1" OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
                         Login
                     </MudButton>
@@ -42,15 +50,29 @@
 
 @code {
     private string userLogin = string.Empty;
+    private bool showUserNotFound = true;
+    private bool userNotFound = false;
+
+    private async Task OnLoginEnter(KeyboardEventArgs e)
+    {
+        if (e.Code != "Enter") return;
+
+        await LoginUser();
+    }
 
     private async Task LoginUser()
     {
+        if (userLogin.Length == 0) return;
+
         UserData? registeredUser = await DatabaseHandlerMongoDB.GetUser(userLogin);
         if (registeredUser == null)
         {
-            Console.WriteLine("HANDLE NON REGISTERED USER");
+            userNotFound = true;
+            showUserNotFound = true;
             return;
         }
+        userNotFound = false;
+        showUserNotFound = false;
 
         userService.LoggedUser = registeredUser;
     }
@@ -59,6 +81,22 @@
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
         var dialog = await dialogService.ShowAsync<RegisterUserDialog>("Registration", options);
+
+        var result = await dialog.Result;
+
+        if (result.Canceled) return;
+        if (result.Data is not UserData registeredUser) return;
+
+        await DatabaseHandlerMongoDB.CreateUser(registeredUser);
+        userService.LoggedUser = registeredUser;
+        StateHasChanged();
+    }
+
+    private async Task QuickRegister()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+        var parameters = new DialogParameters<RegisterUserDialog> { { d => d.QuickUserLogin, userLogin } };
+        var dialog = await dialogService.ShowAsync<RegisterUserDialog>("Registration", parameters, options);
 
         var result = await dialog.Result;
 

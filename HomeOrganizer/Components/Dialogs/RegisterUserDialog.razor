@@ -32,6 +32,7 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public string? QuickUserLogin { get; set; } = string.Empty;
 
     MudForm form;
     ModelFluentValidator orderValidator = new ModelFluentValidator();
@@ -39,13 +40,21 @@
 
     UserData createdUser = new UserData();
 
-    private class UserRegisterModel
-    {
-        public string Login { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-    }
 
     void Cancel() => MudDialog.Cancel();
+    protected override void OnInitialized()
+    {
+        if (QuickUserLogin != null && QuickUserLogin.Length > 0)
+        {
+            model.Login = QuickUserLogin;
+            model.Name = QuickUserLogin;
+
+            if (form != null)
+                form.Validate();
+        }
+
+        base.OnInitialized();
+    }
 
     private async Task RegisterUser()
     {
@@ -57,6 +66,11 @@
         MudDialog.Close(DialogResult.Ok<UserData>(createdUser));
     }
 
+    private class UserRegisterModel
+    {
+        public string Login { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
     /// <summary>
     /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
     /// </summary>
