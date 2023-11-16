@@ -7,6 +7,7 @@ namespace HomeOrganizer.Common
     {
         public static HashSet<IFeature> Features { get; } = new HashSet<IFeature>()
         {
+                new Introduction(),
                 new MediaSubscriptions(),
                 new HouseholdBills(),
                 new CarStatus(),

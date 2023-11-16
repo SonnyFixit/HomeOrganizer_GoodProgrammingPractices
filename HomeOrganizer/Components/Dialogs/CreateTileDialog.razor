@@ -23,7 +23,7 @@
             </MudCardContent>
             <MudCardContent Style="width:160px; " Class="d-flex align-center justify-center">
                 <MudSelect FullWidth="false" T="string" Label="Icon" AnchorOrigin="Origin.BottomCenter" @bind-Value="model.Icon" Immediate="true" For="@(() => model.Icon)" Class="pt-3 test mx-0">
-                    @foreach (var icon in icons)
+                    @foreach (var icon in Constants.TileIcons.Values)
                     {
                         <MudSelectItem Value="@icon">
                             <MudIcon Icon="@icon" Size="Size.Large" />
@@ -102,18 +102,7 @@
         model.Icon = feature.TileData.Icon;
     }
 
-    public static string[] icons = new string[]
-    {
-        MudBlazor.Icons.Material.Filled.QuestionMark,
-        MudBlazor.Icons.Material.Filled.Favorite,
-        MudBlazor.Icons.Material.Filled.Star,
-        MudBlazor.Icons.Material.Filled.Pets,
-        MudBlazor.Icons.Material.Filled.DirectionsCar,
-        MudBlazor.Icons.Material.Filled.Home,
-        MudBlazor.Icons.Material.Filled.Payments,
-        MudBlazor.Icons.Material.Filled.TagFaces,
-        MudBlazor.Icons.Material.Filled.Warning,
-    };
+
 
     /// <summary>
     /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
@@ -132,7 +121,7 @@
 
             RuleFor(x => x.Icon)
                 .NotEmpty()
-                .Must(x => icons.Contains(x));
+                .Must(x => Constants.TileIcons.Values.Contains(x));
         }
 
         public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>

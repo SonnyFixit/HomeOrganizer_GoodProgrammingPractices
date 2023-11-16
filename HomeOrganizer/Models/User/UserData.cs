@@ -1,5 +1,6 @@
 ﻿using HomeOrganizer.Common;
 using HomeOrganizer.Models.Communication;
+using HomeOrganizer.Models.Features;
 using HomeOrganizer.Models.Interfaces;
 
 namespace HomeOrganizer.Models.User
@@ -17,7 +18,10 @@ namespace HomeOrganizer.Models.User
 
         public UserData()
         {
-            Features = new List<IFeature>();
+            Features = new List<IFeature>
+            {
+                Introduction.CreateNew()
+            };
             featuresUsage = FeaturesList.FeaturesUsage();
         }
 
