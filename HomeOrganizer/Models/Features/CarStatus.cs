@@ -13,7 +13,12 @@ namespace HomeOrganizer.Models.Features
             IsUsed = false
         };
 
-        public TileData TileData { get; set; } = new TileData();
+        public TileData TileData { get; set; } = new TileData()
+        {
+            Icon = MudBlazor.Icons.Material.Filled.DirectionsCar,
+            UserGivenName = "Name of your car",
+            UserGivenDescription = "Describe your car in few words",
+        };
 
         public IFeature Create()
         {

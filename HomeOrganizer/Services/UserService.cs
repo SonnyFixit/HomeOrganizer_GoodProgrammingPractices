@@ -1,4 +1,5 @@
-﻿using HomeOrganizer.Models.User;
+﻿using HomeOrganizer.Models.Interfaces;
+using HomeOrganizer.Models.User;
 
 namespace HomeOrganizer.Services
 {
@@ -6,6 +7,7 @@ namespace HomeOrganizer.Services
     public class UserService
     {
         private UserData? loggedUser;
+        public IFeature DraggedFeatureTile { get; set; }
 
         public UserData? LoggedUser
         {

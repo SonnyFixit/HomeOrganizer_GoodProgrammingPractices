@@ -1,4 +1,5 @@
 using HomeOrganizer.Services;
+
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -12,8 +12,12 @@ namespace HomeOrganizer.Models.Features
             IsReusable = true,
             IsUsed = false
         };
-        public TileData TileData { get; set; } = new TileData();
-
+        public TileData TileData { get; set; } = new TileData()
+        {
+            Icon = MudBlazor.Icons.Material.Filled.QuestionMark,
+            UserGivenName = "Feature name",
+            UserGivenDescription = "Describe purpose of feature",
+        };
         public IFeature Create()
         {
             IFeature newFeature = new CustomFeature();

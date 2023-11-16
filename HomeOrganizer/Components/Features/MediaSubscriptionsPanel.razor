@@ -28,6 +28,28 @@
     </MudText>
 </MudButton>
 
+<MudPaper Class="mud-theme-primary">
+    XD
+</MudPaper>
+@* <MudGrid Class="h-100" Style="height:90%">
+    <MudItem xs="3" Style="height:300px;" draggable="true">
+        <MudPaper Height="100%">
+            <MudText Align="Align.Center">
+                Drag me!
+            </MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+ *@
+
+<div class="container" style="height:90%">
+    <div class="row" style="height: 100px">
+        <div style="height: 100%; width: 200px; background-color:red;" draggable="true">
+            TEXT
+        </div>
+    </div>
+</div>
+
 @code {
     [Parameter]
     public MediaSubscriptions MediaSubscriptions { get; set; }

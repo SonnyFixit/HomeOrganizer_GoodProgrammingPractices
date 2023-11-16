@@ -2,7 +2,7 @@
 @using HomeOrganizer.Models.Features;
 @using FluentValidation
 
-<MudDialog DefaultFocus="DefaultFocus.Element">
+<MudDialog DefaultFocus="DefaultFocus.FirstChild">
     <DialogContent>
         <MudForm Model="@model" @ref="@form" Validation="@(orderValidator.ValidateValue)" ValidationDelay="0">
             <MudCardContent>
@@ -10,7 +10,7 @@
                               For="@(() => model.Name)"
                               Immediate="true"
                               Label="Name"
-                              Placeholder="Short and catchy name" />
+                              Placeholder=@feature.TileData.UserGivenName />
 
                 <MudTextField @bind-Value="model.Description"
                               For="@(() => model.Description)"
@@ -18,7 +18,7 @@
                               Label="Description"
                               Class="pt-3"
                               Lines="3"
-                              Placeholder="What it is purpose of this feature for you?" />
+                              Placeholder=@feature.TileData.UserGivenDescription />
 
             </MudCardContent>
             <MudCardContent Style="width:160px; " Class="d-flex align-center justify-center">
@@ -53,8 +53,8 @@
 
     private class UserPartFeatureData
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public string Icon { get; set; } = MudBlazor.Icons.Material.Filled.QuestionMark;
     }
 
@@ -99,6 +99,7 @@
     protected override void OnInitialized()
     {
         feature = FeaturesList.CreateFeature(FeatureName);
+        model.Icon = feature.TileData.Icon;
     }
 
     public static string[] icons = new string[]
@@ -127,8 +128,7 @@
                 .Length(1, 20);
 
             RuleFor(x => x.Description)
-                .NotEmpty()
-                .Length(1, 100);
+                .Length(0, 100);
 
             RuleFor(x => x.Icon)
                 .NotEmpty()

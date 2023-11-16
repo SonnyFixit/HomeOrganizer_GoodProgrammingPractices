@@ -34,9 +34,9 @@
 }
 else
 {
-    if (OpenedFeature == null)
+    if (User.OpenedFeature == null)
     {
-        <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
+        @*         <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
             <MudGrid>
 
                 @foreach (var feature in User.Features.OrderBy(f => f.TileData.Position))
@@ -49,15 +49,31 @@ else
             <MudGrid Justify="Justify.Center" Style="margin-top: auto;">
                 <AddFeatureTile UserData="User" />
             </MudGrid>
+        </MudContainer> *@
+
+        <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
+            <MudGrid>
+
+                @foreach (var feature in User.Features.OrderBy(f => f.TileData.Position))
+                {
+                    if (feature == null || !feature.FeatureData.IsUsed) continue;
+                    <FeatureTile Feature="@feature" OnRemoveFeature="HandleRemoveFeature" OnOpenFeature="HandleOpenFeature" />
+                }
+
+            </MudGrid>
+            <MudGrid Justify="Justify.Center" Style="margin-top: auto;">
+
+                <AddFeatureTile UserData="User" />
+            </MudGrid>
         </MudContainer>
     }
     else
     {
         <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
-            @switch (OpenedFeature.FeatureData.Name)
+            @switch (User.OpenedFeature.FeatureData.Name)
             {
                 case "Media subscriptions":
-                    <MediaSubscriptionsPanel MediaSubscriptions="(OpenedFeature as MediaSubscriptions)" />
+                    <MediaSubscriptionsPanel MediaSubscriptions="(User.OpenedFeature as MediaSubscriptions)" />
                     break;
 
                 default:
@@ -67,11 +83,11 @@ else
                                 Whoops... Something went really really wrong!
                             </MudText>
                             <MudText Typo="Typo.body1" Class="mt-3">
-                                Cannot find feature '@OpenedFeature.FeatureData.Name', maybe it is under production?
+                                Cannot find feature '@User.OpenedFeature.FeatureData.Name', maybe it is under production?
                             </MudText>
                             <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-10" Elevation="0">
 
-                                <MudButton OnClick="((e)=>{OpenedFeature = null;})" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
+                                <MudButton OnClick="((e)=>{User.OpenedFeature = null;})" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
                                     Back home
                                 </MudButton>
                             </MudPaper>
@@ -85,9 +101,15 @@ else
 }
 
 @code {
+
+    private void ItemUpdated(MudItemDropInfo<IFeature> dropItem)
+    {
+        dropItem.Item.TileData.Position = dropItem.IndexInZone;
+    }
+
     bool autoLoginAdming = false;
     protected UserData User { get; set; }
-    protected IFeature OpenedFeature { get; set; }
+    protected IFeature DraggedFeature { get; set; }
 
     private void HandleRemoveFeature(IFeature feature)
     {
@@ -97,17 +119,12 @@ else
 
     private void HandleOpenFeature(IFeature feature)
     {
-        OpenedFeature = feature;
+        User.OpenedFeature = feature;
     }
 
     private async void HandleUserUpdate()
     {
         User = userService.LoggedUser;
-        if (User != null)
-        {
-            OpenedFeature = User.OpenedFeature;
-        }
-
         StateHasChanged();
     }
 

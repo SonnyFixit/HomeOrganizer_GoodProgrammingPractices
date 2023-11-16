@@ -12,7 +12,12 @@ namespace HomeOrganizer.Models.Features
             IsReusable = false,
             IsUsed = false
         };
-        public TileData TileData { get; set; } = new TileData();
+        public TileData TileData { get; set; } = new TileData()
+        {
+            Icon = MudBlazor.Icons.Material.Filled.Payments,
+            UserGivenName = "Name for media subscriptions",
+            UserGivenDescription = "Describe them",
+        };
 
         public IFeature Create()
         {

@@ -1,10 +1,18 @@
 ﻿@using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Models.User;
 @inject IDialogService DialogService
+@inject UserService userService
 
 @if (Feature == null) return;
 
 <MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5">
-    <MudPaper Height="100%" Class="pa-3" Style="cursor: pointer;">
+    <MudCard Height="100%" Class="pa-3" Style="cursor: pointer; overflow:hidden;"
+             draggable="true" dropzone="move"
+    @ondragstart="HandleDragStart"
+    @ondragenter="HandleDragEnter"
+    @ondragleave="HandleDragLeave"
+             ondragover="event.preventDefault();"
+    @ondrop="HandleDrop">
         <MudGrid>
             <MudItem xs="10" Class="py-0  d-flex align-center noSelect" @onclick="OpenFeature">
                 <MudText Typo="Typo.h5">
@@ -28,7 +36,7 @@
             </MudItem>
 
             <MudItem xs="10" Class="noSelect  d-flex align-center" Style="height: 100px" @onclick="OpenFeature">
-                <MudText Typo="Typo.body1" Style="text-wrap: wrap;">
+                <MudText Typo="Typo.body1">
                     @Feature.TileData.UserGivenDescription
                 </MudText>
             </MudItem>
@@ -37,7 +45,7 @@
                 <MudIcon Icon="@Feature.TileData.Icon" Size="Size.Large" Class="mx-auto" />
             </MudItem>
         </MudGrid>
-    </MudPaper>
+    </MudCard>
 </MudItem>
 
 @code {
@@ -49,6 +57,8 @@
 
     [Parameter]
     public EventCallback<IFeature> OnOpenFeature { get; set; }
+
+    private bool dragDropTarget = false;
 
     private async Task RemoveFeature()
     {
@@ -67,6 +77,44 @@
 
     private void OpenFeature()
     {
+        if (userService.DraggedFeatureTile != null) return;
         OnOpenFeature.InvokeAsync(Feature);
+    }
+
+    private void HandleDrop(DragEventArgs e)
+    {
+        if (userService.DraggedFeatureTile == null) return;
+        if (userService.DraggedFeatureTile == Feature) return;
+
+        int dragPosition = userService.DraggedFeatureTile.TileData.Position;
+        int dropPosition = Feature.TileData.Position;
+        var sortedFeatures = userService.LoggedUser.Features.OrderBy(f => f.TileData.Position).ToList();
+
+        int direction = dragPosition > dropPosition ? 1 : -1;
+
+        for (int i = dropPosition; i != dragPosition; i += direction)
+        {
+            sortedFeatures[i].TileData.Position += direction;
+        }
+        sortedFeatures[dragPosition].TileData.Position = dropPosition;
+        UserData tmpUser = userService.LoggedUser;
+        tmpUser.Features = sortedFeatures;
+        userService.LoggedUser = tmpUser;
+        userService.DraggedFeatureTile = null;
+    }
+
+    private void HandleDragStart(DragEventArgs e)
+    {
+        userService.DraggedFeatureTile = Feature;
+    }
+
+    private void HandleDragEnter(DragEventArgs e)
+    {
+        // Changle classes of tiles
+    }
+
+    private void HandleDragLeave(DragEventArgs e)
+    {
+        // Remove changed classes
     }
 }

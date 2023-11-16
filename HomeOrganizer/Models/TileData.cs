@@ -12,5 +12,9 @@ namespace HomeOrganizer.Models
         public string UserGivenName { get; set; } = "Name given by User";
         public string UserGivenDescription { get; set; } = "My feature about this and that, very helpful!";
         public string Icon { get; set; } = MudBlazor.Icons.Material.Filled.QuestionMark;
+
+        // Icon color
+
+        // Tile color
     }
 }

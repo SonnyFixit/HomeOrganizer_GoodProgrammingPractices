@@ -13,7 +13,7 @@ namespace HomeOrganizer.Models.User
         private readonly Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
 
         public IFeature? OpenedFeature { get; set; }
-        public List<IFeature> Features { get; private set; }
+        public List<IFeature> Features { get; set; }
 
         public UserData()
         {
