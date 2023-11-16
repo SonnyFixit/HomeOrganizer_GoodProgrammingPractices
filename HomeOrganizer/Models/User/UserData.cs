@@ -31,12 +31,13 @@ namespace HomeOrganizer.Models.User
                 Introduction.CreateNew()
             };
             featuresUsage = FeaturesList.FeaturesUsage();
+            featuresUsage[Features[0].FeatureData.Name] += 2; // Prevent from creating new Introduction tiles
         }
 
         public void SetRegisterData(string login, string name)
         {
-            this.Login = login;
-            this.Name = name;
+            Login = login;
+            Name = name;
         }
 
         public Response AddFeature(FeatureBase feature)

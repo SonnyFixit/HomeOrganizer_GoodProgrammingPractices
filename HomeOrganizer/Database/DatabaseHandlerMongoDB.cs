@@ -28,62 +28,7 @@ namespace MyWebsiteBlazor.Data.Database
 
         static DatabaseHandlerMongoDB()
         {
-            //BsonClassMap.RegisterClassMap<IFeature>(cm =>
-            //{
-            //    cm.AutoMap();
-            //    cm.SetIsRootClass(true);
-            //});
-
-            // Dodaj niestandardowe mapowanie dla klasy UserData
-            //BsonClassMap.RegisterClassMap<UserData>(cm =>
-            //{
-            //    cm.AutoMap();
-            //    cm.MapMember(p => p.Features).SetElementName("features");
-            //});
-
             db = new MongoClient(connectionString).GetDatabase(databaseName);
-
-            //BsonClassMap.RegisterClassMap<Introduction>(cm =>
-            //{
-            //    cm.SetDiscriminator("Introduction");
-            //    cm.AutoMap();
-            //    cm.SetIgnoreExtraElements(true);
-            //});
-
-            //BsonClassMap.RegisterClassMap<CarStatus>(cm =>
-            //{
-            //    cm.SetDiscriminator("CarStatus");
-            //    cm.AutoMap();
-            //    cm.SetIgnoreExtraElements(true);
-            //});
-
-            //BsonClassMap.RegisterClassMap<MediaSubscriptions>(cm =>
-            //{
-            //    cm.SetDiscriminator("MediaSubscriptions");
-            //    cm.AutoMap();
-            //    cm.SetIgnoreExtraElements(true);
-            //});
-
-            //BsonClassMap.RegisterClassMap<CustomFeature>(cm =>
-            //{
-            //    cm.SetDiscriminator("CustomFeature");
-            //    cm.AutoMap();
-            //    cm.SetIgnoreExtraElements(true);
-            //});
-
-            //BsonClassMap.RegisterClassMap<HouseholdBills>(cm =>
-            //{
-            //    cm.SetDiscriminator("HouseholdBills");
-            //    cm.AutoMap();
-            //    cm.SetIgnoreExtraElements(true);
-            //});
-
-            //BsonClassMap.RegisterClassMap<PetStatus>(cm =>
-            //{
-            //    cm.SetDiscriminator("PetStatus");
-            //    cm.AutoMap();
-            //    cm.SetIgnoreExtraElements(true);
-            //});
         }
 
 
@@ -112,6 +57,19 @@ namespace MyWebsiteBlazor.Data.Database
                 await Console.Out.WriteLineAsync(e.ToString());
             }
             return new Response(true, $"User {newUser.Login} added to database!");
+        }
+
+        public static async Task<Response> UpdateUser(UserData updatedUser)
+        {
+            try
+            {
+                await db.GetCollection<UserData>("Users").ReplaceOneAsync(p => p.Login == updatedUser.Login, updatedUser);
+                return new Response(true, $"User {updatedUser.Login} succesfully updated!");
+            }
+            catch (Exception e)
+            {
+                return new Response(false, $"Can't update {updatedUser.Login}! Error: {e.Message}");
+            }
         }
 
         public static async Task<UserData?> GetUser(string login)

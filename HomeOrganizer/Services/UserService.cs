@@ -1,6 +1,8 @@
 ﻿using HomeOrganizer.Models.Interfaces;
 using HomeOrganizer.Models.User;
 
+using MyWebsiteBlazor.Data.Database;
+
 namespace HomeOrganizer.Services
 {
     // UserService.cs
@@ -21,6 +23,10 @@ namespace HomeOrganizer.Services
 
         public event Action? OnChange;
 
-        private void NotifyStateChanged() => OnChange?.Invoke();
+        private void NotifyStateChanged()
+        {
+            DatabaseHandlerMongoDB.UpdateUser(loggedUser);
+            OnChange?.Invoke();
+        }
     }
 }
