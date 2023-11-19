@@ -13,7 +13,7 @@
             </MudText>
         </MudButton>
 
-        <MudToggleIconButton @bind-Toggled="@IsDarkMode"
+        <MudToggleIconButton ToggledChanged="@UpdateUserTheme"
                              Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
                              ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
 
