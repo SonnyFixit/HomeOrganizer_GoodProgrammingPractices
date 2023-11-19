@@ -16,12 +16,4 @@
 		<PackageReference Include="MudBlazor" Version="6.11.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Include="wwwroot\images\DefaultUser.png" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Resources\" />
-	</ItemGroup>
-
 </Project>
