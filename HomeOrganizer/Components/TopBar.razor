@@ -26,7 +26,7 @@
     <MudSpacer />
     <MudPaper Class="mud-theme-transparent d-flex justify-end" Elevation="0" Width="300px" Height="100%" Style="line-height:48px">
 
-        <MudToggleIconButton @bind-Toggled="@IsDarkMode"
+        <MudToggleIconButton ToggledChanged="UpdateUserTheme"
                              Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
                              ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
     </MudPaper>
@@ -40,6 +40,7 @@
     private async void HandleUserUpdate()
     {
         User = userService.LoggedUser;
+        IsDarkMode = User.UseDarkTheme;
 
         if (User != null && welcome.Length == 0)
         {
@@ -53,6 +54,8 @@
     protected override void OnInitialized()
     {
         User = userService.LoggedUser;
+        if (User != null)
+            IsDarkMode = User.UseDarkTheme;
         userService.OnChange += HandleUserUpdate;
     }
 
@@ -64,6 +67,21 @@
             userService.LoggedUser = User;
         }
         navigationManager.NavigateTo("/");
+    }
+
+    private void UpdateUserTheme()
+    {
+        IsDarkMode = !IsDarkMode;
+
+        if (User != null)
+        {
+            User.UseDarkTheme = IsDarkMode;
+            userService.LoggedUser = User;
+        }
+        else
+        {
+            userService.UnloggedDarkTheme = IsDarkMode;
+        }
     }
 
     public void Dispose()

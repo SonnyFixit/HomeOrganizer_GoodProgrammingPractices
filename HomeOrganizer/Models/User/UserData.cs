@@ -16,7 +16,7 @@ namespace HomeOrganizer.Models.User
 
         public string Login { get; private set; } = "";
         public string Name { get; private set; } = "";
-        public bool UseDarkTheme { get; set; } = true;
+        public bool UseDarkTheme { get; set; } = false;
 
         private readonly Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
 

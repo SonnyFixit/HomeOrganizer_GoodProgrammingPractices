@@ -29,6 +29,7 @@ namespace HomeOrganizer.Models.Features
             UserGivenName = "Your first feature",
             UserGivenDescription = "Check it! It should introduce you to our application :)",
             Position = 0,
+            ColorIndex = 0,
         };
 
         public override FeatureBase Create()

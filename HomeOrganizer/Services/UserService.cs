@@ -10,6 +10,7 @@ namespace HomeOrganizer.Services
     {
         private UserData? loggedUser;
         public FeatureBase DraggedFeatureTile { get; set; }
+        public bool UnloggedDarkTheme = false;
 
         public UserData? LoggedUser
         {

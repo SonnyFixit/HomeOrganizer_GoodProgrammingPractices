@@ -1,4 +1,5 @@
-﻿@using HomeOrganizer.Components
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Components
 @using HomeOrganizer.Components.Dialogs;
 @using HomeOrganizer.Components.Errors
 @using HomeOrganizer.Components.Features;
@@ -47,7 +48,7 @@ else
                 @foreach (var feature in User.Features.OrderBy(f => f.TileData.Position))
                 {
                     if (feature == null || !feature.FeatureData.IsUsed) continue;
-                    <FeatureTile Feature="@feature" OnRemoveFeature="HandleRemoveFeature" OnOpenFeature="HandleOpenFeature" />
+                    <FeatureTile IsDarkMode="@User.UseDarkTheme" Feature="@feature" OnRemoveFeature="HandleRemoveFeature" OnOpenFeature="HandleOpenFeature" />
                 }
 
             </MudGrid>
@@ -105,6 +106,7 @@ else
             selectedType = null;
             parameters = null;
         }
+
         StateHasChanged();
     }
 
@@ -117,7 +119,6 @@ else
     {
         userService.OnChange += HandleUserUpdate;
         User = userService.LoggedUser;
-
         base.OnInitialized();
     }
 

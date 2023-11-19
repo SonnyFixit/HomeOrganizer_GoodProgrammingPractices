@@ -2,6 +2,8 @@
 @using HomeOrganizer.Models.Bases;
 @using HomeOrganizer.Models.Features;
 @using FluentValidation
+@using HomeOrganizer.Models.User;
+@using MudBlazor.Utilities;
 
 <MudDialog DefaultFocus="DefaultFocus.FirstChild">
     <DialogContent>
@@ -22,15 +24,42 @@
                               Placeholder=@feature.TileData.UserGivenDescription />
 
             </MudCardContent>
-            <MudCardContent Style="width:160px; " Class="d-flex align-center justify-center">
-                <MudSelect FullWidth="false" T="string" Label="Icon" AnchorOrigin="Origin.BottomCenter" @bind-Value="model.Icon" Immediate="true" For="@(() => model.Icon)" Class="pt-3 test mx-0">
-                    @foreach (var icon in Constants.TileIcons.Values)
-                    {
-                        <MudSelectItem Value="@icon">
-                            <MudIcon Icon="@icon" Size="Size.Large" />
-                        </MudSelectItem>
-                    }
-                </MudSelect>
+
+            <MudCardContent>
+
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudForm Model="@model" Validation="@(orderValidator.ValidateValue)">
+                            <MudSelect FullWidth="false" T="string" DisableUnderLine="true"
+                                       Label="Icon"
+                                       AnchorOrigin="Origin.BottomCenter" @bind-Value="model.Icon" Immediate="true"
+                                       For="@(() => model.Icon)" Class="pt-3 selectIcon mx-0">
+                                @foreach (var icon in Constants.TileIcons.Values)
+                                {
+                                    <MudSelectItem Value="@icon">
+                                        <MudIcon Icon="@icon" Size="Size.Large" />
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudForm>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudPaper Class="px-12 py-6" Elevation="0">
+                            <div style="font-size:14px; font-family: 'Roboto','Helvetica','Arial','sans-serif'; font-weight;"> Color </div>
+                            <div class="mud-width-full rounded py-4" style="@($"background-color:{model.Color}; cursor:pointer; ")" @onclick="@TogglePalette"></div>
+                            <MudPopover Open="colorPaletteOpen" OverflowBehavior="OverflowBehavior.FlipAlways" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" Paper="false">
+                                <MudForm Model="@model">
+                                    <MudColorPicker PickerVariant="PickerVariant.Static"
+                                                    SpectrumIcon="@Icons.Material.Filled.Star"
+                                                    DisableAlpha="true" DisableInputs="true" DisableModeSwitch="true" DisablePreview="true" DisableToolbar="true" DisableSliders="true"
+                                                    ColorPickerView="ColorPickerView.Palette"
+                                                    Palette="@Constants.TileColorPalettes[User.UseDarkTheme]"
+                                                    For="@(() => model.Color)" @bind-Value="model.Color" />
+                                </MudForm>
+                            </MudPopover>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
             </MudCardContent>
 
 
@@ -46,7 +75,15 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter]
     public string FeatureName { get; set; }
+    [Parameter]
+    public UserData User { get; set; }
+
     private FeatureBase feature;
+    private bool colorPaletteOpen = false;
+    private void TogglePalette()
+    {
+        colorPaletteOpen = !colorPaletteOpen;
+    }
 
     MudForm form;
     ModelFluentValidator orderValidator = new ModelFluentValidator();
@@ -57,6 +94,7 @@
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Icon { get; set; } = MudBlazor.Icons.Material.Filled.QuestionMark;
+        public MudColor Color { get; set; } = Constants.TileColorPalettes[false].ElementAt(0);
     }
 
     void Cancel() => MudDialog.Cancel();
@@ -69,6 +107,7 @@
         feature.TileData.UserGivenName = model.Name;
         feature.TileData.UserGivenDescription = CheckDescription(model.Description);
         feature.TileData.Icon = model.Icon;
+        feature.TileData.ColorIndex = Array.IndexOf(Constants.TileColorPalettes[User.UseDarkTheme], model.Color);
         feature.FeatureData.IsUsed = true;
 
         MudDialog.Close(DialogResult.Ok<FeatureBase>(feature));
@@ -100,6 +139,7 @@
     {
         feature = FeaturesList.CreateFeature(FeatureName);
         model.Icon = feature.TileData.Icon;
+        model.Color = Constants.TileColorPalettes[User.UseDarkTheme].ElementAt(0);
     }
 
 

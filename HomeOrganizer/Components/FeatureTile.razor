@@ -1,4 +1,5 @@
-﻿@using HomeOrganizer.Components.Dialogs;
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Components.Dialogs;
 @using HomeOrganizer.Models.Bases;
 @using HomeOrganizer.Models.User;
 
@@ -8,12 +9,12 @@
 @if (Feature == null) return;
 
 <MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5">
-    <MudCard Height="100%" Class="pa-3" Style="cursor: pointer; overflow:hidden;"
-             draggable="true" dropzone="move"
+    <MudPaper Height="100%" Class="pa-3" Style="@($"cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}")"
+              draggable="true" dropzone="move"
     @ondragstart="HandleDragStart"
     @ondragenter="HandleDragEnter"
     @ondragleave="HandleDragLeave"
-             ondragover="event.preventDefault();"
+              ondragover="event.preventDefault();"
     @ondrop="HandleDrop">
         <MudGrid>
             <MudItem xs="10" Class="py-0  d-flex align-center noSelect" @onclick="OpenFeature">
@@ -27,7 +28,9 @@
                     <MudMenuItem OnClick="RemoveFeature">
                         Delete
                     </MudMenuItem>
-                    <MudMenuItem>Edit</MudMenuItem>
+                    <MudMenuItem>
+                        Edit
+                    </MudMenuItem>
                 </MudMenu>
             </MudItem>
 
@@ -47,7 +50,7 @@
                 <MudIcon Icon="@Feature.TileData.Icon" Size="Size.Large" Class="mx-auto" />
             </MudItem>
         </MudGrid>
-    </MudCard>
+    </MudPaper>
 </MudItem>
 
 @code {
@@ -60,7 +63,10 @@
     [Parameter]
     public EventCallback<FeatureBase> OnOpenFeature { get; set; }
 
+    [Parameter]
+    public bool IsDarkMode { get; set; } = false;
     private bool dragDropTarget = false;
+
 
     private async Task RemoveFeature()
     {

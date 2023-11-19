@@ -77,6 +77,18 @@
         userService.LoggedUser = registeredUser;
     }
 
+    private async Task ProcessDialogResult(DialogResult result)
+    {
+        if (result.Canceled) return;
+        if (result.Data is not UserData registeredUser) return;
+        registeredUser.UseDarkTheme = userService.UnloggedDarkTheme;
+
+        await DatabaseHandlerMongoDB.CreateUser(registeredUser);
+
+        userService.LoggedUser = registeredUser;
+        StateHasChanged();
+    }
+
     private async Task RegisterUser()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
@@ -84,12 +96,7 @@
 
         var result = await dialog.Result;
 
-        if (result.Canceled) return;
-        if (result.Data is not UserData registeredUser) return;
-
-        await DatabaseHandlerMongoDB.CreateUser(registeredUser);
-        userService.LoggedUser = registeredUser;
-        StateHasChanged();
+        await ProcessDialogResult(result);
     }
 
     private async Task QuickRegister()
@@ -100,11 +107,6 @@
 
         var result = await dialog.Result;
 
-        if (result.Canceled) return;
-        if (result.Data is not UserData registeredUser) return;
-
-        await DatabaseHandlerMongoDB.CreateUser(registeredUser);
-        userService.LoggedUser = registeredUser;
-        StateHasChanged();
+        await ProcessDialogResult(result);
     }
 }

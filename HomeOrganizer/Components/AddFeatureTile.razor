@@ -40,7 +40,10 @@
     async Task AddFeature(string featureName)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth = true, MaxWidth = MaxWidth.Medium };
-        var parameters = new DialogParameters<CreateTileDialog> { { d => d.FeatureName, featureName } };
+        var parameters = new DialogParameters<CreateTileDialog>();
+        parameters.Add("FeatureName", featureName);
+        parameters.Add("User", UserData);
+
         var dialog = await DialogService.ShowAsync<CreateTileDialog>($"Provide '{featureName}' data", parameters, options);
 
         var result = await dialog.Result;
