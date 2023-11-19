@@ -1,4 +1,5 @@
 ﻿@using HomeOrganizer.Models.User;
+@using MyWebsiteBlazor.Data.Database;
 @implements IDisposable
 @inject UserService userService
 @inject NavigationManager navigationManager
@@ -31,7 +32,15 @@
     <MudPaper Class="mud-theme-transparent d-flex justify-end align-center" Elevation="0" Width="300px" Height="100%">
         @if (User != null)
         {
-            <MudImage Width="40" Height="40" Src="images/DefaultUser.png" Alt="User profile avatar" Elevation="25" Class="rounded-lg" @onclick="@OpenUserPanel" Style="cursor:pointer" />
+            <MudMenu>
+                <ActivatorContent>
+                    <MudImage Width="40" Height="40" Src="images/DefaultUser.png" Alt="User profile avatar" Elevation="25" Class="rounded-lg" Style="cursor:pointer" />
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem OnClick="@OpenUserPanel" Icon="@Icons.Material.Filled.Person">Profile</MudMenuItem>
+                    <MudMenuItem OnClick="@LogOut" Icon="@Icons.Material.Filled.Logout">Log Out</MudMenuItem>
+                </ChildContent>
+            </MudMenu>
         }
     </MudPaper>
 </MudAppBar>
@@ -44,7 +53,10 @@
     private async void HandleUserUpdate()
     {
         User = userService.LoggedUser;
-        IsDarkMode = User.UseDarkTheme;
+        if (User != null)
+            IsDarkMode = User.UseDarkTheme;
+        else
+            IsDarkMode = userService.UnloggedDarkTheme;
 
         if (User != null && welcome.Length == 0)
         {
@@ -92,6 +104,17 @@
     {
         userService.LoggedUser = User;
         navigationManager.NavigateTo("/UserPanel");
+    }
+
+    private async Task LogOut()
+    {
+        // Update user data before log out
+        userService.UnloggedDarkTheme = User.UseDarkTheme;
+        await DatabaseHandlerMongoDB.UpdateUser(User);
+
+        // log out
+        User = null;
+        userService.LoggedUser = null;
     }
 
     public void Dispose()

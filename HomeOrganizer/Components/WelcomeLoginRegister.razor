@@ -13,9 +13,6 @@
             <MudText Typo="Typo.h6" Align="Align.Center">
                 Home Organizer
             </MudText>
-            <MudText Typo="Typo.body1" Class="mt-3" Align="Align.Center">
-                Login or register account to use our application!
-            </MudText>
             <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-3" Elevation="0">
                 <MudStack Style="width:80%">
                     @if (userNotFound && showUserNotFound)
@@ -24,6 +21,11 @@
                             User not found! <br>
                             Click here for quick register
                         </MudAlert>
+                    }
+
+                    @if (loggingUser)
+                    {
+                        <MudProgressLinear Color="Color.Secondary" Indeterminate="true" Class="my-3" />
                     }
 
                     <MudTextField @bind-Value="userLogin"
@@ -52,6 +54,7 @@
     private string userLogin = string.Empty;
     private bool showUserNotFound = true;
     private bool userNotFound = false;
+    private bool loggingUser = false;
 
     private async Task OnLoginEnter(KeyboardEventArgs e)
     {
@@ -63,14 +66,17 @@
     private async Task LoginUser()
     {
         if (userLogin.Length == 0) return;
+        loggingUser = true;
 
         UserData? registeredUser = await DatabaseHandlerMongoDB.GetUser(userLogin);
         if (registeredUser == null)
         {
             userNotFound = true;
             showUserNotFound = true;
+            loggingUser = false;
             return;
         }
+        loggingUser = false;
         userNotFound = false;
         showUserNotFound = false;
 

@@ -68,7 +68,15 @@ namespace MyWebsiteBlazor.Data.Database
             }
             catch (Exception e)
             {
-                return new Response(false, $"Can't update {updatedUser.Login}! Error: {e.Message}");
+                if (updatedUser == null)
+                {
+                    return new Response(false, $"Can't update user, it is null! Error: {e.Message}");
+
+                }
+                else
+                {
+                    return new Response(false, $"Can't update {updatedUser.Login}! Error: {e.Message}");
+                }
             }
         }
 

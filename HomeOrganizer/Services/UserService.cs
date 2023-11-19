@@ -26,7 +26,11 @@ namespace HomeOrganizer.Services
 
         private void NotifyStateChanged()
         {
-            DatabaseHandlerMongoDB.UpdateUser(loggedUser);
+            if (loggedUser != null)
+            {
+                DatabaseHandlerMongoDB.UpdateUser(loggedUser);
+                UnloggedDarkTheme = loggedUser.UseDarkTheme;
+            }
             OnChange?.Invoke();
         }
     }
