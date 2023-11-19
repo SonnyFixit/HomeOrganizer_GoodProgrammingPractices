@@ -14,12 +14,13 @@
     @ondragstart="HandleDragStart"
     @ondragenter="HandleDragEnter"
     @ondragleave="HandleDragLeave"
-              ondragover="event.preventDefault();"
-    @ondrop="HandleDrop">
+             ondragover="event.preventDefault();"
+    @ondrop="HandleDrop"
+    @onclick="OpenFeature">
         <MudGrid>
-            <MudItem xs="10" Class="py-0  d-flex align-center noSelect" @onclick="OpenFeature">
+            <MudItem xs="10" Class="py-0  d-flex align-center noSelect">
                 <MudText Typo="Typo.h5">
-                    @Feature.TileData.UserGivenName [@Feature.TileData.Position]
+                    @Feature.TileData.UserGivenName
                 </MudText>
             </MudItem>
 
@@ -34,19 +35,19 @@
                 </MudMenu>
             </MudItem>
 
-            <MudItem xs="12" Class="pb-0 pt-0 noSelect d-flex align-center" @onclick="OpenFeature">
+            <MudItem xs="12" Class="pb-0 pt-0 noSelect d-flex align-center">
                 <MudText Typo="Typo.caption">
                     @Feature.FeatureData.Name
                 </MudText>
             </MudItem>
 
-            <MudItem xs="10" Class="noSelect  d-flex align-center" Style="height: 100px" @onclick="OpenFeature">
+            <MudItem xs="12" sm="9" md="10" Class="noSelect  d-flex align-center" Style="height: 100px">
                 <MudText Typo="Typo.body1">
                     @Feature.TileData.UserGivenDescription
                 </MudText>
             </MudItem>
 
-            <MudItem xs="2" Class="pa-0 d-flex align-center justify-center" @onclick="OpenFeature">
+            <MudItem xs="12" sm="3" md="2" Class="pa-0 d-flex align-center justify-center">
                 <MudIcon Icon="@Feature.TileData.Icon" Size="Size.Large" Class="mx-auto" />
             </MudItem>
         </MudGrid>

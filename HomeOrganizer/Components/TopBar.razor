@@ -13,6 +13,10 @@
             </MudText>
         </MudButton>
 
+        <MudToggleIconButton @bind-Toggled="@IsDarkMode"
+                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
+                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
+
     </MudPaper>
     @if (User != null)
     {
@@ -24,11 +28,11 @@
         </MudPaper>
     }
     <MudSpacer />
-    <MudPaper Class="mud-theme-transparent d-flex justify-end" Elevation="0" Width="300px" Height="100%" Style="line-height:48px">
-
-        <MudToggleIconButton ToggledChanged="UpdateUserTheme"
-                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
-                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
+    <MudPaper Class="mud-theme-transparent d-flex justify-end align-center" Elevation="0" Width="300px" Height="100%">
+        @if (User != null)
+        {
+            <MudImage Width="40" Height="40" Src="images/DefaultUser.png" Alt="User profile avatar" Elevation="25" Class="rounded-lg" @onclick="@OpenUserPanel" Style="cursor:pointer" />
+        }
     </MudPaper>
 </MudAppBar>
 
@@ -82,6 +86,12 @@
         {
             userService.UnloggedDarkTheme = IsDarkMode;
         }
+    }
+
+    private void OpenUserPanel()
+    {
+        userService.LoggedUser = User;
+        navigationManager.NavigateTo("/UserPanel");
     }
 
     public void Dispose()

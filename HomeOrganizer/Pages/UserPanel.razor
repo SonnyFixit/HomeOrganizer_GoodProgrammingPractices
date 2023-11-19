@@ -1,0 +1,44 @@
+﻿@using HomeOrganizer.Components
+@using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Components.Errors
+@using HomeOrganizer.Components.Features;
+@using HomeOrganizer.Models.Bases;
+@using HomeOrganizer.Models.Features;
+@using HomeOrganizer.Models.User;
+@using MudBlazor.Services;
+@using MyWebsiteBlazor.Data.Database;
+@using System.Reflection;
+
+@inject UserService userService
+@inject IDialogService DialogService
+@inject NavigationManager navigationManager
+
+@page "/UserPanel"
+<PageTitle> Home Organizer </PageTitle>
+
+@if (user == null)
+{
+    @* GoHome(); *@
+    <h1>ERROR</h1>
+}
+else
+{
+    <h1> @user.Login's user panel</h1>
+}
+
+
+@code {
+    UserData? user = null;
+
+    protected override void OnInitialized()
+    {
+        user = userService.LoggedUser;
+        if (user == null) return;
+        base.OnInitialized();
+    }
+
+    private void GoHome()
+    {
+        navigationManager.NavigateTo("/");
+    }
+}
