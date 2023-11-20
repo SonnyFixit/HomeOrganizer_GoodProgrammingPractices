@@ -2,8 +2,10 @@
 using HomeOrganizer.Models.Bases;
 using HomeOrganizer.Models.Communication;
 using HomeOrganizer.Models.Features;
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+
 using MyWebsiteBlazor.Data.Database;
 
 namespace HomeOrganizer.Models.User
@@ -33,6 +35,11 @@ namespace HomeOrganizer.Models.User
             };
             featuresUsage = FeaturesList.FeaturesUsage();
             featuresUsage[Features[0].FeatureData.Name] += 2; // Prevent from creating new Introduction tiles
+        }
+
+        public void ResetPassword(string newPassword)
+        {
+            Credentials.ResetPassword(newPassword);
         }
 
         public void SetRegisterData(string login, string password, string email, string name)

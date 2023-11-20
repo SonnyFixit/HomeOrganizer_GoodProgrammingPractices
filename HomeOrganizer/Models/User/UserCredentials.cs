@@ -17,6 +17,12 @@ namespace HomeOrganizer.Models.User
             PasswordHash = Security.HashPassword(password, PasswordSalt);
         }
 
+        public void ResetPassword(string newPassword)
+        {
+            PasswordSalt = Security.GenerateSalt();
+            PasswordHash = Security.HashPassword(newPassword, PasswordSalt);
+        }
+
         public bool CheckPassword(string provided)
         {
             if (PasswordHash == null || PasswordSalt == null) return false;

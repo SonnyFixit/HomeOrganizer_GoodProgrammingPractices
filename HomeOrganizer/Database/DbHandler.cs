@@ -2,7 +2,10 @@
 using HomeOrganizer.Models.Bases;
 using HomeOrganizer.Models.Communication;
 using HomeOrganizer.Models.User;
+
 using MongoDB.Driver;
+
+using MudBlazor;
 
 namespace MyWebsiteBlazor.Data.Database
 {
@@ -97,6 +100,38 @@ namespace MyWebsiteBlazor.Data.Database
         {
             UserData? registeredUser = await GetUser(login);
             return registeredUser != null;
+        }
+
+        #endregion
+
+        #region Reset password
+
+        public static async Task<Response> AddResetPasswordData(ResetPasswordData resetData)
+        {
+            try
+            {
+                await db.GetCollection<ResetPasswordData>("ResetPasswordDatas").InsertOneAsync(resetData);
+            }
+            catch (Exception e)
+            {
+                await Console.Out.WriteLineAsync(e.Message);
+                await Console.Out.WriteLineAsync(e.ToString());
+                return new Response(false, $"Error while adding password reset data!");
+            }
+            return new Response(true, $"Created password reset data!");
+        }
+
+        public static async Task<ResetPasswordData?> GetResetPasswordData(string login)
+        {
+            if (string.IsNullOrEmpty(login))
+                return null;
+
+            var resetPasswordDatas = await db.GetCollection<ResetPasswordData>("ResetPasswordDatas").FindAsync(d => d.UserLogin == login);
+
+            var resetPwdDatas = resetPasswordDatas.ToArray();
+            var newestData = resetPwdDatas.OrderBy(d => d.CreationTime).Last();
+
+            return newestData;
         }
 
         #endregion

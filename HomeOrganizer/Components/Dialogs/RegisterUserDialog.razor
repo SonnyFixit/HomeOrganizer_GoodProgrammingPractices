@@ -119,6 +119,7 @@
         public string PasswordRepeated { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
     }
+
     /// <summary>
     /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
     /// </summary>
@@ -150,21 +151,6 @@
 
             RuleFor(m => m.Email)
                 .EmailAddress().WithMessage("Provide correct email adress");
-        }
-
-        private async Task<bool> UserDoesNotExist(string login)
-        {
-            return !await DbHandler.UserExists(login);
-        }
-
-        private bool HasValidPassword(string pwd)
-        {
-            var lowercase = new Regex("[a-z]+");
-            var uppercase = new Regex("[A-Z]+");
-            var digit = new Regex("(\\d)+");
-            var symbol = new Regex("(\\W)+");
-
-            return (lowercase.IsMatch(pwd) && uppercase.IsMatch(pwd) && digit.IsMatch(pwd) && symbol.IsMatch(pwd));
         }
 
         public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
