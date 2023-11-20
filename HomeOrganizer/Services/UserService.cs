@@ -28,7 +28,7 @@ namespace HomeOrganizer.Services
         {
             if (loggedUser != null)
             {
-                DatabaseHandlerMongoDB.UpdateUser(loggedUser);
+                DbHandler.UpdateUser(loggedUser);
                 UnloggedDarkTheme = loggedUser.UseDarkTheme;
             }
             OnChange?.Invoke();

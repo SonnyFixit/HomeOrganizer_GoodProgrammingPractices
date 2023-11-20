@@ -15,13 +15,13 @@ namespace MyWebsiteBlazor.Data.Database
         }
     }
 
-    public static class DatabaseHandlerMongoDB
+    public static class DbHandler
     {
-        private static readonly string connectionString = DatabaseCrudentials.ConnectionString;
-        private static readonly string databaseName = DatabaseCrudentials.DatabaseName;
+        private static readonly string connectionString = DatabaseCredentials.ConnectionString;
+        private static readonly string databaseName = DatabaseCredentials.DatabaseName;
         private static readonly IMongoDatabase? db = null;
 
-        static DatabaseHandlerMongoDB()
+        static DbHandler()
         {
             db = new MongoClient(connectionString).GetDatabase(databaseName);
         }
@@ -37,9 +37,9 @@ namespace MyWebsiteBlazor.Data.Database
 
         public static async Task<Response> CreateUser(UserData newUser)
         {
-            if (await GetUser(newUser.Crudentials.Login) != null)
+            if (await GetUser(newUser.Credentials.Login) != null)
             {
-                return new Response(false, $"User {newUser.Crudentials.Login} already exists!");
+                return new Response(false, $"User {newUser.Credentials.Login} already exists!");
             }
 
             try
@@ -51,15 +51,15 @@ namespace MyWebsiteBlazor.Data.Database
                 await Console.Out.WriteLineAsync(e.Message);
                 await Console.Out.WriteLineAsync(e.ToString());
             }
-            return new Response(true, $"User {newUser.Crudentials.Login} added to database!");
+            return new Response(true, $"User {newUser.Credentials.Login} added to database!");
         }
 
         public static async Task<Response> UpdateUser(UserData updatedUser)
         {
             try
             {
-                await db.GetCollection<UserData>("Users").ReplaceOneAsync(p => p.Crudentials.Login == updatedUser.Crudentials.Login, updatedUser);
-                return new Response(true, $"User {updatedUser.Crudentials.Login} succesfully updated!");
+                await db.GetCollection<UserData>("Users").ReplaceOneAsync(p => p.Credentials.Login == updatedUser.Credentials.Login, updatedUser);
+                return new Response(true, $"User {updatedUser.Credentials.Login} succesfully updated!");
             }
             catch (Exception e)
             {
@@ -70,7 +70,7 @@ namespace MyWebsiteBlazor.Data.Database
                 }
                 else
                 {
-                    return new Response(false, $"Can't update {updatedUser.Crudentials.Login}! Error: {e.Message}");
+                    return new Response(false, $"Can't update {updatedUser.Credentials.Login}! Error: {e.Message}");
                 }
             }
         }
@@ -80,7 +80,7 @@ namespace MyWebsiteBlazor.Data.Database
             if (string.IsNullOrEmpty(login))
                 return null;
 
-            var users = await db.GetCollection<UserData>("Users").FindAsync(d => d.Crudentials.Login == login);
+            var users = await db.GetCollection<UserData>("Users").FindAsync(d => d.Credentials.Login == login);
             var registeredUser = await users.FirstOrDefaultAsync();
 
             return registeredUser;

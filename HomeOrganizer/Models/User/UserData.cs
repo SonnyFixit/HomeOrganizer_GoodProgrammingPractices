@@ -14,8 +14,9 @@ namespace HomeOrganizer.Models.User
         [BsonId]
         public ObjectId Id { get; set; }
 
-        public UserCrudentials Crudentials { get; private set; } = new UserCrudentials("Default", "Default");
+        public UserCredentials Credentials { get; private set; } = new UserCredentials("Default", "Default");
         public string Name { get; private set; } = "";
+        public string Email { get; private set; } = "";
         public bool UseDarkTheme { get; set; } = false;
 
         private Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
@@ -34,9 +35,10 @@ namespace HomeOrganizer.Models.User
             featuresUsage[Features[0].FeatureData.Name] += 2; // Prevent from creating new Introduction tiles
         }
 
-        public void SetRegisterData(string login, string password, string name)
+        public void SetRegisterData(string login, string password, string email, string name)
         {
-            Crudentials = new UserCrudentials(login, password);
+            Credentials = new UserCredentials(login, password);
+            Email = email;
             Name = name;
         }
 
@@ -73,7 +75,7 @@ namespace HomeOrganizer.Models.User
 
             feature.TileData.Position = Features.Count;
 
-            UserData? latestData = await DatabaseHandlerMongoDB.GetUser(Crudentials.Login);
+            UserData? latestData = await DbHandler.GetUser(Credentials.Login);
             if (latestData == null)
             {
                 return new Response(false, $"User is somehow null");
@@ -102,7 +104,7 @@ namespace HomeOrganizer.Models.User
                 return new Response(false, $"User does not contain feature {feature.FeatureData.Name}, {feature.TileData.UserGivenName} (which is weird?)");
             }
 
-            UserData? latestData = await DatabaseHandlerMongoDB.GetUser(Crudentials.Login);
+            UserData? latestData = await DbHandler.GetUser(Credentials.Login);
             if (latestData == null)
             {
                 return new Response(false, $"User is somehow null");

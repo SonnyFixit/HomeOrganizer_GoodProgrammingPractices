@@ -1,6 +1,8 @@
 ﻿@using HomeOrganizer.Components.Dialogs;
 @using HomeOrganizer.Models.User;
 @using MyWebsiteBlazor.Data.Database;
+@using System.Net.Mail;
+@using System.Net;
 
 @inject UserService userService
 @inject IDialogService dialogService
@@ -8,19 +10,37 @@
 
 <MudContainer Class="content px-4" Style="height:90%" MaxWidth="MaxWidth.Large">
 
-    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:15%;" Elevation="0">
+    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:10%;" Elevation="0">
         <MudPaper Class="pa-4" Style="width:400px !important;">
             <MudText Typo="Typo.h6" Align="Align.Center">
                 Home Organizer
             </MudText>
             <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-3" Elevation="0">
                 <MudStack Style="width:80%">
-                    @if (userNotFound && showUserNotFound)
+                    @if (cannotLogin)
                     {
-                        <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="my-2" OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true" CloseIconClicked="(()=>{showUserNotFound = false;})">
-                            User not found! <br>
-                            Click here for quick register
-                        </MudAlert>
+                        <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Error">
+                            Cannot login
+                        </MudText>
+                        if (showResetPassword)
+                        {
+
+                            <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mt-1"
+                              OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
+                              CloseIconClicked="(()=>{showResetPassword = false;})">
+                                Reset your password
+                            </MudAlert>
+                        }
+
+                        if (showUserNotFound)
+                        {
+                            <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Dense="true" Class=""
+                              OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
+                              CloseIconClicked="(()=>{showUserNotFound = false;})">
+                                Click here for quick register!
+                            </MudAlert>
+                        }
+
                     }
 
                     @if (loggingUser)
@@ -33,8 +53,19 @@
                                   Immediate="true"
                                   Label="Login"
                                   Class="pt-3"
-                                  Placeholder="Provide login"
+                                  Required="true"
+                                  Placeholder="Login" />
+
+                    <MudTextField @bind-Value="userPassword"
+                                  For="@(() => userPassword)"
+                                  Immediate="true"
+                                  Label="Password"
+                                  InputType="InputType.Password"
+                                  Class="pt-3"
+                                  Required="true"
+                                  Placeholder="Password"
                                   OnKeyDown="OnLoginEnter" />
+
                     <MudButton Class="pt-1" OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
                         Login
                     </MudButton>
@@ -52,9 +83,12 @@
 
 @code {
     private string userLogin = string.Empty;
+    private string userPassword = string.Empty;
+
     private bool showUserNotFound = true;
-    private bool userNotFound = false;
     private bool loggingUser = false;
+    private bool showResetPassword = false;
+    private bool cannotLogin = false;
 
     private async Task OnLoginEnter(KeyboardEventArgs e)
     {
@@ -68,17 +102,31 @@
         if (userLogin.Length == 0) return;
         loggingUser = true;
 
-        UserData? registeredUser = await DatabaseHandlerMongoDB.GetUser(userLogin);
+        UserData? registeredUser = await DbHandler.GetUser(userLogin);
+        loggingUser = false;
+
         if (registeredUser == null)
         {
-            userNotFound = true;
+            cannotLogin = true;
             showUserNotFound = true;
-            loggingUser = false;
+            showResetPassword = true;
             return;
         }
-        loggingUser = false;
-        userNotFound = false;
+
+        bool goodPassword = registeredUser.Credentials.CheckPassword(userPassword);
+
+        if (!goodPassword)
+        {
+            cannotLogin = true;
+            showUserNotFound = true;
+            showResetPassword = true;
+            return;
+        }
+
+
+        cannotLogin = false;
         showUserNotFound = false;
+        showResetPassword = false;
 
         userService.LoggedUser = registeredUser;
     }
@@ -89,7 +137,7 @@
         if (result.Data is not UserData registeredUser) return;
         registeredUser.UseDarkTheme = userService.UnloggedDarkTheme;
 
-        await DatabaseHandlerMongoDB.CreateUser(registeredUser);
+        await DbHandler.CreateUser(registeredUser);
 
         userService.LoggedUser = registeredUser;
         StateHasChanged();
@@ -114,5 +162,55 @@
         var result = await dialog.Result;
 
         await ProcessDialogResult(result);
+    }
+
+    private async Task ResetPassword()
+    {
+        showResetPassword = false;
+        if (userLogin == null || userLogin.Length == 0) return;
+
+        UserData? user = await DbHandler.GetUser(userLogin);
+        if (user == null) return;
+
+        snackbar.Clear();
+        snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        snackbar.Add("We'll send you an email about resetting password...", Severity.Normal);
+
+        await SendResetPasswordEmail(user.Email, user.Credentials.Login);
+    }
+
+    private async Task SendResetPasswordEmail(string toEmail, string login)
+    {
+        try
+        {
+            using (var client = new SmtpClient())
+            {
+                client.Host = "smtp.gmail.com";
+                client.Port = 587;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.UseDefaultCredentials = false;
+                client.EnableSsl = true;
+                client.Credentials = new NetworkCredential("home.organizer.333@gmail.com", "zlcgbvthwvdbxfuu");
+                using (var message = new MailMessage(
+                    from: new MailAddress("home.organizer.333@gmail.com", "Home Organizer"),
+                    to: new MailAddress(toEmail, $"{login}")
+                    ))
+                {
+
+                    message.Subject = "Reset your password";
+                    message.Body = "Do you really wanna reset your password?";
+
+                    await client.SendMailAsync(message);
+                }
+            }
+
+            // Informacja o pomyślnym wysłaniu maila
+            Console.WriteLine("Reset password email sent successfully.");
+        }
+        catch (Exception ex)
+        {
+            // Obsługa błędów
+            Console.WriteLine($"Error sending reset password email: {ex.Message}");
+        }
     }
 }

@@ -3,23 +3,59 @@
 @using FluentValidation
 @using HomeOrganizer.Models.User;
 @using MyWebsiteBlazor.Data.Database;
+@using System.Text.RegularExpressions;
 
 <MudDialog DefaultFocus="DefaultFocus.FirstChild">
     <DialogContent>
-        <MudForm Model="@model" @ref="@form" Validation="@(orderValidator.ValidateValue)" ValidationDelay="0">
+        <MudForm Model="@model" @ref="@form" Validation="@(registerValidator.ValidateValue)" ValidationDelay="0">
             <MudCardContent>
+                @if (userExists)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Error">
+                        Login is already taken!
+                    </MudText>
+                }
                 <MudTextField @bind-Value="model.Login"
                               For="@(() => model.Login)"
                               Immediate="true"
+                              Required="true"
                               Label="Login"
-                              Placeholder="Your login" />
+                              InputType="InputType.Text"
+                              Placeholder="Login" />
+
+                <MudTextField @bind-Value="model.Password"
+                              For="@(() => model.Password)"
+                              Immediate="true"
+                              Required="true"
+                              Label="Password"
+                              InputType="InputType.Password"
+                              Placeholder="Password" />
+
+                <MudTextField @bind-Value="model.PasswordRepeated"
+                              For="@(() => model.PasswordRepeated)"
+                              Immediate="true"
+                              Required="true"
+                              Label="Password repeated"
+                              InputType="InputType.Password"
+                              Placeholder="Repeat password" />
+
+                <MudText Typo="Typo.caption"> We don't send  any newsletters. It is mainly for reseting your password.</MudText>
+                <MudTextField @bind-Value="model.Email"
+                              For="@(() => model.Email)"
+                              Immediate="true"
+                              Required="true"
+                              Label="Email"
+                              InputType="InputType.Email"
+                              Placeholder="Your email adress for contact" />
+
 
                 <MudTextField @bind-Value="model.Name"
                               For="@(() => model.Name)"
                               Immediate="true"
+                              Required="true"
                               Label="Name"
-                              Placeholder="How you wanne be called?" />
-
+                              InputType="InputType.Text"
+                              Placeholder="How you wanna be called?" />
             </MudCardContent>
         </MudForm>
     </DialogContent>
@@ -31,12 +67,13 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     [Parameter] public string? QuickUserLogin { get; set; } = string.Empty;
 
-    MudForm form;
-    ModelFluentValidator orderValidator = new ModelFluentValidator();
+    MudForm? form;
+    ModelFluentValidator registerValidator = new ModelFluentValidator();
     UserRegisterModel model = new UserRegisterModel();
+    bool userExists = false;
 
     UserData createdUser = new UserData();
 
@@ -61,7 +98,15 @@
         await form.Validate();
         if (!form.IsValid) return;
 
-        createdUser.SetRegisterData(model.Login, "PASSWORD_TO_CHANGE", model.Name);
+        UserData registeredUser = await DbHandler.GetUser(model.Login);
+        if (registeredUser != null)
+        {
+            userExists = true;
+            return;
+        }
+
+        userExists = false;
+        createdUser.SetRegisterData(model.Login, model.Password, model.Email, model.Name);
 
         MudDialog.Close(DialogResult.Ok<UserData>(createdUser));
     }
@@ -70,6 +115,9 @@
     {
         public string Login { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string PasswordRepeated { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
     /// <summary>
     /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
@@ -79,19 +127,44 @@
     {
         public ModelFluentValidator()
         {
-            RuleFor(x => x.Login)
-                .NotEmpty()
-                .MustAsync(async (x, cancel) => await UserDoesNotExist(x)).WithMessage($"User already exists")
-                .Length(3, 30);
+            RuleFor(m => m.Login)
+                .NotEmpty().WithMessage("Login cannot be empty")
+                .MinimumLength(2).WithMessage("Login length must be at least 2.")
+                .MaximumLength(30).WithMessage("Login length must not exceed 30.");
 
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .Length(3, 30);
+            RuleFor(m => m.Name)
+                .NotEmpty().WithMessage("Name cannot be empty")
+                .MinimumLength(2).WithMessage("Name length must be at least 2.")
+                .MaximumLength(30).WithMessage("Name length must not exceed 30.");
+
+            RuleFor(m => m.Password).NotEmpty().WithMessage("Password cannot be empty")
+                .MinimumLength(8).WithMessage("Password length must be at least 8.")
+                .MaximumLength(50).WithMessage("Password length must not exceed 50.")
+                .Matches(@"[A-Z]+").WithMessage("Password must contain at least one uppercase letter.")
+                .Matches(@"[a-z]+").WithMessage("Password must contain at least one lowercase letter.")
+                .Matches(@"[0-9]+").WithMessage("Password must contain at least one number.")
+                .Matches(@"[\!\.@#\-_]+").WithMessage("Password must contain at least one special character ( ! . @ # - _ ).");
+
+            RuleFor(m => m.PasswordRepeated)
+                .Equal(m => m.Password).WithMessage("Repeated password must equal password");
+
+            RuleFor(m => m.Email)
+                .EmailAddress().WithMessage("Provide correct email adress");
         }
 
         private async Task<bool> UserDoesNotExist(string login)
         {
-            return !await DatabaseHandlerMongoDB.UserExists(login);
+            return !await DbHandler.UserExists(login);
+        }
+
+        private bool HasValidPassword(string pwd)
+        {
+            var lowercase = new Regex("[a-z]+");
+            var uppercase = new Regex("[A-Z]+");
+            var digit = new Regex("(\\d)+");
+            var symbol = new Regex("(\\W)+");
+
+            return (lowercase.IsMatch(pwd) && uppercase.IsMatch(pwd) && digit.IsMatch(pwd) && symbol.IsMatch(pwd));
         }
 
         public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>

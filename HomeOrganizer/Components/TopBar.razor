@@ -110,7 +110,7 @@
     {
         // Update user data before log out
         userService.UnloggedDarkTheme = User.UseDarkTheme;
-        await DatabaseHandlerMongoDB.UpdateUser(User);
+        await DbHandler.UpdateUser(User);
 
         // log out
         User = null;
