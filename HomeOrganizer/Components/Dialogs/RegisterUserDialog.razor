@@ -28,16 +28,20 @@
                               Immediate="true"
                               Required="true"
                               Label="Password"
-                              InputType="InputType.Password"
-                              Placeholder="Password" />
+                              Placeholder="Password"
+                              InputType="@PasswordInput"
+                              Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon"
+                              OnAdornmentClick="ChangePasswordVisibility" AdornmentAriaLabel="Show Password" />
 
                 <MudTextField @bind-Value="model.PasswordRepeated"
                               For="@(() => model.PasswordRepeated)"
                               Immediate="true"
                               Required="true"
                               Label="Password repeated"
-                              InputType="InputType.Password"
-                              Placeholder="Repeat password" />
+                              Placeholder="Repeat password"
+                              InputType="@PasswordInput"
+                              Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon"
+                              OnAdornmentClick="ChangePasswordVisibility" AdornmentAriaLabel="Show Password" />
 
                 <MudText Typo="Typo.caption"> We don't send  any newsletters. It is mainly for reseting your password.</MudText>
                 <MudTextField @bind-Value="model.Email"
@@ -77,6 +81,9 @@
 
     UserData createdUser = new UserData();
 
+    bool showPassword = false;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
     void Cancel() => MudDialog.Cancel();
     protected override void OnInitialized()
@@ -91,6 +98,21 @@
         }
 
         base.OnInitialized();
+    }
+
+    void ChangePasswordVisibility()
+    {
+        showPassword = !showPassword;
+        @if (showPassword)
+        {
+            PasswordInput = InputType.Text;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+        }
+        else
+        {
+            PasswordInput = InputType.Password;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+        }
     }
 
     private async Task RegisterUser()

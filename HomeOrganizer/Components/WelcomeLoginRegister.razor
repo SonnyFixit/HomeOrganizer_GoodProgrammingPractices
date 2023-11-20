@@ -63,11 +63,13 @@
                                   For="@(() => userPassword)"
                                   Immediate="true"
                                   Label="Password"
-                                  InputType="InputType.Password"
                                   Class="pt-3"
                                   Required="true"
                                   Placeholder="Password"
-                                  OnKeyDown="OnLoginEnter" />
+                                  OnKeyDown="OnLoginEnter"
+                                  InputType="@PasswordInput"
+                                  Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon"
+                                  OnAdornmentClick="ChangePasswordVisibility" AdornmentAriaLabel="Show Password" />
 
                     <MudButton Class="pt-1" OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
                         Login
@@ -92,6 +94,25 @@
     private bool loggingUser = false;
     private bool showResetPassword = false;
     private bool cannotLogin = false;
+
+    bool showPassword = false;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void ChangePasswordVisibility()
+    {
+        showPassword = !showPassword;
+        @if (showPassword)
+        {
+            PasswordInput = InputType.Text;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+        }
+        else
+        {
+            PasswordInput = InputType.Password;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+        }
+    }
 
     private async Task OnLoginEnter(KeyboardEventArgs e)
     {
