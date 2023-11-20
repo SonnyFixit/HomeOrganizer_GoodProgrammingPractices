@@ -1,13 +1,8 @@
 ﻿using HomeOrganizer.Database;
-
-using MongoDB.Driver;
-
-using HomeOrganizer.Models;
+using HomeOrganizer.Models.Bases;
 using HomeOrganizer.Models.Communication;
 using HomeOrganizer.Models.User;
-using MongoDB.Bson.Serialization;
-using HomeOrganizer.Models.Features;
-using HomeOrganizer.Models.Bases;
+using MongoDB.Driver;
 
 namespace MyWebsiteBlazor.Data.Database
 {
@@ -42,9 +37,9 @@ namespace MyWebsiteBlazor.Data.Database
 
         public static async Task<Response> CreateUser(UserData newUser)
         {
-            if (await GetUser(newUser.Login) != null)
+            if (await GetUser(newUser.Crudentials.Login) != null)
             {
-                return new Response(false, $"User {newUser.Login} already exists!");
+                return new Response(false, $"User {newUser.Crudentials.Login} already exists!");
             }
 
             try
@@ -56,15 +51,15 @@ namespace MyWebsiteBlazor.Data.Database
                 await Console.Out.WriteLineAsync(e.Message);
                 await Console.Out.WriteLineAsync(e.ToString());
             }
-            return new Response(true, $"User {newUser.Login} added to database!");
+            return new Response(true, $"User {newUser.Crudentials.Login} added to database!");
         }
 
         public static async Task<Response> UpdateUser(UserData updatedUser)
         {
             try
             {
-                await db.GetCollection<UserData>("Users").ReplaceOneAsync(p => p.Login == updatedUser.Login, updatedUser);
-                return new Response(true, $"User {updatedUser.Login} succesfully updated!");
+                await db.GetCollection<UserData>("Users").ReplaceOneAsync(p => p.Crudentials.Login == updatedUser.Crudentials.Login, updatedUser);
+                return new Response(true, $"User {updatedUser.Crudentials.Login} succesfully updated!");
             }
             catch (Exception e)
             {
@@ -75,7 +70,7 @@ namespace MyWebsiteBlazor.Data.Database
                 }
                 else
                 {
-                    return new Response(false, $"Can't update {updatedUser.Login}! Error: {e.Message}");
+                    return new Response(false, $"Can't update {updatedUser.Crudentials.Login}! Error: {e.Message}");
                 }
             }
         }
@@ -85,10 +80,17 @@ namespace MyWebsiteBlazor.Data.Database
             if (string.IsNullOrEmpty(login))
                 return null;
 
-            var users = await db.GetCollection<UserData>("Users").FindAsync(d => d.Login == login);
+            var users = await db.GetCollection<UserData>("Users").FindAsync(d => d.Crudentials.Login == login);
             var registeredUser = await users.FirstOrDefaultAsync();
 
             return registeredUser;
+        }
+
+        public static async Task<List<FeatureBase>> GetUsersFeatures(string login)
+        {
+            var user = await GetUser(login);
+            if (user == null) return new List<FeatureBase>();
+            else return user.Features;
         }
 
         public static async Task<bool> UserExists(string login)

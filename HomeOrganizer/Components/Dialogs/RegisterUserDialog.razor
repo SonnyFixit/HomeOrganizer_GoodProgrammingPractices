@@ -61,7 +61,7 @@
         await form.Validate();
         if (!form.IsValid) return;
 
-        createdUser.SetRegisterData(model.Login, model.Name);
+        createdUser.SetRegisterData(model.Login, "PASSWORD_TO_CHANGE", model.Name);
 
         MudDialog.Close(DialogResult.Ok<UserData>(createdUser));
     }

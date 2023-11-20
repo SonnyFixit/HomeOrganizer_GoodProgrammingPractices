@@ -4,6 +4,7 @@
 @using HomeOrganizer.Components.Errors
 @using HomeOrganizer.Components.Features;
 @using HomeOrganizer.Models.Bases;
+@using HomeOrganizer.Models.Communication;
 @using HomeOrganizer.Models.Features;
 @using HomeOrganizer.Models.User;
 @using MudBlazor.Services;
@@ -82,9 +83,17 @@ else
     private Type? selectedType = null;
     private Dictionary<string, object>? parameters = new Dictionary<string, object>();
 
-    private void HandleRemoveFeature(FeatureBase feature)
+    private async Task HandleRemoveFeature(FeatureBase feature)
     {
-        User.RemoveFeature(feature);
+        Response response = await User.RemoveFeature(feature);
+        if (response.Status)
+        {
+            userService.LoggedUser = User;
+        }
+        else
+        {
+
+        }
         StateHasChanged();
     }
 
@@ -115,10 +124,11 @@ else
         userService.OnChange -= HandleUserUpdate;
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         userService.OnChange += HandleUserUpdate;
         User = userService.LoggedUser;
+
         base.OnInitialized();
     }
 

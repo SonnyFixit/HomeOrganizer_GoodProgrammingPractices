@@ -51,7 +51,7 @@
         if (result.Canceled) return;
         if (result.Data is not FeatureBase feature) return;
 
-        Response addResponse = UserData.AddFeature(feature);
+        Response addResponse = await UserData.AddFeature(feature);
         if (addResponse.Status)
         {
             UserData.OpenedFeature = feature;

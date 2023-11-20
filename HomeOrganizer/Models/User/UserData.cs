@@ -1,10 +1,10 @@
 ﻿using HomeOrganizer.Common;
+using HomeOrganizer.Models.Bases;
 using HomeOrganizer.Models.Communication;
 using HomeOrganizer.Models.Features;
-using HomeOrganizer.Models.Bases;
-
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MyWebsiteBlazor.Data.Database;
 
 namespace HomeOrganizer.Models.User
 {
@@ -14,11 +14,11 @@ namespace HomeOrganizer.Models.User
         [BsonId]
         public ObjectId Id { get; set; }
 
-        public string Login { get; private set; } = "";
+        public UserCrudentials Crudentials { get; private set; } = new UserCrudentials("Default", "Default");
         public string Name { get; private set; } = "";
         public bool UseDarkTheme { get; set; } = false;
 
-        private readonly Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
+        private Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
 
         public FeatureBase? OpenedFeature { get; set; }
 
@@ -34,13 +34,13 @@ namespace HomeOrganizer.Models.User
             featuresUsage[Features[0].FeatureData.Name] += 2; // Prevent from creating new Introduction tiles
         }
 
-        public void SetRegisterData(string login, string name)
+        public void SetRegisterData(string login, string password, string name)
         {
-            Login = login;
+            Crudentials = new UserCrudentials(login, password);
             Name = name;
         }
 
-        public Response AddFeature(FeatureBase feature)
+        public async Task<Response> AddFeature(FeatureBase feature)
         {
             if (feature == null)
             {
@@ -72,12 +72,23 @@ namespace HomeOrganizer.Models.User
             }
 
             feature.TileData.Position = Features.Count;
+
+            UserData? latestData = await DatabaseHandlerMongoDB.GetUser(Crudentials.Login);
+            if (latestData == null)
+            {
+                return new Response(false, $"User is somehow null");
+            }
+
+            featuresUsage = latestData.featuresUsage;
+            Features = latestData.Features;
+
             Features.Add(feature);
             featuresUsage[feature.FeatureData.Name]++;
+
             return new Response(true, $"Created {feature.FeatureData.Name}");
         }
 
-        public Response RemoveFeature(FeatureBase feature)
+        public async Task<Response> RemoveFeature(FeatureBase feature)
         {
             if (feature == null || feature.FeatureData.Name.Length == 0)
             {
@@ -91,11 +102,20 @@ namespace HomeOrganizer.Models.User
                 return new Response(false, $"User does not contain feature {feature.FeatureData.Name}, {feature.TileData.UserGivenName} (which is weird?)");
             }
 
+            UserData? latestData = await DatabaseHandlerMongoDB.GetUser(Crudentials.Login);
+            if (latestData == null)
+            {
+                return new Response(false, $"User is somehow null");
+            }
+
+            featuresUsage = latestData.featuresUsage;
+            Features = latestData.Features;
+
             featuresUsage[featureToDelete.FeatureData.Name]--;
 
             var sorted = Features.OrderBy(f => f.TileData.Position).ToList();
-            int deletedIndex = sorted.IndexOf(featureToDelete);
-            sorted.Remove(featureToDelete);
+            int deletedIndex = featureToDelete.TileData.Position;
+            sorted.RemoveAt(deletedIndex);
             for (int i = deletedIndex; i < sorted.Count; i++)
             {
                 sorted[i].TileData.Position--;
