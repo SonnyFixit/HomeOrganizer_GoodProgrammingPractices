@@ -1,5 +1,6 @@
 ﻿@using HomeOrganizer.Common;
 @using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Models.Communication;
 @using HomeOrganizer.Models.User;
 @using MyWebsiteBlazor.Data.Database;
 @using System.Net.Mail;
@@ -161,7 +162,15 @@
         if (result.Data is not UserData registeredUser) return;
         registeredUser.UseDarkTheme = userService.UnloggedDarkTheme;
 
-        await DbHandler.CreateUser(registeredUser);
+        Response response = await DbHandler.CreateUser(registeredUser);
+
+        if (!response.Status)
+        {
+            snackbar.Clear();
+            snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            snackbar.Add($"We couldn't create account. {response.Message}", Severity.Info);
+            return;
+        }
 
         userService.LoggedUser = registeredUser;
         StateHasChanged();

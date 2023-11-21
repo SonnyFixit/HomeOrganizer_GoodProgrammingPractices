@@ -50,6 +50,7 @@ else
                 @foreach (var feature in User.Features.OrderBy(f => f.TileData.Position))
                 {
                     if (feature == null || !feature.FeatureData.IsUsed) continue;
+
                     <FeatureTile IsDarkMode="@User.UseDarkTheme" Feature="@feature"
                      OnOpenFeature="HandleOpenFeature"
                      OnEditFeature="HandleEditFeature"

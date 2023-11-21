@@ -18,19 +18,21 @@
     <MudSpacer />
     @if (User != null)
     {
-        <MudPaper Class="mud-theme-transparent" Elevation="0" Width="300px" Height="100%" Style="line-height:48px">
+        <div style="width:40px;">
+        </div>
+        <MudPaper Class="mud-theme-transparent" Elevation="0" Width="200px" Height="100%" Style="line-height:48px">
             <MudText Align="Align.Center" Style="line-height:48px" Class="noSelect">
                 @welcome
             </MudText>
         </MudPaper>
-        <MudToggleIconButton ToggledChanged="@UpdateUserTheme"
+        <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Toggled="@IsDarkMode" Edge="Edge.End"
                          Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
                          ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
     }
     else
     {
         <MudPaper Class="mud-theme-transparent d-flex justify-center flex-grow-1 gap-4" Elevation="0" Style="width:300px">
-            <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Class="mx-0"
+            <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Class="mx-0" Toggled="@IsDarkMode"
                              Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
                              ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
         </MudPaper>
@@ -41,7 +43,9 @@
         {
             <MudMenu>
                 <ActivatorContent>
-                    <MudImage Width="40" Height="40" Src="images/DefaultUser.png" Alt="User profile avatar" Elevation="25" Class="rounded-lg" Style="cursor:pointer" />
+                    <MudAvatar Rounded="true" Style="cursor:pointer; height:40px; width:40px;">
+                        <MudImage Width="40" Height="40" Src="images/DefaultUser.png" Alt="User profile avatar" Elevation="25" />
+                    </MudAvatar>
                 </ActivatorContent>
                 <ChildContent>
                     <MudMenuItem OnClick="@OpenUserPanel" Icon="@Icons.Material.Filled.Person">Profile</MudMenuItem>
@@ -60,14 +64,11 @@
     private async void HandleUserUpdate()
     {
         User = userService.LoggedUser;
-        if (User != null)
-            IsDarkMode = User.UseDarkTheme;
-        else
-            IsDarkMode = userService.UnloggedDarkTheme;
+        IsDarkMode = User == null ? userService.UnloggedDarkTheme : User.UseDarkTheme;
 
         if (User != null && welcome.Length == 0)
         {
-            string[] welcomes = new string[] { "Hello", "Welcome", "Good day", "Yo, what's up", " Good to see you", "Welcome back" };
+            string[] welcomes = new string[] { "Hello", "Welcome", "Good day", "Yo, what's up", " Good to see you", "Welcome back", "Ayooo" };
             welcome = $"{welcomes[Random.Shared.Next(welcomes.Length)]}, {User.Name}!";
         }
 
@@ -77,8 +78,8 @@
     protected override void OnInitialized()
     {
         User = userService.LoggedUser;
-        if (User != null)
-            IsDarkMode = User.UseDarkTheme;
+        IsDarkMode = User == null ? userService.UnloggedDarkTheme : User.UseDarkTheme;
+
         userService.OnChange += HandleUserUpdate;
     }
 

@@ -18,12 +18,41 @@
 
 @if (user == null)
 {
-    @* GoHome(); *@
-    <h1>ERROR</h1>
+    <UserPanelError />
 }
 else
 {
-    <h1> @user.Credentials.Login's user panel</h1>
+    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Elevation="0">
+        <MudPaper Width="600px" Height="600px" Class="pa-4 mt-16">
+
+            <MudText Typo="Typo.h4" Align="Align.Center">
+                User panel
+            </MudText>
+
+            <MudGrid>
+                <MudItem xs="12" sm="3">
+                    <MudImage Width="100" Height="100"
+                          Src="images/DefaultUser.png" Alt="User profile avatar"
+                          Elevation="25" Class="rounded-lg" />
+                </MudItem>
+                <MudItem xs="12" sm="9">
+                    <MudText Typo="Typo.h6" Align="Align.Start">
+                        @user.Credentials.Login
+                    </MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText>
+                        Name: @user.Name
+                    </MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText>
+                        Email: @user.Email
+                    </MudText>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudPaper>
 }
 
 

@@ -40,7 +40,12 @@ namespace MyWebsiteBlazor.Data.Database
         {
             if (await GetUserByLogin(newUser.Credentials.Login) != null)
             {
-                return new Response(false, $"User {newUser.Credentials.Login} already exists!");
+                return new Response(false, $"User with login: {newUser.Credentials.Login} already exists!");
+            }
+
+            if (await GetUserByEmail(newUser.Email) != null)
+            {
+                return new Response(false, $"User with email: {newUser.Email} already exists!");
             }
 
             try
@@ -51,6 +56,7 @@ namespace MyWebsiteBlazor.Data.Database
             {
                 await Console.Out.WriteLineAsync(e.Message);
                 await Console.Out.WriteLineAsync(e.ToString());
+                return new Response(true, $"Database error! Please, contact us!");
             }
             return new Response(true, $"User {newUser.Credentials.Login} added to database!");
         }
