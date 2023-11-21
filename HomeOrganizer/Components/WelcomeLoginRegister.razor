@@ -29,8 +29,8 @@
                         {
 
                             <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mt-1"
-                                      OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
-                                      CloseIconClicked="(()=>{showResetPassword = false;})">
+                              OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
+                              CloseIconClicked="(()=>{showResetPassword = false;})">
                                 Reset your password
                             </MudAlert>
                         }
@@ -38,8 +38,8 @@
                         if (showUserNotFound)
                         {
                             <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Dense="true" Class=""
-                                      OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
-                                      CloseIconClicked="(()=>{showUserNotFound = false;})">
+                              OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
+                              CloseIconClicked="(()=>{showUserNotFound = false;})">
                                 Click here for quick register!
                             </MudAlert>
                         }
@@ -203,38 +203,11 @@
         ResetPasswordData resetData = Security.CreateResetPasswordData(user.Credentials.Login);
         await DbHandler.AddResetPasswordData(resetData);
 
-        await SendResetPasswordEmail(user.Email, resetData);
-    }
-
-    private async Task SendResetPasswordEmail(string toEmail, ResetPasswordData resetData)
-    {
-
         string resetUrl = $"{navigationManager.BaseUri}ResetPassword/{resetData.Token}";
 
         try
         {
-            using (var client = new SmtpClient())
-            {
-                client.Host = "smtp.gmail.com";
-                client.Port = 587;
-                client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                client.UseDefaultCredentials = false;
-                client.EnableSsl = true;
-                client.Credentials = new NetworkCredential("home.organizer.333@gmail.com", "zlcgbvthwvdbxfuu");
-                using (var message = new MailMessage(
-                    from: new MailAddress("home.organizer.333@gmail.com", "Home Organizer"),
-                    to: new MailAddress(toEmail, $"{resetData.UserLogin}")
-                    ))
-                {
-
-                    message.Subject = "Reset your password";
-                    message.Body = "Do you really wanna reset your password? Ok then, " +
-                                    $"click this link: <a href=\"{resetUrl}\">RESET PASSWORD</a>";
-                    message.IsBodyHtml = true;
-
-                    await client.SendMailAsync(message);
-                }
-            }
+            await EmailService.SendResetPassword(user.Email, user.Credentials.Login, resetUrl);
         }
         catch (Exception ex)
         {
