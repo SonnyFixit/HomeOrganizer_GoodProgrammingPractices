@@ -6,9 +6,10 @@
         </MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined"> Cancel </MudButton>
-        <MudSpacer />
-        <MudButton Color="Color.Error" OnClick="Delete" EndIcon="@Icons.Material.Filled.DeleteForever" Variant="Variant.Outlined">Delete</MudButton>
+        <MudStack Row="true" Justify="Justify.SpaceBetween" Style="width:100%;" Class="px-4 pb-2">
+            <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined"> Cancel </MudButton>
+            <MudButton Color="Color.Error" OnClick="Delete" EndIcon="@Icons.Material.Filled.DeleteForever" Variant="Variant.Outlined">Delete</MudButton>
+        </MudStack>
     </DialogActions>
 </MudDialog>
 @code {
