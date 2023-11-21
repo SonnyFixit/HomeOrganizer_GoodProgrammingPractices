@@ -7,14 +7,13 @@
 
 <MudDialog DefaultFocus="DefaultFocus.FirstChild">
     <DialogContent>
+        @if (processing)
+        {
+            <MudProgressLinear Color="Color.Success" Indeterminate="true" Class="my-1" />
+        }
         <MudForm Model="@model" @ref="@form" Validation="@(registerValidator.ValidateValue)" ValidationDelay="0">
             <MudCardContent>
-                @if (userExists)
-                {
-                    <MudText Typo="Typo.caption" Color="Color.Error">
-                        Login is already taken!
-                    </MudText>
-                }
+
                 <MudTextField @bind-Value="model.Login"
                               For="@(() => model.Login)"
                               Immediate="true"
@@ -22,6 +21,12 @@
                               Label="Login"
                               InputType="InputType.Text"
                               Placeholder="Login" />
+                @if (loginExists)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Error">
+                        Login is already taken!
+                    </MudText>
+                }
 
                 <MudTextField @bind-Value="model.Password"
                               For="@(() => model.Password)"
@@ -43,7 +48,6 @@
                               Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon"
                               OnAdornmentClick="ChangePasswordVisibility" AdornmentAriaLabel="Show Password" />
 
-                <MudText Typo="Typo.caption"> We don't send  any newsletters. It is mainly for reseting your password.</MudText>
                 <MudTextField @bind-Value="model.Email"
                               For="@(() => model.Email)"
                               Immediate="true"
@@ -51,6 +55,13 @@
                               Label="Email"
                               InputType="InputType.Email"
                               Placeholder="Your email adress for contact" />
+                @if (emailExists)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Error">
+                        Email is already taken! <br />
+                    </MudText>
+                }
+                <MudText Typo="Typo.caption"> <i> We don't send  any newsletters. It's mainly for account management. </i> </MudText>
 
 
                 <MudTextField @bind-Value="model.Name"
@@ -77,7 +88,9 @@
     MudForm? form;
     ModelFluentValidator registerValidator = new ModelFluentValidator();
     UserRegisterModel model = new UserRegisterModel();
-    bool userExists = false;
+    bool loginExists = false;
+    bool emailExists = false;
+    bool processing = false;
 
     UserData createdUser = new UserData();
 
@@ -117,17 +130,29 @@
 
     private async Task RegisterUser()
     {
+        processing = true;
         await form.Validate();
-        if (!form.IsValid) return;
-
-        UserData registeredUser = await DbHandler.GetUser(model.Login);
-        if (registeredUser != null)
+        if (!form.IsValid)
         {
-            userExists = true;
+            processing = false;
+            return;
+        }
+        UserData registeredUser = await DbHandler.GetUserByLogin(model.Login);
+        loginExists = registeredUser != null;
+
+        registeredUser = await DbHandler.GetUserByEmail(model.Email);
+        emailExists = registeredUser != null;
+
+        if (loginExists || emailExists)
+        {
+            processing = false;
             return;
         }
 
-        userExists = false;
+
+        processing = false;
+        loginExists = false;
+        emailExists = false;
         createdUser.SetRegisterData(model.Login, model.Password, model.Email, model.Name);
 
         MudDialog.Close(DialogResult.Ok<UserData>(createdUser));

@@ -126,7 +126,7 @@
         if (userLogin.Length == 0) return;
         loggingUser = true;
 
-        UserData? registeredUser = await DbHandler.GetUser(userLogin);
+        UserData? registeredUser = await DbHandler.GetUserByLogin(userLogin);
         loggingUser = false;
 
         if (registeredUser == null)
@@ -169,7 +169,7 @@
 
     private async Task RegisterUser()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = false };
         var dialog = await dialogService.ShowAsync<RegisterUserDialog>("Registration", options);
 
         var result = await dialog.Result;
@@ -179,7 +179,7 @@
 
     private async Task QuickRegister()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = true };
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = false };
         var parameters = new DialogParameters<RegisterUserDialog> { { d => d.QuickUserLogin, userLogin } };
         var dialog = await dialogService.ShowAsync<RegisterUserDialog>("Registration", parameters, options);
 
@@ -193,7 +193,7 @@
         showResetPassword = false;
         if (userLogin == null || userLogin.Length == 0) return;
 
-        UserData? user = await DbHandler.GetUser(userLogin);
+        UserData? user = await DbHandler.GetUserByLogin(userLogin);
         if (user == null) return;
 
         snackbar.Clear();

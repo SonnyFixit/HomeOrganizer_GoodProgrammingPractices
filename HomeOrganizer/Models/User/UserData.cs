@@ -82,7 +82,7 @@ namespace HomeOrganizer.Models.User
 
             feature.TileData.Position = Features.Count;
 
-            UserData? latestData = await DbHandler.GetUser(Credentials.Login);
+            UserData? latestData = await DbHandler.GetUserByLogin(Credentials.Login);
             if (latestData == null)
             {
                 return new Response(false, $"User is somehow null");
@@ -124,7 +124,7 @@ namespace HomeOrganizer.Models.User
                 return new Response(false, $"User does not contain feature {feature.FeatureData.Name}, {feature.TileData.UserGivenName} (which is weird?)");
             }
 
-            UserData? latestData = await DbHandler.GetUser(Credentials.Login);
+            UserData? latestData = await DbHandler.GetUserByLogin(Credentials.Login);
             if (latestData == null)
             {
                 return new Response(false, $"User is somehow null");

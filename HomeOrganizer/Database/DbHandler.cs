@@ -5,8 +5,6 @@ using HomeOrganizer.Models.User;
 
 using MongoDB.Driver;
 
-using MudBlazor;
-
 namespace MyWebsiteBlazor.Data.Database
 {
     public static class ExtendMongo
@@ -40,7 +38,7 @@ namespace MyWebsiteBlazor.Data.Database
 
         public static async Task<Response> CreateUser(UserData newUser)
         {
-            if (await GetUser(newUser.Credentials.Login) != null)
+            if (await GetUserByLogin(newUser.Credentials.Login) != null)
             {
                 return new Response(false, $"User {newUser.Credentials.Login} already exists!");
             }
@@ -78,7 +76,7 @@ namespace MyWebsiteBlazor.Data.Database
             }
         }
 
-        public static async Task<UserData?> GetUser(string login)
+        public static async Task<UserData?> GetUserByLogin(string login)
         {
             if (string.IsNullOrEmpty(login))
                 return null;
@@ -88,17 +86,27 @@ namespace MyWebsiteBlazor.Data.Database
 
             return registeredUser;
         }
+        public static async Task<UserData?> GetUserByEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return null;
+
+            var users = await db.GetCollection<UserData>("Users").FindAsync(d => d.Email == email);
+            var registeredUser = await users.FirstOrDefaultAsync();
+
+            return registeredUser;
+        }
 
         public static async Task<List<FeatureBase>> GetUsersFeatures(string login)
         {
-            var user = await GetUser(login);
+            var user = await GetUserByLogin(login);
             if (user == null) return new List<FeatureBase>();
             else return user.Features;
         }
 
         public static async Task<bool> UserExists(string login)
         {
-            UserData? registeredUser = await GetUser(login);
+            UserData? registeredUser = await GetUserByLogin(login);
             return registeredUser != null;
         }
 
