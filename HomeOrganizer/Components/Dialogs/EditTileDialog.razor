@@ -13,7 +13,7 @@
                               For="@(() => model.Name)"
                               Immediate="true"
                               Label="Name"
-                              Placeholder=@feature.TileData.UserGivenName />
+                              Placeholder=@Feature.TileData.UserGivenName />
 
                 <MudTextField @bind-Value="model.Description"
                               For="@(() => model.Description)"
@@ -21,7 +21,7 @@
                               Label="Description"
                               Class="pt-3"
                               Lines="3"
-                              Placeholder=@feature.TileData.UserGivenDescription />
+                              Placeholder=@Feature.TileData.UserGivenDescription />
 
             </MudCardContent>
 
@@ -67,18 +67,17 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined" Color="Color.Warning">Cancel</MudButton>
-        <MudButton Color="Color.Success" OnClick="CreateTile" EndIcon="@Icons.Material.Filled.CreateNewFolder" Variant="Variant.Outlined">Add</MudButton>
+        <MudButton Color="Color.Success" OnClick="EditTile" EndIcon="@Icons.Material.Filled.Upgrade" Variant="Variant.Outlined">Update</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter]
-    public string? FeatureName { get; set; }
+    public FeatureBase? Feature { get; set; }
     [Parameter]
     public bool UseDarkTheme { get; set; }
 
-    private FeatureBase? feature;
     private bool colorPaletteOpen = false;
 
     MudForm? form;
@@ -87,9 +86,13 @@
 
     protected override void OnInitialized()
     {
-        feature = FeaturesList.CreateFeature(FeatureName);
-        model.Icon = feature.TileData.Icon;
-        model.Color = Constants.TileColorPalettes[UseDarkTheme].ElementAt(0);
+        if (Feature == null)
+            MudDialog.Close(DialogResult.Cancel());
+
+        model.Icon = Feature.TileData.Icon;
+        model.Color = Constants.TileColorPalettes[UseDarkTheme].ElementAt(Feature.TileData.ColorIndex);
+        model.Description = Feature.TileData.UserGivenDescription;
+        model.Name = Feature.TileData.UserGivenName;
     }
 
     private class UserPartFeatureData
@@ -99,25 +102,27 @@
         public string Icon { get; set; } = MudBlazor.Icons.Material.Filled.QuestionMark;
         public MudColor Color { get; set; } = Constants.TileColorPalettes[false].ElementAt(0);
     }
+
     private void TogglePalette()
     {
         colorPaletteOpen = !colorPaletteOpen;
     }
 
+
     void Cancel() => MudDialog.Cancel();
 
-    private async Task CreateTile()
+    private async Task EditTile()
     {
         await form.Validate();
         if (!form.IsValid) return;
 
-        feature.TileData.UserGivenName = model.Name;
-        feature.TileData.UserGivenDescription = CheckDescription(model.Description);
-        feature.TileData.Icon = model.Icon;
-        feature.TileData.ColorIndex = Array.IndexOf(Constants.TileColorPalettes[UseDarkTheme], model.Color);
-        feature.FeatureData.IsUsed = true;
+        Feature.TileData.UserGivenName = model.Name;
+        Feature.TileData.UserGivenDescription = CheckDescription(model.Description);
+        Feature.TileData.Icon = model.Icon;
+        Feature.TileData.ColorIndex = Array.IndexOf(Constants.TileColorPalettes[UseDarkTheme], model.Color);
+        Feature.FeatureData.IsUsed = true;
 
-        MudDialog.Close(DialogResult.Ok<FeatureBase>(feature));
+        MudDialog.Close(DialogResult.Ok<FeatureBase>(Feature));
     }
 
     private string CheckDescription(string description)
@@ -141,7 +146,6 @@
 
         return newDescription;
     }
-
 
 
 

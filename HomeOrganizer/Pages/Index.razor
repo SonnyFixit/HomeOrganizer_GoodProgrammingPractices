@@ -15,6 +15,7 @@
 
 @inject UserService userService
 @inject IDialogService DialogService
+@inject ISnackbar snackbarService
 
 @page "/"
 
@@ -49,12 +50,15 @@ else
                 @foreach (var feature in User.Features.OrderBy(f => f.TileData.Position))
                 {
                     if (feature == null || !feature.FeatureData.IsUsed) continue;
-                    <FeatureTile IsDarkMode="@User.UseDarkTheme" Feature="@feature" OnRemoveFeature="HandleRemoveFeature" OnOpenFeature="HandleOpenFeature" />
+                    <FeatureTile IsDarkMode="@User.UseDarkTheme" Feature="@feature"
+                     OnOpenFeature="HandleOpenFeature"
+                     OnEditFeature="HandleEditFeature"
+                     OnRemoveFeature="HandleRemoveFeature" />
                 }
 
             </MudGrid>
             <MudGrid Justify="Justify.Center" Style="margin-top: auto;">
-                <AddFeatureTile UserData="User" />
+                <AddFeatureTile User="User" />
             </MudGrid>
         </MudContainer>
     }
@@ -83,18 +87,12 @@ else
     private Type? selectedType = null;
     private Dictionary<string, object>? parameters = new Dictionary<string, object>();
 
-    private async Task HandleRemoveFeature(FeatureBase feature)
+    protected override async Task OnInitializedAsync()
     {
-        Response response = await User.RemoveFeature(feature);
-        if (response.Status)
-        {
-            userService.LoggedUser = User;
-        }
-        else
-        {
+        userService.OnChange += HandleUserUpdate;
+        User = userService.LoggedUser;
 
-        }
-        StateHasChanged();
+        base.OnInitialized();
     }
 
     private void HandleOpenFeature(FeatureBase feature)
@@ -106,6 +104,41 @@ else
             {"FeatureBase", User.OpenedFeature}
         };
     }
+
+    private async Task HandleEditFeature(FeatureBase feature)
+    {
+        Response response = await User.UpdateFeature(feature);
+
+        if (response.Status)
+        {
+            userService.LoggedUser = User;
+        }
+        else
+        {
+            snackbarService.Clear();
+            snackbarService.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            snackbarService.Add($"Cannot edit tile! {response.Message}", Severity.Error);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task HandleRemoveFeature(FeatureBase feature)
+    {
+        Response response = await User.RemoveFeature(feature);
+        if (response.Status)
+        {
+            userService.LoggedUser = User;
+        }
+        else
+        {
+            snackbarService.Clear();
+            snackbarService.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            snackbarService.Add($"Cannot remove tile! {response.Message}", Severity.Error);
+        }
+        StateHasChanged();
+    }
+
 
     private async void HandleUserUpdate()
     {
@@ -124,13 +157,6 @@ else
         userService.OnChange -= HandleUserUpdate;
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        userService.OnChange += HandleUserUpdate;
-        User = userService.LoggedUser;
-
-        base.OnInitialized();
-    }
 
 
     // TODO: DRAG AND DROP MUDBLAZOR

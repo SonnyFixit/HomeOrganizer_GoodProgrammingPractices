@@ -3,7 +3,7 @@
 @using HomeOrganizer.Models.Bases;
 @using HomeOrganizer.Models.User;
 
-@inject IDialogService DialogService
+@inject IDialogService dialogService
 @inject UserService userService
 
 @if (Feature == null) return;
@@ -11,12 +11,12 @@
 <MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5">
     <MudPaper Height="100%" Class="pa-3" Style="@($"cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}")"
               draggable="true" dropzone="move"
-    @ondragstart="HandleDragStart"
-    @ondragenter="HandleDragEnter"
-    @ondragleave="HandleDragLeave"
-             ondragover="event.preventDefault();"
-    @ondrop="HandleDrop"
-    @onclick="OpenFeature">
+              @ondragstart="HandleDragStart"
+              @ondragenter="HandleDragEnter"
+              @ondragleave="HandleDragLeave"
+              ondragover="event.preventDefault();"
+              @ondrop="HandleDrop"
+              @onclick="OpenFeature">
         <MudGrid>
             <MudItem xs="10" Class="py-0  d-flex align-center noSelect">
                 <MudText Typo="Typo.h5">
@@ -29,7 +29,7 @@
                     <MudMenuItem OnClick="RemoveFeature">
                         Delete
                     </MudMenuItem>
-                    <MudMenuItem>
+                    <MudMenuItem OnClick="EditFeature">
                         Edit
                     </MudMenuItem>
                 </MudMenu>
@@ -59,21 +59,41 @@
     public FeatureBase? Feature { get; set; }
 
     [Parameter]
-    public EventCallback<FeatureBase> OnRemoveFeature { get; set; }
+    public EventCallback<FeatureBase> OnOpenFeature { get; set; }
 
     [Parameter]
-    public EventCallback<FeatureBase> OnOpenFeature { get; set; }
+    public EventCallback<FeatureBase> OnEditFeature { get; set; }
+
+    [Parameter]
+    public EventCallback<FeatureBase> OnRemoveFeature { get; set; }
 
     [Parameter]
     public bool IsDarkMode { get; set; } = false;
     private bool dragDropTarget = false;
 
+    private async Task EditFeature()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth = true, MaxWidth = MaxWidth.Medium };
+        var parameters = new DialogParameters<EditTileDialog>();
+        parameters.Add("Feature", Feature);
+        parameters.Add("UseDarkTheme", IsDarkMode);
+
+        var dialog = await dialogService.ShowAsync<EditTileDialog>($"Edit {Feature.TileData.UserGivenName} tile", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (result.Canceled) return;
+        if (result.Data is not FeatureBase feature) return;
+
+        Feature = feature;
+        await OnEditFeature.InvokeAsync(Feature);
+    }
 
     private async Task RemoveFeature()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<DeleteConfirmDialog> { { f => f.Feature, Feature } };
-        var dialog = await DialogService.ShowAsync<DeleteConfirmDialog>("Confirm", parameters, options);
+        var dialog = await dialogService.ShowAsync<DeleteConfirmDialog>("Confirm", parameters, options);
 
         var result = await dialog.Result;
 

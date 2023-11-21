@@ -97,6 +97,19 @@ namespace HomeOrganizer.Models.User
             return new Response(true, $"Created {feature.FeatureData.Name}");
         }
 
+        public async Task<Response> UpdateFeature(FeatureBase feature)
+        {
+            if (feature == null || feature.FeatureData.Name.Length == 0)
+            {
+                return new Response(false, "Edited feature is unknown");
+            }
+
+            int updateFeatureIndex = Features.FindIndex(f => f.Compare(feature));
+            Features[updateFeatureIndex] = feature;
+
+            return new Response(true, $"Feature {feature.FeatureData.Name}, {feature.TileData.UserGivenName} updated.");
+        }
+
         public async Task<Response> RemoveFeature(FeatureBase feature)
         {
             if (feature == null || feature.FeatureData.Name.Length == 0)
