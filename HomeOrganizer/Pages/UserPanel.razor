@@ -22,47 +22,48 @@
 }
 else
 {
-    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Elevation="0">
-        <MudPaper Width="600px" Height="600px" Class="pa-4 mt-16">
+    <MudPaper Width="900px" Height="600px" Class="mx-auto mt-10 mud-theme-transparent" Elevation="0">
 
-            <MudText Typo="Typo.h4" Align="Align.Center">
-                User panel
-            </MudText>
+        <MudStack Row="true" Style="width:100%; height:100%;" Class="mud-theme-transparent" Spacing="3">
+            <MudPaper Width="180px" Class="mud-theme-transparent" Elevation="0">
+                @if (!user.RightUserPanelNavigation)
+                {
+                    <UserPanelNavigation OnNavigationChanged="HandleNavigationChanged" />
+                }
+            </MudPaper>
+            <MudPaper Width="540px" Class="pa-4" Elevation="0">
+                CURRENT PANEL: @currentPanel
+            </MudPaper>
+            <MudPaper Width="180px" Class="mud-theme-transparent" Elevation="0">
+                @if (user.RightUserPanelNavigation)
+                {
+                    <UserPanelNavigation OnNavigationChanged="HandleNavigationChanged" />
+                }
+            </MudPaper>
+        </MudStack>
 
-            <MudGrid>
-                <MudItem xs="12" sm="3">
-                    <MudImage Width="100" Height="100"
-                          Src="images/DefaultUser.png" Alt="User profile avatar"
-                          Elevation="25" Class="rounded-lg" />
-                </MudItem>
-                <MudItem xs="12" sm="9">
-                    <MudText Typo="Typo.h6" Align="Align.Start">
-                        @user.Credentials.Login
-                    </MudText>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudText>
-                        Name: @user.Name
-                    </MudText>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudText>
-                        Email: @user.Email
-                    </MudText>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
     </MudPaper>
 }
 
 
 @code {
     UserData? user = null;
+    string currentPanel = "Profile";
+
+    private void HandleNavigationChanged(string changedTo)
+    {
+        if (currentPanel == changedTo)
+            return;
+
+        currentPanel = changedTo;
+        StateHasChanged();
+    }
 
     protected override void OnInitialized()
     {
         user = userService.LoggedUser;
         if (user == null) return;
+        user.RightUserPanelNavigation = false;
         base.OnInitialized();
     }
 

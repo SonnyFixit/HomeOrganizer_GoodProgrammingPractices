@@ -20,6 +20,7 @@ namespace HomeOrganizer.Models.User
         public string Name { get; private set; } = "";
         public string Email { get; private set; } = "";
         public bool UseDarkTheme { get; set; } = false;
+        public bool RightUserPanelNavigation { get; set; } = false;
 
         private Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
 
