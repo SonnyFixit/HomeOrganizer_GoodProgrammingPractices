@@ -1,0 +1,31 @@
+﻿@using HomeOrganizer.Models.Bases;
+
+<MudDialog DefaultFocus="DefaultFocus.LastChild">
+    <DialogContent>
+        <Cropper ImageFile="AvatarImage" @ref="cropper"
+                 PureCSharpProcessing="true"
+                 IsImageLocked="true" CropperHeight="250" Ratio="1.0" RequireAspectRatio="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudStack Row="true" Justify="Justify.SpaceBetween" Style="width:100%;" Class="px-4 pb-2">
+            <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined"> Cancel </MudButton>
+            <MudButton Color="Color.Success" OnClick="CropAvatar" EndIcon="@Icons.Material.Filled.Crop" Variant="Variant.Outlined">Crop</MudButton>
+        </MudStack>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public IBrowserFile? AvatarImage { get; set; }
+    Cropper cropper;
+
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task CropAvatar()
+    {
+        var cropperResult = await cropper.GetCropedResult();
+        MudDialog.Close(DialogResult.Ok<ImageCroppedResult>(cropperResult));
+    }
+}

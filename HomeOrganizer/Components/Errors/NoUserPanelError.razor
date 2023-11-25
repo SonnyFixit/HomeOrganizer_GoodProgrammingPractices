@@ -1,0 +1,39 @@
+﻿@using HomeOrganizer.Models.User;
+@inject NavigationManager navigationManager
+@inject UserService userService
+
+@if (User == null)
+{
+    <HomeOrganizer.Components.Errors.NoFeatureError />
+    return;
+}
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5">
+            Error
+        </MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudText Typo="Typo.body1">
+            Whooops... Something went wrong! <br />
+            We cannot recognize this user setting panel.
+        </MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudButton OnClick="GoHome" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
+            Back home
+        </MudButton>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public UserData? User { get; set; } = null;
+
+
+    private void GoHome()
+    {
+        navigationManager.NavigateTo("/UserPanel");
+    }
+}

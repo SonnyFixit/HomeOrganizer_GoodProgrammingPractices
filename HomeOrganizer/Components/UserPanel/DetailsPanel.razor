@@ -1,0 +1,29 @@
+﻿@using HomeOrganizer.Models.User;
+
+@inject UserService userService
+
+@if (User == null)
+{
+    <HomeOrganizer.Components.Errors.NoFeatureError />
+    return;
+}
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5">
+            Details
+        </MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudText Typo="Typo.body1">
+            Hello @User.Credentials.Login!
+        </MudText>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public UserData? User { get; set; } = null;
+
+
+}

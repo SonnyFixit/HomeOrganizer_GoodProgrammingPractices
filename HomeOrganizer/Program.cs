@@ -16,6 +16,7 @@ builder.Services.AddServerSideBlazor()
         options.HandshakeTimeout = TimeSpan.FromSeconds(30);
         options.MaximumReceiveMessageSize = 32 * 1024 * 100;
     });
+
 builder.Services.AddMudServices();
 
 var app = builder.Build();

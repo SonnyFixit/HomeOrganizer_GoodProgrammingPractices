@@ -26,15 +26,15 @@
             </MudText>
         </MudPaper>
         <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Toggled="@IsDarkMode" Edge="Edge.End"
-                         Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
-                         ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
+                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
+                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
     }
     else
     {
         <MudPaper Class="mud-theme-transparent d-flex justify-center flex-grow-1 gap-4" Elevation="0" Style="width:300px">
             <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Class="mx-0" Toggled="@IsDarkMode"
-                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
-                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
+                                 Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
+                                 ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
         </MudPaper>
     }
     <MudSpacer />
@@ -44,7 +44,7 @@
             <MudMenu>
                 <ActivatorContent>
                     <MudAvatar Rounded="true" Style="cursor:pointer; height:40px; width:40px;">
-                        <MudImage Width="40" Height="40" Src="images/DefaultUser.png" Alt="User profile avatar" Elevation="25" />
+                        <MudImage Width="40" Height="40" Src="@User.Avatar" Alt="User profile avatar" Elevation="25" />
                     </MudAvatar>
                 </ActivatorContent>
                 <ChildContent>

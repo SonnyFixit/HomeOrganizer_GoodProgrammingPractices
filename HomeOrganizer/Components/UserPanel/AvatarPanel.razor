@@ -1,0 +1,124 @@
+﻿@using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Models.User;
+
+@inject UserService userService
+@inject IDialogService dialogService
+@inject IJSRuntime js
+@inject ISnackbar snackbarService
+
+@if (User == null)
+{
+    <HomeOrganizer.Components.Errors.NoFeatureError />
+    return;
+}
+
+<MudStack Row="false" Justify="Justify.SpaceBetween" Style="height:50%">
+    <MudPaper Elevation="0">
+        <MudText Typo="Typo.h5">
+            Avatar
+        </MudText>
+    </MudPaper>
+
+    <MudPaper Elevation="0">
+        <MudStack Row="true" Justify="Justify.SpaceAround" AlignItems="AlignItems.Center">
+            <MudAvatar Rounded="true" Style="height:100px; width:100px;">
+                <MudImage Width="100" Height="100" Src="@User.Avatar" Alt="User profile avatar" Elevation="25" />
+            </MudAvatar>
+            @if (croppedAvatar != null)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="Color.Secondary" Style="font-size: 4rem;" />
+
+                <MudAvatar Rounded="true" Style="height:100px; width:100px;">
+                    <MudImage id="newAvatarImage" Width="100" Height="100" Src="" Alt="User profile avatar" Elevation="25" />
+                </MudAvatar>
+            }
+        </MudStack>
+    </MudPaper>
+
+    @if (croppedAvatar == null)
+    {
+        <MudStack Row="true" Justify="Justify.Center">
+            <MudFileUpload T="IBrowserFile" Accept=".png, .jpg" FilesChanged="UploadFile" MaximumFileCount="1">
+                <ButtonTemplate>
+                    <MudButton HtmlTag="label"
+                               Variant="Variant.Outlined"
+                               Color="Color.Success"
+                               Class="mx-auto"
+                               StartIcon="@Icons.Material.Filled.CloudUpload"
+                               for="@context">
+                        Upload image
+                    </MudButton>
+                </ButtonTemplate>
+            </MudFileUpload>
+        </MudStack>
+    }
+    else
+    {
+        <MudStack Row="true" Justify="Justify.SpaceBetween" Style="width:100%;" Class="px-4 pb-2">
+            <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined"> Cancel </MudButton>
+            <MudButton Color="Color.Success" OnClick="UpdateAvatar" EndIcon="@Icons.Material.Filled.Crop" Variant="Variant.Outlined">Update</MudButton>
+        </MudStack>
+    }
+
+</MudStack>
+
+@code {
+    [Parameter]
+    public UserData? User { get; set; } = null;
+
+    Cropper cropper;
+    ImageCroppedResult? croppedAvatar = null;
+
+    private async Task UploadFile(IBrowserFile file)
+    {
+        croppedAvatar = null;
+        IBrowserFile? avatarImage = await file.RequestImageFileAsync("png", 250, 250);
+
+        DialogResult? result = await ShowCropperDialog(avatarImage);
+        if (result == null || result.Canceled) return;
+        if (result.Data is not ImageCroppedResult croppedResult) return;
+
+        croppedAvatar = croppedResult;
+
+        var buffer = await croppedAvatar.GetDataAsync();
+
+        StateHasChanged();
+        await Task.Delay(10);
+        await js.SetImageAsync(buffer, "newAvatarImage", croppedAvatar.Format.DefaultMimeType);
+
+        StateHasChanged();
+    }
+
+    private async Task<DialogResult?> ShowCropperDialog(IBrowserFile avatarImage)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = false };
+        var parameters = new DialogParameters<ChangeAvatarDialog> { { d => d.AvatarImage, avatarImage } };
+        var dialog = await dialogService.ShowAsync<ChangeAvatarDialog>("Crop avatar image", parameters, options);
+
+        return await dialog.Result;
+    }
+
+    private async Task Cancel()
+    {
+        croppedAvatar = null;
+    }
+
+    private async Task UpdateAvatar()
+    {
+        var buffer = await croppedAvatar.GetDataAsync();
+        string avatarBase64 = Convert.ToBase64String(buffer);
+
+        bool userUpdateResult = User.UpdateImage(avatarBase64);
+        if (userUpdateResult)
+        {
+            userService.LoggedUser = User;
+            croppedAvatar = null;
+        }
+        else
+        {
+            snackbarService.Clear();
+            snackbarService.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            snackbarService.Add("Cannot update avatara :( Contact us please!", Severity.Error);
+        }
+    }
+}

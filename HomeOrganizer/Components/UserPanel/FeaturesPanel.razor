@@ -1,0 +1,38 @@
+﻿@using HomeOrganizer.Models.User;
+
+@inject UserService userService
+
+@if (User == null)
+{
+    <HomeOrganizer.Components.Errors.NoFeatureError />
+    return;
+}
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5">
+            Features
+        </MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudTable Items="@User.Features" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+            <HeaderContent>
+                <MudTh>#</MudTh>
+                <MudTh>Type</MudTh>
+                <MudTh>Name</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="#">@context.TileData.Position</MudTd>
+                <MudTd DataLabel="Type">@context.FeatureData.Name</MudTd>
+                <MudTd DataLabel="Name">@context.TileData.UserGivenName</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public UserData? User { get; set; } = null;
+
+
+}

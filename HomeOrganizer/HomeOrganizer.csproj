@@ -10,10 +10,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.16" />
 		<PackageReference Include="FluentValidation" Version="11.8.0" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
 		<PackageReference Include="MongoDB.Driver" Version="2.22.0" />
 		<PackageReference Include="MudBlazor" Version="6.11.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\images\temp\" />
 	</ItemGroup>
 
 </Project>

@@ -17,6 +17,7 @@ namespace HomeOrganizer.Models.User
         public ObjectId Id { get; set; }
 
         public UserCredentials Credentials { get; private set; } = new UserCredentials("Default", "Default");
+        public string Avatar { get; private set; } = "images/DefaultUser.png";
         public string Name { get; private set; } = "";
         public string Email { get; private set; } = "";
         public bool UseDarkTheme { get; set; } = false;
@@ -36,6 +37,13 @@ namespace HomeOrganizer.Models.User
             };
             featuresUsage = FeaturesList.FeaturesUsage();
             featuresUsage[Features[0].FeatureData.Name] += 2; // Prevent from creating new Introduction tiles
+        }
+
+        public bool UpdateImage(string base64Image)
+        {
+            if (string.IsNullOrEmpty(base64Image)) return false;
+            Avatar = $"data:image/png;base64, {base64Image}";
+            return true;
         }
 
         public void ResetPassword(string newPassword)

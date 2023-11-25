@@ -1,0 +1,31 @@
+﻿@using HomeOrganizer.Models.User;
+
+@inject UserService userService
+
+@if (User == null)
+{
+    <HomeOrganizer.Components.Errors.NoFeatureError />
+    return;
+}
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5">
+            Notifications
+        </MudText>
+    </MudItem>
+    <MudItem xs="12">
+        <MudText Typo="Typo.body1">
+            Hello @User.Credentials.Login! <br />
+            There should be notification settings but we are working on them right now... <br />
+            Please! Be patient! They will be soon!
+        </MudText>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public UserData? User { get; set; } = null;
+
+
+}

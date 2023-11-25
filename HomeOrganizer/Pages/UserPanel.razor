@@ -32,7 +32,16 @@ else
                 }
             </MudPaper>
             <MudPaper Width="540px" Class="pa-4" Elevation="0">
-                CURRENT PANEL: @currentPanel
+
+                @if (selectedPanel == null || parameters == null)
+                {
+                    <NoUserPanelError />
+                }
+                else
+                {
+                    <DynamicComponent Type="@selectedPanel" Parameters="@parameters" />
+                }
+
             </MudPaper>
             <MudPaper Width="180px" Class="mud-theme-transparent" Elevation="0">
                 @if (user.RightUserPanelNavigation)
@@ -48,15 +57,20 @@ else
 
 @code {
     UserData? user = null;
-    string currentPanel = "Profile";
+
+    private Type? selectedPanel = null;
+    private Dictionary<string, object>? parameters = null;
 
     private void HandleNavigationChanged(string changedTo)
     {
-        if (currentPanel == changedTo)
-            return;
+        if (string.IsNullOrEmpty(changedTo)) return;
 
-        currentPanel = changedTo;
-        StateHasChanged();
+        selectedPanel = Common.DynamicComponentMenager.GetUserPanelType(changedTo + "Panel");
+
+        parameters = new Dictionary<string, object>()
+        {
+            {"User", user}
+        };
     }
 
     protected override void OnInitialized()
