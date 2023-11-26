@@ -34,9 +34,9 @@
                               Required="true"
                               Label="Password"
                               Placeholder="Password"
-                              InputType="@PasswordInput"
-                              Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon"
-                              OnAdornmentClick="ChangePasswordVisibility" AdornmentAriaLabel="Show Password" />
+                              InputType="@passwordsVisibilities["Password"].InputType"
+                              Adornment="Adornment.End" AdornmentIcon="@passwordsVisibilities["Password"].Icon"
+                              OnAdornmentClick="@passwordsVisibilities["Password"].ChangeVisibility" AdornmentAriaLabel="Show Password" />
 
                 <MudTextField @bind-Value="model.PasswordRepeated"
                               For="@(() => model.PasswordRepeated)"
@@ -44,9 +44,9 @@
                               Required="true"
                               Label="Password repeated"
                               Placeholder="Repeat password"
-                              InputType="@PasswordInput"
-                              Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon"
-                              OnAdornmentClick="ChangePasswordVisibility" AdornmentAriaLabel="Show Password" />
+                              InputType="@passwordsVisibilities["Repeated"].InputType"
+                              Adornment="Adornment.End" AdornmentIcon="@passwordsVisibilities["Repeated"].Icon"
+                              OnAdornmentClick="@passwordsVisibilities["Repeated"].ChangeVisibility" AdornmentAriaLabel="Show Password" />
 
                 <MudTextField @bind-Value="model.Email"
                               For="@(() => model.Email)"
@@ -94,9 +94,11 @@
 
     UserData createdUser = new UserData();
 
-    bool showPassword = false;
-    InputType PasswordInput = InputType.Password;
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    private Dictionary<string, PasswordVisibility> passwordsVisibilities = new Dictionary<string, PasswordVisibility>()
+    {
+        {"Password", new PasswordVisibility()},
+        {"Repeated", new PasswordVisibility()}
+    };
 
     void Cancel() => MudDialog.Cancel();
     protected override void OnInitialized()
@@ -111,21 +113,6 @@
         }
 
         base.OnInitialized();
-    }
-
-    void ChangePasswordVisibility()
-    {
-        showPassword = !showPassword;
-        @if (showPassword)
-        {
-            PasswordInput = InputType.Text;
-            PasswordInputIcon = Icons.Material.Filled.Visibility;
-        }
-        else
-        {
-            PasswordInput = InputType.Password;
-            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-        }
     }
 
     private async Task RegisterUser()

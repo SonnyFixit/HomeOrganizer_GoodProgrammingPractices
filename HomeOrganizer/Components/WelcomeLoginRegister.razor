@@ -30,8 +30,8 @@
                         {
 
                             <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mt-1"
-                              OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
-                              CloseIconClicked="(()=>{showResetPassword = false;})">
+                                      OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
+                                      CloseIconClicked="(()=>{showResetPassword = false;})">
                                 Reset your password
                             </MudAlert>
                         }
@@ -39,8 +39,8 @@
                         if (showUserNotFound)
                         {
                             <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Dense="true" Class=""
-                              OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
-                              CloseIconClicked="(()=>{showUserNotFound = false;})">
+                                      OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
+                                      CloseIconClicked="(()=>{showUserNotFound = false;})">
                                 Click here for quick register!
                             </MudAlert>
                         }
@@ -68,9 +68,9 @@
                                   Required="true"
                                   Placeholder="Password"
                                   OnKeyDown="OnLoginEnter"
-                                  InputType="@PasswordInput"
-                                  Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon"
-                                  OnAdornmentClick="ChangePasswordVisibility" AdornmentAriaLabel="Show Password" />
+                                  InputType="@passwordVisibility.InputType"
+                                  Adornment="Adornment.End" AdornmentIcon="@passwordVisibility.Icon"
+                                  OnAdornmentClick="@passwordVisibility.ChangeVisibility" AdornmentAriaLabel="Show Password" />
 
                     <MudButton Class="pt-1" OnClick="LoginUser" EndIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Outlined">
                         Login
@@ -96,24 +96,7 @@
     private bool showResetPassword = false;
     private bool cannotLogin = false;
 
-    bool showPassword = false;
-    InputType PasswordInput = InputType.Password;
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-
-    void ChangePasswordVisibility()
-    {
-        showPassword = !showPassword;
-        @if (showPassword)
-        {
-            PasswordInput = InputType.Text;
-            PasswordInputIcon = Icons.Material.Filled.Visibility;
-        }
-        else
-        {
-            PasswordInput = InputType.Password;
-            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-        }
-    }
+    private PasswordVisibility passwordVisibility = new PasswordVisibility();
 
     private async Task OnLoginEnter(KeyboardEventArgs e)
     {

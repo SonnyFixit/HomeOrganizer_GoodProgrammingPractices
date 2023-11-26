@@ -8,7 +8,7 @@
 
 @if (User == null)
 {
-    <HomeOrganizer.Components.Errors.NoFeatureError />
+    <HomeOrganizer.Components.Errors.NoUserPanelError />
     return;
 }
 
@@ -92,8 +92,8 @@
     private async Task<DialogResult?> ShowCropperDialog(IBrowserFile avatarImage)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = false };
-        var parameters = new DialogParameters<ChangeAvatarDialog> { { d => d.AvatarImage, avatarImage } };
-        var dialog = await dialogService.ShowAsync<ChangeAvatarDialog>("Crop avatar image", parameters, options);
+        var parameters = new DialogParameters<CropAvatarDialog> { { d => d.AvatarImage, avatarImage } };
+        var dialog = await dialogService.ShowAsync<CropAvatarDialog>("Crop avatar image", parameters, options);
 
         return await dialog.Result;
     }
