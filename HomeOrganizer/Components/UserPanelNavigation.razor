@@ -12,7 +12,7 @@
 @inject NavigationManager navigationManager
 
 
-<MudPaper Width="100%" Height="100%" Elevation="0">
+<MudPaper Class="d-flex align-content-space-between flex-wrap flex-grow-1" Width="100%" Height="100%" Elevation="0">
     <MudList Clickable="true" SelectedItemChanged="HandleItemChanged">
         <MudListSubheader>
             Settings
@@ -23,15 +23,37 @@
         <MudListItem Icon="@Icons.Material.Filled.Notifications" Text="Notifications" Value="4" />
         <MudListItem Icon="@Icons.Material.Filled.FormatListNumbered" Text="Features" Value="5" />
     </MudList>
+    <MudStack Justify="Justify.Center" Row="true" Style="width: 100%; height: 40px;">
+
+        @if (IsRightSide)
+        {
+            <MudButton Style="width:100%" OnClick="ChangeSide" StartIcon="@Icons.Material.Filled.ArrowBack" Color="Color.Success" aria-label="Move left" />
+        }
+        else
+        {
+            <MudButton Style="width:100%" OnClick="ChangeSide" StartIcon="@Icons.Material.Filled.ArrowForward" Color="Color.Success" aria-label="Move right" />
+        }
+    </MudStack>
 </MudPaper>
 
 @code {
     [Parameter]
+    public bool IsRightSide { get; set; } = false;
+
+    [Parameter]
     public EventCallback<string> OnNavigationChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnSideChange { get; set; }
 
     private async Task HandleItemChanged(MudListItem selectedItem)
     {
         if (selectedItem == null) return;
         await OnNavigationChanged.InvokeAsync(selectedItem.Text);
+    }
+
+    private async Task ChangeSide()
+    {
+        await OnSideChange.InvokeAsync();
     }
 }

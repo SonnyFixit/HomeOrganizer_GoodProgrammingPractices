@@ -41,7 +41,7 @@
     <MudPaper Class="mud-theme-transparent d-flex justify-end align-center" Elevation="0" Width="170px" Height="100%">
         @if (User != null)
         {
-            <MudMenu>
+            <MudMenu AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopRight">
                 <ActivatorContent>
                     <MudAvatar Rounded="true" Style="cursor:pointer; height:40px; width:40px;">
                         <MudImage Width="40" Height="40" Src="@User.Avatar" Alt="User profile avatar" Elevation="25" />
