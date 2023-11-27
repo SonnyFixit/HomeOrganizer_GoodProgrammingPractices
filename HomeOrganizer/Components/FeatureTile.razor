@@ -10,19 +10,20 @@
 
 <MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5" Style="height:200px">
 
-    <MudCard Style="@($"height:100%; cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}; ")" draggable="true" dropzone="move"
+    <MudCard Style="@($"height:100%; cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}; {outlineStyle} {marginStyle}")" draggable="true" dropzone="move"
              Class="d-flex flex-column flex-grow-1 align-stretch"
+             ondragover="event.preventDefault();"
     @ondragstart="HandleDragStart"
     @ondragenter="HandleDragEnter"
     @ondragleave="HandleDragLeave"
-             ondragover="event.preventDefault();"
-    @ondrop="HandleDrop"
-    @onclick="OpenFeature">
+    @ondragend="HandleDragEnd"
+    @onclick="OpenFeature"
+    @ondrop="HandleDrop">
         <MudCardHeader>
             <CardHeaderContent>
                 <MudStack Spacing="0">
                     <MudText Typo="Typo.h6">
-                        @Feature.TileData.UserGivenName
+                        @Feature.TileData.UserGivenName [@Feature.TileData.Position]
                     </MudText>
                     <MudText Typo="Typo.caption">
                         <i>
@@ -71,6 +72,10 @@
     public bool IsDarkMode { get; set; } = false;
     private bool dragDropTarget = false;
 
+    private int onHoverCounter = 0;
+    private string outlineStyle = string.Empty;
+    private string marginStyle = string.Empty;
+
     private async Task EditFeature()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth = true, MaxWidth = MaxWidth.Medium };
@@ -110,14 +115,23 @@
         OnOpenFeature.InvokeAsync(Feature);
     }
 
+    private void ClearHoverData()
+    {
+        onHoverCounter = 0;
+        outlineStyle = string.Empty;
+        marginStyle = string.Empty;
+    }
+
     private void HandleDrop(DragEventArgs e)
     {
+        ClearHoverData();
+
         if (userService.DraggedFeatureTile == null) return;
         if (userService.DraggedFeatureTile == Feature) return;
 
+        var sortedFeatures = userService.LoggedUser.Features.OrderBy(f => f.TileData.Position).ToList();
         int dragPosition = userService.DraggedFeatureTile.TileData.Position;
         int dropPosition = Feature.TileData.Position;
-        var sortedFeatures = userService.LoggedUser.Features.OrderBy(f => f.TileData.Position).ToList();
 
         int direction = dragPosition > dropPosition ? 1 : -1;
 
@@ -125,6 +139,7 @@
         {
             sortedFeatures[i].TileData.Position += direction;
         }
+
         sortedFeatures[dragPosition].TileData.Position = dropPosition;
         UserData tmpUser = userService.LoggedUser;
         tmpUser.Features = sortedFeatures;
@@ -134,16 +149,37 @@
 
     private void HandleDragStart(DragEventArgs e)
     {
+        ClearHoverData();
         userService.DraggedFeatureTile = Feature;
+    }
+
+    private void HandleDragEnd(DragEventArgs e)
+    {
+        ClearHoverData();
+    }
+
+    private void ChangeHoverClass()
+    {
+        string outlineColor = IsDarkMode ? "#bababa" : "#3d3d3d";
+        outlineStyle = onHoverCounter > 0 ? $"outline: 2px dashed {outlineColor};" : string.Empty;
+
+        // DragPosition > DropPosition -> direction
+        string marginSide = userService.DraggedFeatureTile.TileData.Position > Feature.TileData.Position ? "left" : "right";
+        marginStyle = onHoverCounter > 0 ? $"margin-{marginSide}:50px;" : string.Empty;
     }
 
     private void HandleDragEnter(DragEventArgs e)
     {
-        // Changle classes of tiles
+        if (userService.DraggedFeatureTile == Feature) return;
+        onHoverCounter++;
     }
 
-    private void HandleDragLeave(DragEventArgs e)
+    private async Task HandleDragLeave(DragEventArgs e)
     {
-        // Remove changed classes
+        await Task.Delay(10);
+        if (onHoverCounter > 0)
+            onHoverCounter--;
+
+        ChangeHoverClass();
     }
 }
