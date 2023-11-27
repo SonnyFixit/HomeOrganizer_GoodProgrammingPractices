@@ -29,8 +29,9 @@ else
                 @if (!user.RightUserPanelNavigation)
                 {
                     <UserPanelNavigation IsRightSide="user.RightUserPanelNavigation"
-                                         OnSideChange="HandleSideChange"
-                                         OnNavigationChanged="HandleNavigationChanged" />
+                                 CurrentPanel="@currentPanelValue"
+                                 OnSideChange="HandleSideChange"
+                                 OnNavigationChanged="HandleNavigationChanged" />
                 }
 
             </MudPaper>
@@ -50,8 +51,9 @@ else
                 @if (user.RightUserPanelNavigation)
                 {
                     <UserPanelNavigation IsRightSide="user.RightUserPanelNavigation"
-                                         OnSideChange="HandleSideChange"
-                                         OnNavigationChanged="HandleNavigationChanged" />
+                                 CurrentPanel="@currentPanelValue"
+                                 OnSideChange="HandleSideChange"
+                                 OnNavigationChanged="HandleNavigationChanged" />
                 }
             </MudPaper>
         </MudStack>
@@ -63,6 +65,7 @@ else
 @code {
     UserData? user = null;
 
+    private object currentPanelValue = 1;
     private Type? selectedPanel = null;
     private Dictionary<string, object>? parameters = null;
 
@@ -73,15 +76,17 @@ else
         userService.LoggedUser = user;
     }
 
-    private void HandleNavigationChanged(string changedTo)
+    private void HandleNavigationChanged(UserPanelNavigationData changedTo)
     {
-        if (string.IsNullOrEmpty(changedTo)) return;
+        if (string.IsNullOrEmpty(changedTo.Text)) return;
+        if (changedTo.Value == null) return;
 
-        selectedPanel = Common.DynamicComponentMenager.GetUserPanelType(changedTo + "Panel");
+        currentPanelValue = changedTo.Value;
+        selectedPanel = Common.DynamicComponentMenager.GetUserPanelType(changedTo.Text + "Panel");
 
         parameters = new Dictionary<string, object>()
             {
-            {"User", user}
+                {"User", user}
             };
     }
 
@@ -97,4 +102,5 @@ else
     {
         navigationManager.NavigateTo("/");
     }
+
 }

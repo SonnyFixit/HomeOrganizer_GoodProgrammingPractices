@@ -13,7 +13,7 @@
 
 
 <MudPaper Class="d-flex align-content-space-between flex-wrap flex-grow-1" Width="100%" Height="100%" Elevation="0">
-    <MudList @bind-SelectedValue="@selectedValue" Clickable="true" SelectedItemChanged="HandleItemChanged">
+    <MudList @bind-SelectedValue="@CurrentPanel" Clickable="true" SelectedItemChanged="HandleItemChanged">
         <MudListSubheader>
             Settings
         </MudListSubheader>
@@ -41,17 +41,18 @@
     public bool IsRightSide { get; set; } = false;
 
     [Parameter]
-    public EventCallback<string> OnNavigationChanged { get; set; }
+    public object CurrentPanel { get; set; } = 1;
+
+    [Parameter]
+    public EventCallback<UserPanelNavigationData> OnNavigationChanged { get; set; }
 
     [Parameter]
     public EventCallback OnSideChange { get; set; }
 
-    private object selectedValue = 1;
-
     private async Task HandleItemChanged(MudListItem selectedItem)
     {
         if (selectedItem == null) return;
-        await OnNavigationChanged.InvokeAsync(selectedItem.Text);
+        await OnNavigationChanged.InvokeAsync(new UserPanelNavigationData(selectedItem.Text, selectedItem.Value));
     }
 
     private async Task ChangeSide()
