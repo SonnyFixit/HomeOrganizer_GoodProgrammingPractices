@@ -75,9 +75,10 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined" Color="Color.Warning">Cancel</MudButton>
-        <MudSpacer />
-        <MudButton Color="Color.Success" OnClick="RegisterUser" EndIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Outlined">Register</MudButton>
+        <MudStack Row="true" Justify="Justify.SpaceBetween" Style="width:100%;" Class="px-4 pb-2">
+            <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined" Color="Color.Warning">Cancel</MudButton>
+            <MudButton Color="Color.Success" OnClick="RegisterUser" EndIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Outlined">Register</MudButton>
+        </MudStack>
     </DialogActions>
 </MudDialog>
 
