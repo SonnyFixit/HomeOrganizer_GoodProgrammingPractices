@@ -13,7 +13,7 @@
 
 
 <MudPaper Class="d-flex align-content-space-between flex-wrap flex-grow-1" Width="100%" Height="100%" Elevation="0">
-    <MudList Clickable="true" SelectedItemChanged="HandleItemChanged">
+    <MudList @bind-SelectedValue="@selectedValue" Clickable="true" SelectedItemChanged="HandleItemChanged">
         <MudListSubheader>
             Settings
         </MudListSubheader>
@@ -45,6 +45,8 @@
 
     [Parameter]
     public EventCallback OnSideChange { get; set; }
+
+    private object selectedValue = 1;
 
     private async Task HandleItemChanged(MudListItem selectedItem)
     {

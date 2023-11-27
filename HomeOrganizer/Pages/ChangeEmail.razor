@@ -1,0 +1,149 @@
+﻿@using FluentValidation;
+@using HomeOrganizer.Common;
+@using HomeOrganizer.Components
+@using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Components.Errors
+@using HomeOrganizer.Components.Features;
+@using HomeOrganizer.Models.Bases;
+@using HomeOrganizer.Models.Features;
+@using HomeOrganizer.Models.User;
+@using MudBlazor.Services;
+@using MyWebsiteBlazor.Data.Database;
+@using System.Reflection;
+
+@inject UserService userService
+@inject NavigationManager navigationManager
+@inject ISnackbar snackbarService
+
+@page "/ChangeEmail/{*token}"
+<PageTitle> Change email </PageTitle>
+
+<MudContainer Class="content px-4" Style="height:90%" MaxWidth="MaxWidth.Large">
+
+    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:10%;" Elevation="0">
+        <MudPaper Class="pa-4" Style="width:400px !important;">
+            <MudText Typo="Typo.h6" Align="Align.Center">
+                Home Organizer
+            </MudText>
+            <MudText Typo="Typo.subtitle2" Align="Align.Center">
+                Change email
+            </MudText>
+            <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-3" Elevation="0">
+                <MudStack Style="width:80%">
+
+                    @if (!afterReset)
+                    {
+                        @if (checkErrorMessage.Length > 0)
+                        {
+                            <MudText Typo="Typo.caption" Align="Align.Center" Color="Color.Error">
+                                @checkErrorMessage
+                            </MudText>
+                        }
+                        <MudTextField @bind-Value="userLogin"
+                                      For="@(() => userLogin)"
+                                      Immediate="true"
+                                      Label="Login"
+                                      Class="pt-3"
+                                      Required="true"
+                                      Placeholder="Provide login"
+                                      OnKeyDown="OnLoginEnter" />
+
+                        <MudButton Class="pt-1" OnClick="CheckToken" EndIcon="@Icons.Material.Filled.Check" Color="Color.Success" Variant="Variant.Outlined">
+                            Update email
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Class="pt-1" OnClick="BackToHome" EndIcon="@Icons.Material.Filled.Home" Color="Color.Success" Variant="Variant.Outlined">
+                            Back to main website
+                        </MudButton>
+                    }
+
+                </MudStack>
+
+            </MudPaper>
+        </MudPaper>
+    </MudPaper>
+
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string? Token { get; set; }
+
+    private string userLogin = string.Empty;
+    private string checkErrorMessage = string.Empty;
+    private bool afterReset = false;
+
+    protected override void OnInitialized()
+    {
+        Token = Token ?? string.Empty;
+    }
+
+    private async Task OnLoginEnter(KeyboardEventArgs e)
+    {
+        if (e.Code != "Enter") return;
+        await CheckToken();
+    }
+
+    private async Task CheckToken()
+    {
+        if (string.IsNullOrEmpty(userLogin))
+        {
+            checkErrorMessage = "Provided login is empty";
+            return;
+        }
+
+        if (string.IsNullOrEmpty(Token))
+        {
+            checkErrorMessage = "Wrong token!";
+            return;
+        }
+
+        ChangeEmailData changeData = await DbHandler.GetChangeEmailData(userLogin);
+        if (changeData == null)
+        {
+            checkErrorMessage = "Cannot get change email data, try resend email.";
+            return;
+        }
+
+        if (Security.IsEmailLinkExpired(changeData.CreationTime) || !Security.IsCorrectToken(Token, changeData.Salt, changeData.HashedToken))
+        {
+            checkErrorMessage = "Link expired, resend email.";
+            return;
+        }
+
+        checkErrorMessage = string.Empty;
+        await ChangeUserEmail(changeData.NewEmail);
+    }
+
+    private async Task ChangeUserEmail(string newEmail)
+    {
+        UserData user = await DbHandler.GetUserByLogin(userLogin);
+        if (user == null)
+        {
+            checkErrorMessage = $"Can't get {userLogin} user :(";
+            return;
+        }
+
+        user.UpdateEmail(newEmail);
+        var response = await DbHandler.UpdateUser(user);
+
+        snackbarService.Clear();
+        snackbarService.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        if (response.Status)
+        {
+            snackbarService.Add("Email successfully changed!", MudBlazor.Severity.Success);
+        }
+        else
+        {
+            snackbarService.Add("Couldn't change your email, try again later...", MudBlazor.Severity.Error);
+        }
+        afterReset = true;
+    }
+
+    private void BackToHome()
+    {
+        navigationManager.NavigateTo("/");
+    }
+}

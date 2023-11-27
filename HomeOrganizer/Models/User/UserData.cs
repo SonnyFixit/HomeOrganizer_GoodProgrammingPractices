@@ -25,6 +25,7 @@ namespace HomeOrganizer.Models.User
 
         private Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
 
+        [BsonIgnore]
         public FeatureBase? OpenedFeature { get; set; }
 
         public List<FeatureBase> Features { get; set; }
@@ -37,6 +38,22 @@ namespace HomeOrganizer.Models.User
             };
             featuresUsage = FeaturesList.FeaturesUsage();
             featuresUsage[Features[0].FeatureData.Name] += 2; // Prevent from creating new Introduction tiles
+        }
+
+        public void UpdateName(string name)
+        {
+            if (!string.IsNullOrEmpty(name) && Name != name)
+            {
+                Name = name;
+            }
+        }
+
+        public void UpdateEmail(string email)
+        {
+            if (!string.IsNullOrEmpty(email))
+            {
+                Email = email;
+            }
         }
 
         public bool UpdateImage(string base64Image)

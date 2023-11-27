@@ -1,29 +1,172 @@
-﻿@using HomeOrganizer.Models.User;
+﻿@using FluentValidation;
+@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.User;
+@using MyWebsiteBlazor.Data.Database;
 
 @inject UserService userService
+@inject ISnackbar snackbarService
+@inject NavigationManager navigationManager
 
 @if (User == null)
 {
-    <HomeOrganizer.Components.Errors.NoFeatureError />
+    <HomeOrganizer.Components.Errors.NoUserPanelError />
     return;
 }
 
-<MudGrid>
-    <MudItem xs="12">
+<MudStack Row="false" Justify="Justify.SpaceBetween" Style="height:60%">
+    <MudPaper Elevation="0">
         <MudText Typo="Typo.h5">
             Details
         </MudText>
-    </MudItem>
-    <MudItem xs="12">
-        <MudText Typo="Typo.body1">
-            Hello @User.Credentials.Login!
-        </MudText>
-    </MudItem>
-</MudGrid>
+    </MudPaper>
+    <MudPaper Elevation="0">
+        <MudForm Model="@model" @ref="@form" Validation="@(changeDetailsValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent>
+
+                @if (!goodCurrentPassword)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Error">
+                        Wrong current password!
+                    </MudText>
+                }
+
+                <MudTextField @bind-Value="model.Name"
+                              For="@(() => model.Name)"
+                              Immediate="true"
+                              Required="true"
+                              Label="Name"
+                              Placeholder="Name"
+                              InputType="@InputType.Text" />
+
+                <MudTextField @bind-Value="model.Email"
+                              For="@(() => model.Email)"
+                              Immediate="true"
+                              Required="true"
+                              Label="Name"
+                              Placeholder="Name"
+                              Class="mt-5"
+                              InputType="@InputType.Email" />
+
+                @if (!goodCurrentPassword)
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Error">
+                        Wrong password!
+                    </MudText>
+                }
+                <MudTextField @bind-Value="model.Password"
+                              For="@(() => model.Password)"
+                              Immediate="true"
+                              Required="true"
+                              Label="Password"
+                              Placeholder="Provide password"
+                              Class="mt-5"
+                              InputType="@passwordVisibility.InputType"
+                              Adornment="Adornment.End" AdornmentIcon="@passwordVisibility.Icon"
+                              OnAdornmentClick="@passwordVisibility.ChangeVisibility" AdornmentAriaLabel="Show Password" />
+
+            </MudCardContent>
+        </MudForm>
+    </MudPaper>
+    <MudStack Class="mt-5" Row="true" Justify="Justify.Center">
+        <MudButton OnClick="ChangeDetails" EndIcon="@Icons.Material.Filled.PublishedWithChanges" IconColor="Color.Success" Variant="Variant.Outlined" Color="Color.Success">
+            Change details
+        </MudButton>
+    </MudStack>
+</MudStack>
 
 @code {
     [Parameter]
     public UserData? User { get; set; } = null;
+    MudForm? form;
+    ModelFluentValidator changeDetailsValidator = new ModelFluentValidator();
+    DetailsModel model = new DetailsModel();
+
+    bool goodCurrentPassword = true;
+
+    PasswordVisibility passwordVisibility = new PasswordVisibility();
+
+    protected override void OnInitialized()
+    {
+        if (User == null) return;
+
+        model.Name = User.Name;
+        model.Email = User.Email;
+
+        base.OnInitialized();
+    }
 
 
+    private async Task ChangeDetails()
+    {
+        await form.Validate();
+        if (!form.IsValid)
+        {
+            return;
+        }
+
+        goodCurrentPassword = User.Credentials.CheckPassword(model.Password);
+
+        if (!goodCurrentPassword)
+        {
+            return;
+        }
+
+        User.UpdateName(model.Name);
+
+        snackbarService.Clear();
+        snackbarService.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        if (User.Email != model.Email)
+        {
+            ChangeEmailData resetData = Security.CreateChangeEmailData(User.Credentials.Login, model.Email);
+            await DbHandler.AddChangeEmailData(resetData);
+            string changeUrl = $"{navigationManager.BaseUri}ChangeEmail/{resetData.Token}";
+
+            snackbarService.Add($"We'll send confirmation mail to new mail, and notification mail to current mail!", MudBlazor.Severity.Warning);
+            await EmailService.SendEmailChangedNew(model.Email, User.Credentials.Login, changeUrl);
+            await EmailService.SendEmailChangedCurrent(User.Email, User.Credentials.Login);
+        }
+
+        var response = await DbHandler.UpdateUser(User);
+
+        if (response.Status)
+        {
+            snackbarService.Add("Details successfully changed!", MudBlazor.Severity.Success);
+            userService.LoggedUser = User;
+        }
+        else
+        {
+            snackbarService.Add("Couldn't change your details, try again later...", MudBlazor.Severity.Error);
+        }
+    }
+
+    private class DetailsModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private class ModelFluentValidator : AbstractValidator<DetailsModel>
+    {
+        public ModelFluentValidator()
+        {
+            RuleFor(m => m.Name)
+                .NotEmpty().WithMessage("Name cannot be empty")
+                .MinimumLength(2).WithMessage("Name length must be at least 2.")
+                .MaximumLength(30).WithMessage("Name length must not exceed 30.");
+
+            RuleFor(m => m.Email).EmailAddress();
+
+            RuleFor(m => m.Password)
+                .NotEmpty().WithMessage("Provide your current password to update changes");
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<DetailsModel>.CreateWithOptions((DetailsModel)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
 }

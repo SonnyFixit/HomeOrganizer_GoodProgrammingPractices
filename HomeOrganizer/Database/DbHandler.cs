@@ -135,6 +135,7 @@ namespace MyWebsiteBlazor.Data.Database
             return new Response(true, $"Created password reset data!");
         }
 
+
         public static async Task<ResetPasswordData?> GetResetPasswordData(string login)
         {
             if (string.IsNullOrEmpty(login))
@@ -148,6 +149,37 @@ namespace MyWebsiteBlazor.Data.Database
             return newestData;
         }
 
+        #endregion
+
+        #region Change email
+
+        public static async Task<Response> AddChangeEmailData(ChangeEmailData changeData)
+        {
+            try
+            {
+                await db.GetCollection<ChangeEmailData>("ChangeEmailDatas").InsertOneAsync(changeData);
+            }
+            catch (Exception e)
+            {
+                await Console.Out.WriteLineAsync(e.Message);
+                await Console.Out.WriteLineAsync(e.ToString());
+                return new Response(false, $"Error while adding email change data!");
+            }
+            return new Response(true, $"Created change email data!");
+        }
+
+        public static async Task<ChangeEmailData?> GetChangeEmailData(string login)
+        {
+            if (string.IsNullOrEmpty(login))
+                return null;
+
+            var changeEmailDatas = await db.GetCollection<ChangeEmailData>("ChangeEmailDatas").FindAsync(d => d.UserLogin == login);
+
+            var changeEmailDatasArray = changeEmailDatas.ToArray();
+            var newestData = changeEmailDatasArray.OrderBy(d => d.CreationTime).Last();
+
+            return newestData;
+        }
         #endregion
     }
 }

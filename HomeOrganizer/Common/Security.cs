@@ -14,7 +14,8 @@ namespace HomeOrganizer.Common
         private static readonly int resetTokenSize = 32;
         private static readonly int resetTokenIterations = 500000;
 
-        public static readonly TimeSpan tokenExpirationTime = new TimeSpan(0, 10, 0);
+        public static readonly TimeSpan passwordTokenExpirationTime = new TimeSpan(0, 10, 0);
+        public static readonly TimeSpan emailTokenExpirationTime = new TimeSpan(0, 30, 0);
 
         public static string GenerateSalt()
         {
@@ -68,23 +69,51 @@ namespace HomeOrganizer.Common
             };
         }
 
-        public static bool IsLinkExpired(DateTime creationTime)
+        public static ChangeEmailData CreateChangeEmailData(string login, string newEmail)
         {
-            DateTime expirationTime = creationTime.Add(tokenExpirationTime);
+            byte[] salt = RandomNumberGenerator.GetBytes(keySize);
+            byte[] token = RandomNumberGenerator.GetBytes(resetTokenSize);
 
-            return expirationTime < DateTime.UtcNow;
-        }
-
-        public static bool IsCorrectToken(string token, ResetPasswordData resetData)
-        {
             var hashedToken = Rfc2898DeriveBytes.Pbkdf2(
-                Convert.FromHexString(token),
-                Convert.FromHexString(resetData.Salt),
+                token,
+                salt,
                 resetTokenIterations,
                 hashAlgorithm,
                 resetTokenSize);
 
-            return CryptographicOperations.FixedTimeEquals(hashedToken, Convert.FromHexString(resetData.HashedToken));
+            return new ChangeEmailData()
+            {
+                UserLogin = login,
+                Token = Convert.ToHexString(token),
+                HashedToken = Convert.ToHexString(hashedToken),
+                Salt = Convert.ToHexString(salt),
+                CreationTime = DateTime.UtcNow,
+                NewEmail = newEmail
+            };
+        }
+
+        public static bool IsPasswordLinkExpired(DateTime creationTime)
+        {
+            DateTime expirationTime = creationTime.Add(passwordTokenExpirationTime);
+            return expirationTime < DateTime.UtcNow;
+        }
+
+        public static bool IsEmailLinkExpired(DateTime creationTime)
+        {
+            DateTime expirationTime = creationTime.Add(emailTokenExpirationTime);
+            return expirationTime < DateTime.UtcNow;
+        }
+
+        public static bool IsCorrectToken(string token, string salt, string receivedHash)
+        {
+            var hashedToken = Rfc2898DeriveBytes.Pbkdf2(
+                Convert.FromHexString(token),
+                Convert.FromHexString(salt),
+                resetTokenIterations,
+                hashAlgorithm,
+                resetTokenSize);
+
+            return CryptographicOperations.FixedTimeEquals(hashedToken, Convert.FromHexString(receivedHash));
         }
     }
 }
