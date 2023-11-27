@@ -1,5 +1,7 @@
-﻿@using HomeOrganizer.Models.User;
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.User;
 
+@implements IDisposable
 @inject UserService userService
 
 @if (User == null)
@@ -8,31 +10,54 @@
     return;
 }
 
-<MudGrid>
-    <MudItem xs="12">
+<MudStack Row="false" Justify="Justify.SpaceBetween" Style="height:100%">
+    <MudPaper Elevation="0">
         <MudText Typo="Typo.h5">
             Features
         </MudText>
-    </MudItem>
-    <MudItem xs="12">
-        <MudTable Items="@User.Features" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-            <HeaderContent>
-                <MudTh>#</MudTh>
-                <MudTh>Type</MudTh>
-                <MudTh>Name</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="#">@context.TileData.Position</MudTd>
-                <MudTd DataLabel="Type">@context.FeatureData.Name</MudTd>
-                <MudTd DataLabel="Name">@context.TileData.UserGivenName</MudTd>
-            </RowTemplate>
-        </MudTable>
-    </MudItem>
-</MudGrid>
+    </MudPaper>
+    <MudTable Height="400px" Items="@User.Features.OrderBy(f=>f.TileData.Position)" Elevation="8"
+              FixedHeader="true"
+              Square="true"
+              Hover="true"
+              LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh Style="border-radius:0px;">#</MudTh>
+            <MudTh>Type</MudTh>
+            <MudTh Style="border-radius:0px;">Name</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd Style="@GetColorStyle(context.TileData.ColorIndex)" DataLabel="#">@context.TileData.Position</MudTd>
+            <MudTd Style="@GetColorStyle(context.TileData.ColorIndex)" DataLabel="Type">@context.FeatureData.Name</MudTd>
+            <MudTd Style="@GetColorStyle(context.TileData.ColorIndex)" DataLabel="Name">@context.TileData.UserGivenName</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudStack>
 
 @code {
     [Parameter]
     public UserData? User { get; set; } = null;
 
+    protected override async Task OnInitializedAsync()
+    {
+        userService.OnChange += HandleUserUpdate;
+        base.OnInitialized();
+    }
 
+    private string GetColorStyle(int colorIndex)
+    {
+        if (User == null) return string.Empty;
+        return $"background-color:{Constants.TileColorPalettes[User.UseDarkTheme][colorIndex]};";
+    }
+
+    private async void HandleUserUpdate()
+    {
+        User = userService.LoggedUser;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        userService.OnChange -= HandleUserUpdate;
+    }
 }

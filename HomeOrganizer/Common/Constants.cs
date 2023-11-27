@@ -1,4 +1,5 @@
-﻿using MudBlazor.Utilities;
+﻿using MudBlazor;
+using MudBlazor.Utilities;
 
 namespace HomeOrganizer.Common
 {
@@ -6,15 +7,15 @@ namespace HomeOrganizer.Common
     {
         public static readonly Dictionary<string, string> TileIcons = new Dictionary<string, string>()
         {
-            {"QuestionMark", MudBlazor.Icons.Material.Filled.QuestionMark  },
-            {"Favorite", MudBlazor.Icons.Material.Filled.Favorite      },
-            {"Star", MudBlazor.Icons.Material.Filled.Star          },
-            {"Pets", MudBlazor.Icons.Material.Filled.Pets        },
-            {"DirectionsCar", MudBlazor.Icons.Material.Filled.DirectionsCar },
-            {"Home", MudBlazor.Icons.Material.Filled.Home       },
-            {"Payments", MudBlazor.Icons.Material.Filled.Payments      },
-            {"TagFaces", MudBlazor.Icons.Material.Filled.TagFaces      },
-            {"Warning", MudBlazor.Icons.Material.Filled.Warning       },
+            {"QuestionMark", Icons.Material.Filled.QuestionMark  },
+            {"Favorite", Icons.Material.Filled.Favorite      },
+            {"Star", Icons.Material.Filled.Star          },
+            {"Pets", Icons.Material.Filled.Pets        },
+            {"DirectionsCar", Icons.Material.Filled.DirectionsCar },
+            {"Home", Icons.Material.Filled.Home       },
+            {"Payments", Icons.Material.Filled.Payments      },
+            {"TagFaces", Icons.Material.Filled.TagFaces      },
+            {"Warning", Icons.Material.Filled.Warning       },
         };
 
         public static string GetTileIcon(string name)
@@ -42,5 +43,51 @@ namespace HomeOrganizer.Common
                 }
             }
         };
+
+        /// <summary>
+        /// False -> PaletteLight <br/>
+        /// True -> PaletteDark
+        /// </summary>
+        public static readonly Dictionary<bool, Palette> CustomPalettes = new Dictionary<bool, Palette>()
+        {
+            {
+                false,
+                new PaletteLight()
+                {
+                    // Main colors
+                    Primary = Colors.Blue.Lighten1,
+                    Secondary = Colors.Teal.Lighten1,
+
+                    // Theme icon color...
+                    Tertiary = Colors.BlueGrey.Lighten1,
+
+                    // Main elements
+                    Background = Colors.LightBlue.Lighten4,
+
+
+                    // Appbar
+                    AppbarBackground = Colors.DeepOrange.Lighten2,
+                    AppbarText = Colors.Shades.Black
+                }
+            },
+            {
+                true,
+                new PaletteDark()
+                {
+                    Primary = Colors.Blue.Darken2,
+                    Secondary = Colors.Teal.Darken2,
+
+                    Tertiary = Colors.Amber.Lighten3,
+                }
+            }
+        };
+
+
+        public static readonly MudTheme CustomTheme = new MudTheme()
+        {
+            Palette = CustomPalettes[false],
+            PaletteDark = CustomPalettes[true]
+        };
+
     }
 }

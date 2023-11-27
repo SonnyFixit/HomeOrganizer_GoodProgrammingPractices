@@ -21,15 +21,16 @@
 
 <PageTitle> Home Organizer </PageTitle>
 
+
 @if (User == null)
 {
     <WelcomeLoginRegister />
 }
 else
 {
-    if (User.OpenedFeature == null)
+    @if (User.OpenedFeature == null)
     {
-        <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
+        <MudStack Justify="Justify.SpaceBetween" Style="height:100%">
             <MudGrid>
 
                 @foreach (var feature in User.Features.OrderBy(f => f.TileData.Position))
@@ -37,31 +38,28 @@ else
                     if (feature == null || !feature.FeatureData.IsUsed) continue;
 
                     <FeatureTile IsDarkMode="@User.UseDarkTheme" Feature="@feature"
-                                 OnOpenFeature="HandleOpenFeature"
-                                 OnEditFeature="HandleEditFeature"
-                                 OnRemoveFeature="HandleRemoveFeature" />
+                     OnOpenFeature="HandleOpenFeature"
+                     OnEditFeature="HandleEditFeature"
+                     OnRemoveFeature="HandleRemoveFeature" />
                 }
 
             </MudGrid>
-            <MudGrid Justify="Justify.Center" Style="margin-top: auto;">
+            <MudStack Justify="Justify.Center" Style="width:100%">
                 <AddFeatureTile User="User" />
-            </MudGrid>
-        </MudContainer>
+            </MudStack>
+        </MudStack>
     }
     else
     {
-        <MudContainer Class="content pt-4" MaxWidth="MaxWidth.ExtraLarge" Style="height: 90%; display: flex; flex-direction: column;">
 
-            @if (selectedType == null)
-            {
-                <NoFeatureError />
-            }
-            else
-            {
-                <DynamicComponent Type="@selectedType" Parameters="@parameters" />
-            }
-
-        </MudContainer>
+        @if (selectedType == null)
+        {
+            <NoFeatureError />
+        }
+        else
+        {
+            <DynamicComponent Type="@selectedType" Parameters="@parameters" />
+        }
     }
 }
 
@@ -145,7 +143,7 @@ else
 
 
 
-    // TODO: DRAG AND DROP MUDBLAZOR
+    // TODO: DRAG AND DROP MUDBLAZOR - if it will fix issue with area around dragged object
     // FROM: https://mudblazor.com/components/dropzone#mics-chess-board
     // int columns = 4;
     // [Inject] IBreakpointService BreakpointListener { get; set; }

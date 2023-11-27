@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using HomeOrganizer.Common;
+﻿using HomeOrganizer.Common;
 using HomeOrganizer.Models.Bases;
 
 using MongoDB.Bson.Serialization.Attributes;
@@ -25,7 +19,7 @@ namespace HomeOrganizer.Models.Features
 
         public override TileData TileData { get; set; } = new TileData()
         {
-            Icon = Constants.TileIcons["TagFaces"],
+            Icon = Constants.GetTileIcon("TagFaces"),
             UserGivenName = "Your first feature",
             UserGivenDescription = "Check it! It should introduce you to our application :)",
             Position = 0,

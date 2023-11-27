@@ -12,9 +12,8 @@
 @inject NavigationManager navigationManager
 
 
-<MudContainer Class="content px-4" Style="height:90%" MaxWidth="MaxWidth.Large">
-
-    <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Style="margin-top:10%;" Elevation="0">
+<MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="height:100%; width:100%;">
+    <MudPaper Class=" mud-theme-transparent" Elevation="0">
         <MudPaper Class="pa-4" Style="width:400px !important;">
             <MudText Typo="Typo.h6" Align="Align.Center">
                 Home Organizer
@@ -30,8 +29,8 @@
                         {
 
                             <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mt-1"
-                                      OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
-                                      CloseIconClicked="(()=>{showResetPassword = false;})">
+                              OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
+                              CloseIconClicked="(()=>{showResetPassword = false;})">
                                 Reset your password
                             </MudAlert>
                         }
@@ -39,8 +38,8 @@
                         if (showUserNotFound)
                         {
                             <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Dense="true" Class=""
-                                      OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
-                                      CloseIconClicked="(()=>{showUserNotFound = false;})">
+                              OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
+                              CloseIconClicked="(()=>{showUserNotFound = false;})">
                                 Click here for quick register!
                             </MudAlert>
                         }
@@ -84,8 +83,8 @@
             </MudPaper>
         </MudPaper>
     </MudPaper>
+</MudStack>
 
-</MudContainer>
 
 @code {
     private string userLogin = string.Empty;

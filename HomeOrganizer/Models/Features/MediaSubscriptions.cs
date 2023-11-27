@@ -1,4 +1,5 @@
-﻿using HomeOrganizer.Models.Bases;
+﻿using HomeOrganizer.Common;
+using HomeOrganizer.Models.Bases;
 
 namespace HomeOrganizer.Models.Features
 {
@@ -14,7 +15,7 @@ namespace HomeOrganizer.Models.Features
         };
         public override TileData TileData { get; set; } = new TileData()
         {
-            Icon = MudBlazor.Icons.Material.Filled.Payments,
+            Icon = Constants.GetTileIcon("Payments"),
             UserGivenName = "Name for media subscriptions",
             UserGivenDescription = "Describe them",
         };

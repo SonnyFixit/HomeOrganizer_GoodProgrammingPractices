@@ -10,6 +10,11 @@
 <div class="page" style="height:100%">
     <main style="height:100%">
         <TopBar />
-        @Body
+        <MudContainer Class="content pt-4 content-container"
+                      MaxWidth="MaxWidth.ExtraLarge"
+                      Style="display: flex; flex-direction: column;">
+            @Body
+        </MudContainer>
+        <CustomFooter />
     </main>
 </div>

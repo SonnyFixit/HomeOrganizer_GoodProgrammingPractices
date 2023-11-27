@@ -1,0 +1,108 @@
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Features;
+@using FluentValidation
+@using HomeOrganizer.Models.User;
+@using MyWebsiteBlazor.Data.Database;
+@using System.Text.RegularExpressions;
+
+<MudDialog DefaultFocus="DefaultFocus.FirstChild">
+    <DialogContent>
+        @if (processing)
+        {
+            <MudProgressLinear Color="Color.Success" Indeterminate="true" Class="my-1" />
+        }
+        <MudForm Model="@model" @ref="@form" Validation="@(contactEmailValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent>
+
+                <MudTextField @bind-Value="model.From"
+                              For="@(() => model.From)"
+                              Immediate="true"
+                              Required="false"
+                              Label="From"
+                              InputType="InputType.Text"
+                              Placeholder="Who are you? Leave it empty if you want to by anonymous." />
+
+                <MudTextField @bind-Value="model.Title"
+                              For="@(() => model.Title)"
+                              Immediate="true"
+                              Required="true"
+                              Label="Title"
+                              InputType="InputType.Text"
+                              Placeholder="What is the issue?" />
+
+                <MudTextField @bind-Value="model.Content"
+                              For="@(() => model.Content)"
+                              Immediate="true"
+                              Required="true"
+                              Label="Content"
+                              InputType="InputType.Text"
+                              Lines="10"
+                              Placeholder="Describe your issue" />
+            </MudCardContent>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" StartIcon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Outlined" Color="Color.Warning">Cancel</MudButton>
+        <MudSpacer />
+        <MudButton Color="Color.Success" OnClick="SendContactEmail" EndIcon="@Icons.Material.Filled.Send" Variant="Variant.Outlined">Send</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public UserData? User { get; set; } = null;
+
+    MudForm? form;
+    ModelFluentValidator contactEmailValidator = new ModelFluentValidator();
+    ContactEmail model = new ContactEmail();
+    bool processing = false;
+
+
+    void Cancel() => MudDialog.Cancel();
+    protected override void OnInitialized()
+    {
+        model.From = User != null ? User.Credentials.Login : string.Empty;
+
+        base.OnInitialized();
+    }
+
+    private async Task SendContactEmail()
+    {
+        await form.Validate();
+        if (!form.IsValid)
+        {
+            return;
+        }
+
+        MudDialog.Close(DialogResult.Ok<ContactEmail>(model));
+    }
+
+    /// <summary>
+    /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
+    /// </summary>
+    /// <typeparam name="UserRegisterModel"></typeparam>
+    private class ModelFluentValidator : AbstractValidator<ContactEmail>
+    {
+        public ModelFluentValidator()
+        {
+            RuleFor(m => m.From)
+                .MaximumLength(30).WithMessage("From field length must not exceed 30.");
+
+            RuleFor(m => m.Title)
+                .NotEmpty().WithMessage("Title cannot be empty")
+                .MaximumLength(90).WithMessage("Title length must not exceed 90.");
+
+            RuleFor(m => m.Content)
+            .NotEmpty().WithMessage("Content cannot be empty")
+            .MaximumLength(300).WithMessage("Content length must not exceed 300.");
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<ContactEmail>.CreateWithOptions((ContactEmail)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+}

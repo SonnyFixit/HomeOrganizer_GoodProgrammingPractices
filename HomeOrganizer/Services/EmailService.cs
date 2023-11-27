@@ -1,7 +1,6 @@
-﻿using System.Net;
+﻿using HomeOrganizer.Common;
+using System.Net;
 using System.Net.Mail;
-
-using HomeOrganizer.Common;
 
 namespace HomeOrganizer.Services
 {
@@ -140,7 +139,7 @@ namespace HomeOrganizer.Services
 
         public static async Task SendEmailChangedNew(string newEmail, string login, string changeEmailUrl)
         {
-            string newEmailBody = "<!DOCTYPE html>" +
+            string body = "<!DOCTYPE html>" +
            "<html lang=\"pl\">" +
            "<head>" +
            "<meta charset=\"UTF-8\">" +
@@ -163,7 +162,54 @@ namespace HomeOrganizer.Services
                "</body>" +
            "</html>";
 
-            await SendEmail(newEmail, login, "Email changed - new", newEmailBody);
+            await SendEmail(newEmail, login, "Email changed - new", body);
+        }
+
+        public static async Task SendContactUs(string from, string issue, string content)
+        {
+            string body = "<!DOCTYPE html>" +
+               "<html lang=\"pl\">" +
+               "<head>" +
+               "<meta charset=\"UTF-8\">" +
+               "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+               "<title>USER CONTACT</title>" +
+               emailStyle +
+               "</head>" +
+                   "<body>" +
+                       "<div class=\"email-container\">" +
+                       $"<h2>User contacted us!</h2>" +
+                       $"<h4>User: {from}</h4>" +
+                       $"<h4>Title: {issue}</h4>" +
+                       "<h4>Content:</h4>" +
+                       $"<p> {content} </p>" +
+                       "</div>" +
+                   "</body>" +
+               "</html>";
+
+            await SendEmail("home.organizer.333@gmail.com", "Home Organizer", "USER CONTACT", body);
+        }
+
+        public static async Task SendContactUsResponse(string email, string login, string issue)
+        {
+            string body = "<!DOCTYPE html>" +
+               "<html lang=\"pl\">" +
+               "<head>" +
+               "<meta charset=\"UTF-8\">" +
+               "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
+               "<title>Password changed</title>" +
+               emailStyle +
+               "</head>" +
+                   "<body>" +
+                       "<div class=\"email-container\">" +
+                       $"<h2>Thank you for contacting us!</h2>" +
+                       $"<h4>Last time we received email with issue:</h4>" +
+                       $"<h4>{issue}</h4>" +
+                       "<p>We will look into it and check what can we do about it</p>" +
+                       "<p>Home Organizer Team</p>" +
+                       "</div>" +
+                   "</body>" +
+               "</html>";
+            await SendEmail(email, login, "Thank you for contact!", body);
         }
     }
 }

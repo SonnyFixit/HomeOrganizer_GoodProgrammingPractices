@@ -15,11 +15,11 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
 
     [Parameter]
     public IBrowserFile? AvatarImage { get; set; }
-    Cropper cropper;
+    Cropper? cropper;
 
     void Cancel() => MudDialog.Cancel();
 

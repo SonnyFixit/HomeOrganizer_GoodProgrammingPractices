@@ -22,43 +22,46 @@
 }
 else
 {
-    <MudPaper Width="960px" Height="500px" Class="mx-auto mt-10 mud-theme-transparent" Elevation="0">
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="height:100%; width:100%;" Spacing="0">
 
-        <MudStack Row="true" Style="width:100%; height:100%;" Justify="Justify.SpaceBetween" Class="mud-theme-transparent">
-            <MudPaper Width="180px" Class="mud-theme-transparent" Elevation="0">
-                @if (!user.RightUserPanelNavigation)
-                {
-                    <UserPanelNavigation IsRightSide="user.RightUserPanelNavigation"
-                                 CurrentPanel="@currentPanelValue"
-                                 OnSideChange="HandleSideChange"
-                                 OnNavigationChanged="HandleNavigationChanged" />
-                }
+        <MudPaper Width="960px" Height="600px" Class="mud-theme-transparent" Elevation="0">
 
-            </MudPaper>
-            <MudPaper Width="540px" Class="pa-4" Elevation="0">
+            <MudStack Row="true" Style="width:100%; height:100%;" Justify="Justify.SpaceBetween" Class="mud-theme-transparent">
+                <MudPaper Width="180px" Class="mud-theme-transparent" Elevation="0">
+                    @if (!user.RightUserPanelNavigation)
+                    {
+                        <UserPanelNavigation IsRightSide="user.RightUserPanelNavigation"
+                                     CurrentPanel="@currentPanelValue"
+                                     OnSideChange="HandleSideChange"
+                                     OnNavigationChanged="HandleNavigationChanged" />
+                    }
 
-                @if (selectedPanel == null || parameters == null)
-                {
-                    <NoUserPanelError />
-                }
-                else
-                {
-                    <DynamicComponent Type="@selectedPanel" Parameters="@parameters" />
-                }
+                </MudPaper>
+                <MudPaper Width="540px" Class="pa-4" Elevation="0">
 
-            </MudPaper>
-            <MudPaper Width="180px" Class="mud-theme-transparent" Elevation="0">
-                @if (user.RightUserPanelNavigation)
-                {
-                    <UserPanelNavigation IsRightSide="user.RightUserPanelNavigation"
-                                 CurrentPanel="@currentPanelValue"
-                                 OnSideChange="HandleSideChange"
-                                 OnNavigationChanged="HandleNavigationChanged" />
-                }
-            </MudPaper>
-        </MudStack>
+                    @if (selectedPanel == null || parameters == null)
+                    {
+                        <NoUserPanelError />
+                    }
+                    else
+                    {
+                        <DynamicComponent Type="@selectedPanel" Parameters="@parameters" />
+                    }
 
-    </MudPaper>
+                </MudPaper>
+                <MudPaper Width="180px" Class="mud-theme-transparent" Elevation="0">
+                    @if (user.RightUserPanelNavigation)
+                    {
+                        <UserPanelNavigation IsRightSide="user.RightUserPanelNavigation"
+                                     CurrentPanel="@currentPanelValue"
+                                     OnSideChange="HandleSideChange"
+                                     OnNavigationChanged="HandleNavigationChanged" />
+                    }
+                </MudPaper>
+            </MudStack>
+
+        </MudPaper>
+    </MudStack>
 }
 
 

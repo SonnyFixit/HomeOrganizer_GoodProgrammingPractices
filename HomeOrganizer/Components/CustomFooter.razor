@@ -1,0 +1,85 @@
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Components.Dialogs;
+@using HomeOrganizer.Models.User;
+@inject UserService userService
+@inject IDialogService dialogService
+@inject ISnackbar snackbar
+
+<MudPaper Height="24px" Style="@($"background-color: {Constants.CustomPalettes[isDarkMode].AppbarBackground}")" Square="true">
+    <MudStack Row="true" Style="height:100%" Justify="Justify.SpaceBetween" Class="px-5">
+        <MudText Class="noSelect" Typo="Typo.caption"
+                 Style="@($"color: {Constants.CustomPalettes[isDarkMode].AppbarText}; line-height:24px;")">
+            Home Organizer
+        </MudText>
+        <MudButton OnClick="OpenContactUs" Color="Color.Info" EndIcon="@Icons.Material.Filled.Email">
+            Contact us!
+        </MudButton>
+    </MudStack>
+</MudPaper>
+
+@code {
+    private bool isDarkMode { get; set; } = false;
+
+    private async void HandleUserUpdate()
+    {
+        isDarkMode = userService.LoggedUser == null ? userService.UnloggedDarkTheme : userService.LoggedUser.UseDarkTheme;
+
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        isDarkMode = userService.LoggedUser == null ? userService.UnloggedDarkTheme : userService.LoggedUser.UseDarkTheme;
+
+        userService.OnChange += HandleUserUpdate;
+    }
+
+    public void Dispose()
+    {
+        userService.OnChange -= HandleUserUpdate;
+    }
+
+    private async Task OpenContactUs()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = false };
+        var parameters = new DialogParameters<ContactUsDialog> { { d => d.User, userService.LoggedUser } };
+        var dialog = await dialogService.ShowAsync<ContactUsDialog>("Contact us!", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (result.Canceled) return;
+
+        snackbar.Clear();
+        snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+
+        if (result.Data is not ContactEmail contactEmail)
+        {
+            snackbar.Add($"We cannot send email to us :(", Severity.Error);
+            return;
+        }
+        snackbar.Add($"Thank you for contact!", Severity.Success);
+
+        string from = contactEmail.From.Length == 0 ? "Anonymous user, for sure not registered :P" : contactEmail.From;
+        try
+        {
+            await EmailService.SendContactUs(from, contactEmail.Title, contactEmail.Content);
+        }
+        catch (Exception)
+        {
+
+        }
+
+        // User don't want to by anonymous
+        if (userService.LoggedUser != null && contactEmail.From.Length > 0)
+        {
+            try
+            {
+                await EmailService.SendContactUsResponse(userService.LoggedUser.Email, contactEmail.From, contactEmail.Title);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+    }
+}

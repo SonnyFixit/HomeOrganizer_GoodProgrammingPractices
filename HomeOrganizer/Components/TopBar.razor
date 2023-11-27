@@ -1,10 +1,11 @@
-﻿@using HomeOrganizer.Models.User;
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.User;
 @using MyWebsiteBlazor.Data.Database;
 @implements IDisposable
 @inject UserService userService
 @inject NavigationManager navigationManager
 
-<MudThemeProvider @bind-IsDarkMode="@IsDarkMode" Theme="customTheme" />
+<MudThemeProvider @bind-IsDarkMode="@isDarkMode" Theme="Constants.CustomTheme" />
 
 <MudAppBar Color="Color.Inherit" Fixed="false" Dense="true">
     <MudPaper Class="mud-theme-transparent" Elevation="0" Style="width:170px">
@@ -16,7 +17,7 @@
     </MudPaper>
 
     <MudSpacer />
-    @if (User != null)
+    @if (user != null)
     {
         <div style="width:40px;">
         </div>
@@ -25,26 +26,26 @@
                 @welcome
             </MudText>
         </MudPaper>
-        <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Toggled="@IsDarkMode" Edge="Edge.End"
-                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
-                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
+        <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Toggled="@isDarkMode" Edge="Edge.End"
+                         Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
+                         ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
     }
     else
     {
         <MudPaper Class="mud-theme-transparent d-flex justify-center flex-grow-1 gap-4" Elevation="0" Style="width:300px">
-            <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Class="mx-0" Toggled="@IsDarkMode"
-                                 Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
-                                 ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
+            <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Class="mx-0" Toggled="@isDarkMode"
+                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
+                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
         </MudPaper>
     }
     <MudSpacer />
     <MudPaper Class="mud-theme-transparent d-flex justify-end align-center" Elevation="0" Width="170px" Height="100%">
-        @if (User != null)
+        @if (user != null)
         {
             <MudMenu AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopRight">
                 <ActivatorContent>
                     <MudAvatar Rounded="true" Style="cursor:pointer; height:40px; width:40px;">
-                        <MudImage Width="40" Height="40" Src="@User.Avatar" Alt="User profile avatar" Elevation="25" />
+                        <MudImage Width="40" Height="40" Src="@user.Avatar" Alt="User profile avatar" Elevation="25" />
                     </MudAvatar>
                 </ActivatorContent>
                 <ChildContent>
@@ -57,19 +58,19 @@
 </MudAppBar>
 
 @code {
-    public UserData User { get; set; }
-    public bool IsDarkMode { get; set; } = false;
+    private UserData user { get; set; }
+    private bool isDarkMode { get; set; } = false;
     private string welcome = string.Empty;
 
     private async void HandleUserUpdate()
     {
-        User = userService.LoggedUser;
-        IsDarkMode = User == null ? userService.UnloggedDarkTheme : User.UseDarkTheme;
+        user = userService.LoggedUser;
+        isDarkMode = user == null ? userService.UnloggedDarkTheme : user.UseDarkTheme;
 
-        if (User != null && welcome.Length == 0)
+        if (user != null && welcome.Length == 0)
         {
             string[] welcomes = new string[] { "Hello", "Welcome", "Good day", "Yo, what's up", " Good to see you", "Welcome back", "Ayooo" };
-            welcome = $"{welcomes[Random.Shared.Next(welcomes.Length)]}, {User.Name}!";
+            welcome = $"{welcomes[Random.Shared.Next(welcomes.Length)]}, {user.Name}!";
         }
 
         StateHasChanged();
@@ -77,54 +78,10 @@
 
     protected override void OnInitialized()
     {
-        User = userService.LoggedUser;
-        IsDarkMode = User == null ? userService.UnloggedDarkTheme : User.UseDarkTheme;
+        user = userService.LoggedUser;
+        isDarkMode = user == null ? userService.UnloggedDarkTheme : user.UseDarkTheme;
 
         userService.OnChange += HandleUserUpdate;
-    }
-
-    private void GoHome()
-    {
-        if (User != null)
-        {
-            User.OpenedFeature = null;
-            userService.LoggedUser = User;
-        }
-        navigationManager.NavigateTo("/");
-    }
-
-    private void UpdateUserTheme()
-    {
-        IsDarkMode = !IsDarkMode;
-
-        if (User != null)
-        {
-            User.UseDarkTheme = IsDarkMode;
-            userService.LoggedUser = User;
-        }
-        else
-        {
-            userService.UnloggedDarkTheme = IsDarkMode;
-        }
-    }
-
-    private void OpenUserPanel()
-    {
-        userService.LoggedUser = User;
-        navigationManager.NavigateTo("/UserPanel");
-    }
-
-    private async Task LogOut()
-    {
-        // Update user data before log out
-        userService.UnloggedDarkTheme = User.UseDarkTheme;
-        await DbHandler.UpdateUser(User);
-
-        // log out
-        User = null;
-        userService.LoggedUser = null;
-
-        navigationManager.NavigateTo("/");
     }
 
     public void Dispose()
@@ -132,40 +89,47 @@
         userService.OnChange -= HandleUserUpdate;
     }
 
-
-    private MudTheme customTheme = new MudTheme()
+    private void GoHome()
+    {
+        if (user != null)
         {
-            Palette = new PaletteLight()
-            {
-                // Main colors
-                Primary = Colors.Blue.Lighten1,
-                Secondary = Colors.Teal.Lighten1,
+            user.OpenedFeature = null;
+            userService.LoggedUser = user;
+        }
+        navigationManager.NavigateTo("/");
+    }
 
-                // Theme icon color...
-                Tertiary = Colors.BlueGrey.Lighten1,
+    private void UpdateUserTheme()
+    {
+        isDarkMode = !isDarkMode;
 
-                // Main elements
-                Background = Colors.LightBlue.Lighten4,
+        if (user != null)
+        {
+            user.UseDarkTheme = isDarkMode;
+            userService.LoggedUser = user;
+        }
+        else
+        {
+            userService.UnloggedDarkTheme = isDarkMode;
+        }
+    }
 
+    private void OpenUserPanel()
+    {
+        userService.LoggedUser = user;
+        navigationManager.NavigateTo("/UserPanel");
+    }
 
-                // Appbar
-                AppbarBackground = Colors.DeepOrange.Lighten2,
-                AppbarText = Colors.Shades.Black
-            },
+    private async Task LogOut()
+    {
+        // Update user data before log out
+        userService.UnloggedDarkTheme = user.UseDarkTheme;
+        await DbHandler.UpdateUser(user);
 
-            PaletteDark = new PaletteDark()
-            {
-                Primary = Colors.Blue.Darken2,
-                Secondary = Colors.Teal.Darken2,
+        // log out
+        user = null;
+        userService.LoggedUser = null;
 
-                Tertiary = Colors.Amber.Lighten3,
-            },
-
-            LayoutProperties = new LayoutProperties()
-            {
-                DrawerWidthLeft = "260px",
-                DrawerWidthRight = "300px"
-            }
-        };
-
+        navigationManager.NavigateTo("/");
+    }
 }
