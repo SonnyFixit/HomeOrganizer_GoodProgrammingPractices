@@ -28,7 +28,7 @@ namespace HomeOrganizer.Services
         {
             if (loggedUser != null)
             {
-                //DbHandler.UpdateUser(loggedUser);
+                DbHandler.UpdateUser(loggedUser);
                 UnloggedDarkTheme = loggedUser.UseDarkTheme;
             }
             OnChange?.Invoke();

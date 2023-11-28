@@ -4,7 +4,7 @@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
-<html lang="en" style="height:100%">
+<html lang="en" style="height:100%; overflow:hidden;">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,7 +16,7 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
-<body style="height:100%">
+<body style="height:100%;  overflow:hidden;">
     <component type="typeof(App)" render-mode="ServerPrerendered" />
 
     <div id="blazor-error-ui">
@@ -33,6 +33,67 @@
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="_content/Chronos.Blazor.Cropper/CropHelper.js"></script>
+
+    <script>
+
+        window.addCustomListener = (id) => {
+
+            document.getElementById(id).addEventListener("dragstart", function (e) {
+
+
+                var hideDragImage = this.cloneNode(true);
+                hideDragImage.id = "hideDragImage-hide"
+
+                var dragImage = this.cloneNode(true);
+                dragImage.id = "draggeimage";
+                dragImage.style.position = "absolute";
+                dragImage.style.width = "350px";
+                dragImage.style.height = "150px";
+
+                hideDragImage.style.opacity = 0;
+                document.body.appendChild(hideDragImage);
+                document.body.appendChild(dragImage);
+                e.dataTransfer.setDragImage(hideDragImage, 0, 0);
+            }, false);
+
+            document.getElementById(id).addEventListener("dragend", function (e) {
+                var hideDragImage = document.getElementById('hideDragImage-hide');
+                var dragImage = document.getElementById('draggeimage');
+                hideDragImage.remove()
+                dragImage.remove()
+            }, false);
+
+            document.getElementById(id).addEventListener("drag", (event) => {
+                dragImage = document.getElementById('draggeimage');
+                if (dragImage) {
+                    dragImage.style.left = event.pageX + "px";
+                    dragImage.style.top = event.pageY + "px";
+                }
+            })
+
+            // document.getElementById(id).addEventListener("dragstart", function (e) {
+            //     let dragTile = this.cloneNode(true);
+            //     dragTile.className = "";
+
+            //     const w = document.getElementById(id).style.width;
+            //     dragTile.style.width = w;
+            //     dragTile.style.height = "200px";
+
+            //     dragTile.style.position = "absolute";
+            //     dragTile.style.top = "-100000px";
+            //     dragTile.style.left = "-100000px";
+
+
+            //     console.log(dragTile)
+            //     // document.body.appendChild(div);
+
+            //     document.body.append(dragTile);
+            //     // document.body.appendChild(crt);
+
+            //     e.dataTransfer.setDragImage(dragTile, 0, 100);
+            // });
+        }
+    </script>
 
 </body>
 </html>

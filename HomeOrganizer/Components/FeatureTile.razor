@@ -5,54 +5,60 @@
 
 @inject IDialogService dialogService
 @inject UserService userService
+@inject IJSRuntime javascript
 
 @if (Feature == null) return;
 
-<MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5" Style="height:200px">
-
-    <MudCard Style="@($"height:100%; cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}; {outlineStyle} {marginStyle}")" draggable="true" dropzone="move"
-             Class="d-flex flex-column flex-grow-1 align-stretch"
-             ondragover="event.preventDefault();"
+<MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5" Style="height:200px;">
+    <MudPaper Class="mud-theme-transparent" Style="width:100%; height:100%;"
+              Elevation="0"
+              draggable="true"
+              dropzone="move"
+              id="@($"FeatureTile{Feature.TileData.Position}")"
+              ondragover="event.preventDefault();"
     @ondragstart="HandleDragStart"
     @ondragenter="HandleDragEnter"
     @ondragleave="HandleDragLeave"
     @ondragend="HandleDragEnd"
     @onclick="OpenFeature"
     @ondrop="HandleDrop">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <MudStack Spacing="0">
-                    <MudText Typo="Typo.h6">
-                        @Feature.TileData.UserGivenName [@Feature.TileData.Position]
-                    </MudText>
-                    <MudText Typo="Typo.caption">
-                        <i>
-                            @Feature.FeatureData.Name
-                        </i>
-                    </MudText>
-                </MudStack>
+        <MudCard Style="@($"height:100%; cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}; {outlineStyle} {marginStyle}")"
+                 Class="d-flex flex-column flex-grow-1 align-stretch">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h6">
+                            @Feature.TileData.UserGivenName [@Feature.TileData.Position][@onHoverCounter]
+                        </MudText>
+                        <MudText Typo="Typo.caption">
+                            <i>
+                                @Feature.FeatureData.Name
+                            </i>
+                        </MudText>
+                    </MudStack>
 
-            </CardHeaderContent>
-            <CardHeaderActions>
-                <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
-                    <MudMenuItem OnClick="RemoveFeature">
-                        Delete
-                    </MudMenuItem>
-                    <MudMenuItem OnClick="EditFeature">
-                        Edit
-                    </MudMenuItem>
-                </MudMenu>
-            </CardHeaderActions>
-        </MudCardHeader>
-        <MudCardContent Class="flex-grow-1">
-            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.End" Style="height:100%;">
-                <MudText Typo="Typo.body1">
-                    @Feature.TileData.UserGivenDescription
-                </MudText>
-                <MudIcon Icon="@Feature.TileData.Icon" Size="Size.Large" />
-            </MudStack>
-        </MudCardContent>
-    </MudCard>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudMenu Icon="@Icons.Material.Filled.Settings" AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopLeft">
+                        <MudMenuItem OnClick="RemoveFeature">
+                            Delete
+                        </MudMenuItem>
+                        <MudMenuItem OnClick="EditFeature">
+                            Edit
+                        </MudMenuItem>
+                    </MudMenu>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent Class="flex-grow-1">
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.End" Style="height:100%;">
+                    <MudText Typo="Typo.body1">
+                        @Feature.TileData.UserGivenDescription
+                    </MudText>
+                    <MudIcon Icon="@Feature.TileData.Icon" Size="Size.Large" />
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    </MudPaper>
 </MudItem>
 
 @code {
@@ -75,6 +81,14 @@
     private int onHoverCounter = 0;
     private string outlineStyle = string.Empty;
     private string marginStyle = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await javascript.InvokeVoidAsync("addCustomListener", $"FeatureTile{Feature.TileData.Position}");
+        }
+    }
 
     private async Task EditFeature()
     {
@@ -122,12 +136,35 @@
         marginStyle = string.Empty;
     }
 
+    public void HandleDragStartFromJS(int featurePosition)
+    {
+        Console.WriteLine("JS");
+        if (userService.LoggedUser == null) return;
+        if (userService.DraggedFeatureTile != null) return;
+        if (featurePosition < 0 || featurePosition >= userService.LoggedUser.Features.Count) return;
+
+        ClearHoverData();
+        userService.DraggedFeatureTile = userService.LoggedUser.Features.OrderBy(f => f.TileData.Position).ToArray()[featurePosition];
+
+        StateHasChanged();
+    }
+
     private void HandleDrop(DragEventArgs e)
     {
         ClearHoverData();
 
-        if (userService.DraggedFeatureTile == null) return;
-        if (userService.DraggedFeatureTile == Feature) return;
+        if (userService.DraggedFeatureTile == null)
+        {
+            Console.WriteLine("DraggedFeatureTile jest null");
+            return;
+        };
+        if (userService.DraggedFeatureTile == Feature)
+        {
+            Console.WriteLine("DraggedFeatureTile jest Feature");
+            return;
+        };
+
+        Console.WriteLine($"Swap drag[{userService.DraggedFeatureTile.TileData.Position}] with drop[{Feature.TileData.Position}]");
 
         var sortedFeatures = userService.LoggedUser.Features.OrderBy(f => f.TileData.Position).ToList();
         int dragPosition = userService.DraggedFeatureTile.TileData.Position;
@@ -163,23 +200,26 @@
         string outlineColor = IsDarkMode ? "#bababa" : "#3d3d3d";
         outlineStyle = onHoverCounter > 0 ? $"outline: 2px dashed {outlineColor};" : string.Empty;
 
+        if (Feature == null || userService.DraggedFeatureTile == null) return;
         // DragPosition > DropPosition -> direction
         string marginSide = userService.DraggedFeatureTile.TileData.Position > Feature.TileData.Position ? "left" : "right";
-        marginStyle = onHoverCounter > 0 ? $"margin-{marginSide}:50px;" : string.Empty;
+        marginStyle = onHoverCounter > 0 ? $"margin-{marginSide}:100px !important;" : string.Empty;
     }
 
     private void HandleDragEnter(DragEventArgs e)
     {
         if (userService.DraggedFeatureTile == Feature) return;
         onHoverCounter++;
+        ChangeHoverClass();
     }
 
     private async Task HandleDragLeave(DragEventArgs e)
     {
-        await Task.Delay(10);
+        await Task.Delay(100);
         if (onHoverCounter > 0)
             onHoverCounter--;
 
         ChangeHoverClass();
     }
 }
+
