@@ -7,15 +7,12 @@
 @inject UserService userService
 @inject NavigationManager navigationManager
 
-@if (mediaSubscriptions == null)
+@if (Feature == null || mediaSubscriptions == null)
 {
-    <MudPaper>
-        <MudText Typo="Typo.h6">
-            [Media Subscriptions Panel] Whoops... Media subscriptions are unknown!
-        </MudText>
-    </MudPaper>
+    <HomeOrganizer.Components.Errors.NoFeaturePanelError Feature="@Feature" CastToFeature="@mediaSubscriptions" />
     return;
 }
+
 
 <MudText Typo="Typo.h6">
     Media subscriptions: @mediaSubscriptions.TileData.UserGivenName
@@ -39,7 +36,7 @@
 
 @code {
     [Parameter]
-    public FeatureBase? FeatureBase { get; set; }
+    public FeatureBase? Feature { get; set; }
     public MediaSubscriptions? mediaSubscriptions = null;
 
     private int subscriptionsCount = 0;
@@ -51,8 +48,8 @@
 
     protected override void OnInitialized()
     {
-        if (FeatureBase == null) return;
-        if (FeatureBase is not MediaSubscriptions receivedFeature) return;
+        if (Feature == null) return;
+        if (Feature is not MediaSubscriptions receivedFeature) return;
         mediaSubscriptions = receivedFeature;
 
         base.OnInitialized();

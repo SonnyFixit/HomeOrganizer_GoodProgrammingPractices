@@ -1,0 +1,22 @@
+﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Models.Bases;
+@inject UserService userService
+
+<MudPaper Height="46px" Width="100%" Elevation="0" Class="py-1 px-3"
+          Style="@($"background-color:{Constants.TileColorPalettes[userService.LoggedUser.UseDarkTheme][Feature.TileData.ColorIndex]};")">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Style="height:100%;">
+        <MudText Typo="Typo.h4" Style="line-height:46px;">
+            @Feature.TileData.UserGivenName
+        </MudText>
+        <MudIcon Icon="@Feature.TileData.Icon" Style="font-size: 26px;" />
+        <MudSpacer />
+        <MudText Typo="Typo.caption">
+            @Feature.FeatureData.Name
+        </MudText>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public FeatureBase Feature { get; set; }
+}

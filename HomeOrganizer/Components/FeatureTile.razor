@@ -9,9 +9,9 @@
 
 @if (Feature == null) return;
 
-<MudItem xs="12" sm="6" md="3" xl="3" Class="@hoverClass" Style="height:200px;">
-    <MudPaper Class="mud-theme-transparent" Style="width:100%; height:100%;"
-              Elevation="0"
+<MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5" Style="height:200px;">
+
+    <MudPaper Class="@($"mud-theme-transparent {hoverClass}")" Width="100%" Height="100%" Elevation="0"
               draggable="true"
               dropzone="move"
               id="@($"FeatureTile{Feature.TileData.Position}")"
@@ -79,7 +79,7 @@
 
     private int onHoverCounter = 0;
     private string dragStyle = string.Empty;
-    private string hoverClass = "pa-4";
+    private string hoverClass = "pa-0";
 
     // protected override async Task OnAfterRenderAsync(bool firstRender)
     // {
@@ -132,7 +132,7 @@
     {
         onHoverCounter = 0;
         dragStyle = string.Empty;
-        hoverClass = "pa-4";
+        hoverClass = "pa-0";
     }
 
     private void HandleDrop(DragEventArgs e)
@@ -178,7 +178,7 @@
 
     private void ChangeHoverClass()
     {
-        hoverClass = onHoverCounter > 0 ? "pa-6" : "pa-4";
+        hoverClass = onHoverCounter > 0 ? "pa-1" : "pa-0";
     }
 
     private void HandleDragEnter(DragEventArgs e)

@@ -1,4 +1,6 @@
 ﻿@using HomeOrganizer.Common;
+@using HomeOrganizer.Components.Common
+@using HomeOrganizer.Components.Errors
 @using HomeOrganizer.Models.Bases;
 @using HomeOrganizer.Models.Communication;
 @using HomeOrganizer.Models.Features;
@@ -7,44 +9,94 @@
 @inject UserService userService
 @inject NavigationManager navigationManager
 
-@if (introduction == null)
+@if (Feature == null || introduction == null)
 {
-    <MudPaper>
-        <MudText Typo="Typo.h6">
-            [@introduction.FeatureData.Name Panel] Whoops... @introduction.TileData.UserGivenName feature is unknown!
-        </MudText>
-    </MudPaper>
+    <NoFeaturePanelError Feature="@Feature" CastToFeature="@introduction" PanelName="Introduction" />
     return;
 }
 
-<MudText Typo="Typo.h6">
-    @introduction.FeatureData.Name: @introduction.TileData.UserGivenName
-</MudText>
-<MudText Typo="Typo.body1">
-    You have @subscriptionsCount subscriptions!
-</MudText>
-<MudButton OnClick="AddSubscription">
-    <MudText Typo="Typo.button">
-        Add subscription
-    </MudText>
-</MudButton>
+<MudStack>
+
+    <FeatureTopBar Feature="introduction" />
+
+    <MudGrid>
+        <MudItem xs="7">
+            <MudPaper Height="200px" Class="pa-2">
+                <MudStack Spacing="3">
+                    <MudText Typo="Typo.h5">
+                        Hello!
+                    </MudText>
+                    <MudText Typo="Typo.body1">
+                        This is the introduction for Home Organizer,
+                        our application that helps keeping everything together.
+                    </MudText>
+                    <MudText Typo="Typo.body1">
+                        This panel is a playground for you to test
+                        some smaller features that are used in other panels.
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="1">
+            <MudPaper Height="200px" Class="mud-theme-transparent" Elevation="0">
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="4">
+            <MudPaper Height="200px" Style="overflow:hidden;">
+                <MudImage Src="images/introduction/dog.jpg"
+                          ObjectFit="ObjectFit.Cover"
+                          Style="width:100%;" Height="200" />
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="4">
+            <MudPaper Height="200px" Style="overflow:hidden;">
+                <MudImage Src="images/introduction/sunset.jpg"
+                          ObjectFit="ObjectFit.Cover"
+                          Style="width:100%;" Height="200" />
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="1">
+            <MudPaper Height="200px" Class="mud-theme-transparent" Elevation="0">
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="7">
+            <MudPaper Height="200px" Class="pa-2">
+                <MudText Typo="Typo.body1">
+                    You can edit this panel data from previous screen - home page.
+                    Click <i>tile settings icon</i> (right top) and change something!
+                </MudText>
+                <MudText Typo="Typo.body1">
+                    You can add more panels in home screen by clicking bottom + button and chosing one!
+                    Every panel is different in its structure and offers different features.
+                    If you cannot find the right panel for your requirements you can create custom one.
+                    Or maybe you have some thoughts on existing ones? Let us know via contact form - bottm right button.
+                </MudText>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="4">
+            <MudPaper Height="200px">
+                4
+            </MudPaper>
+        </MudItem>
+
+    </MudGrid>
+
+</MudStack>
+
 
 @code {
     [Parameter]
-    public FeatureBase? FeatureBase { get; set; }
-    public Introduction? introduction = null;
-
-    private int subscriptionsCount = 0;
-
-    private void AddSubscription()
-    {
-        subscriptionsCount++;
-    }
+    public FeatureBase? Feature { get; set; }
+    private Introduction? introduction = null;
 
     protected override void OnInitialized()
     {
-        if (FeatureBase == null) return;
-        if (FeatureBase is not Introduction receivedFeature) return;
+        if (Feature == null) return;
+        if (Feature is not Introduction receivedFeature) return;
         introduction = receivedFeature;
 
         base.OnInitialized();

@@ -1,0 +1,50 @@
+﻿@using HomeOrganizer.Models.Bases;
+@inject NavigationManager navigationManager
+
+<MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Style="height:100%; width:100%;" Spacing="0">
+
+    <MudPaper Width="500px" Class="pa-4 mt-16">
+        <MudText Typo="Typo.h6">
+            Whoops... Something went really really wrong!
+        </MudText>
+
+        <MudText Typo="Typo.body1" Class="mt-3">
+            We cannot recognize feature data :(
+        </MudText>
+
+        @if (Feature == null)
+        {
+            <MudText Typo="Typo.body1" Class="mt-3">
+                Base feature data is empty...
+            </MudText>
+        }
+
+        @if (CastToFeature == null)
+        {
+            <MudText Typo="Typo.body1" Class="mt-3">
+                Cannot get @PanelName data from base feature data.
+            </MudText>
+        }
+
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-10" Elevation="0">
+            <MudButton OnClick="GoHome" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
+                Back home
+            </MudButton>
+        </MudPaper>
+    </MudPaper>
+
+</MudStack>
+
+@code {
+    [Parameter]
+    public FeatureBase Feature { get; set; } = null;
+    [Parameter]
+    public FeatureBase CastToFeature { get; set; } = null;
+    [Parameter]
+    public string PanelName { get; set; } = string.Empty;
+
+    private void GoHome()
+    {
+        navigationManager.NavigateTo("/");
+    }
+}
