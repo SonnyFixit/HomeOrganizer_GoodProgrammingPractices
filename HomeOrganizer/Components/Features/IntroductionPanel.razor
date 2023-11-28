@@ -5,9 +5,11 @@
 @using HomeOrganizer.Models.Communication;
 @using HomeOrganizer.Models.Features;
 @using HomeOrganizer.Models.User;
+@using ApexCharts;
 
 @inject UserService userService
 @inject NavigationManager navigationManager
+@implements IDisposable
 
 @if (Feature == null || introduction == null)
 {
@@ -20,6 +22,7 @@
     <FeatureTopBar Feature="introduction" />
 
     <MudGrid>
+
         <MudItem xs="7">
             <MudPaper Height="200px" Class="pa-2">
                 <MudStack Spacing="3">
@@ -37,15 +40,17 @@
                 </MudStack>
             </MudPaper>
         </MudItem>
+
         <MudItem xs="1">
-            <MudPaper Height="200px" Class="mud-theme-transparent" Elevation="0">
-            </MudPaper>
+            <MudPaper Height="200px" Class="mud-theme-transparent" Elevation="0" />
         </MudItem>
+
         <MudItem xs="4">
-            <MudPaper Height="200px" Style="overflow:hidden;">
+            <MudPaper Height="200px" Style="overflow:hidden;" Elevation="0" Class="mud-theme-transparent" Square="true">
                 <MudImage Src="images/introduction/dog.jpg"
-                          ObjectFit="ObjectFit.Cover"
-                          Style="width:100%;" Height="200" />
+                          Class="rounded"
+                          ObjectFit="ObjectFit.ScaleDown"
+                          Height="200" />
             </MudPaper>
         </MudItem>
 
@@ -58,8 +63,7 @@
         </MudItem>
 
         <MudItem xs="1">
-            <MudPaper Height="200px" Class="mud-theme-transparent" Elevation="0">
-            </MudPaper>
+            <MudPaper Height="200px" Class="mud-theme-transparent" Elevation="0" />
         </MudItem>
 
         <MudItem xs="7">
@@ -77,9 +81,22 @@
             </MudPaper>
         </MudItem>
 
-        <MudItem xs="4">
-            <MudPaper Height="200px">
-                4
+        <MudItem xs="6">
+            <MudPaper Height="300px" Class="pa-2 overflow-scroll">
+                <ApexChart TItem="SinglePoint" Height="260" Width="1500" Options="@options" @ref="@chart"
+                           Title="Your expanses">
+
+                    @foreach (var series in DataSeries)
+                    {
+                        <ApexPointSeries TItem="SinglePoint"
+                                         Items="@series.Value"
+                                         Name="@series.Key"
+                                         SeriesType="SeriesType.Bar"
+                                         XValue="e => e.CreateDateText()"
+                                         YValue="e=> (decimal)e.Value" />
+                    }
+
+                </ApexChart>
             </MudPaper>
         </MudItem>
 
@@ -93,12 +110,78 @@
     public FeatureBase? Feature { get; set; }
     private Introduction? introduction = null;
 
+    private ApexChart<SinglePoint> chart;
+
+    ApexChartOptions<SinglePoint> options = new ApexCharts.ApexChartOptions<SinglePoint>()
+        {
+            Legend = new Legend()
+            {
+
+            },
+            Theme = new Theme()
+            {
+                Mode = Mode.Dark
+            }
+        };
+
+    private Dictionary<string, List<SinglePoint>> DataSeries { get; set; } = new Dictionary<string, List<SinglePoint>>()
+    {
+        {"Food", new List<SinglePoint>()},
+        {"Clothes", new List<SinglePoint>()},
+        {"Travels", new List<SinglePoint>()},
+        {"Games", new List<SinglePoint>()},
+        {"Subcriptions", new List<SinglePoint>()},
+        {"Other", new List<SinglePoint>()}
+    };
+
+    public class SinglePoint
+    {
+        public DateTime Date { get; set; }
+        public double Value { get; set; }
+
+        public string CreateDateText()
+        {
+            return $"{Date.Month}/{Date.Year}";
+        }
+    }
+
     protected override void OnInitialized()
     {
         if (Feature == null) return;
         if (Feature is not Introduction receivedFeature) return;
         introduction = receivedFeature;
 
+        userService.OnChange += HandleUserUpdate;
+
+        // last 3 years
+        int months = 36;
+        for (int i = 0; i < months; i++)
+        {
+            foreach (var series in DataSeries)
+            {
+                series.Value.Add(new SinglePoint()
+                    {
+                        Date = DateTime.Now.AddMonths(-i),
+                        Value = Random.Shared.Next(500) + Math.Round((double)Random.Shared.NextDouble(), 2)
+                    });
+            }
+        }
+
         base.OnInitialized();
+    }
+
+    public void Dispose()
+    {
+        userService.OnChange -= HandleUserUpdate;
+    }
+
+    private void HandleUserUpdate()
+    {
+        if (userService.LoggedUser == null) return;
+
+        options.Theme.Mode = userService.LoggedUser.UseDarkTheme ? Mode.Dark : Mode.Light;
+        StateHasChanged();
+        chart.UpdateOptionsAsync(false, false, false);
+        chart.RenderAsync();
     }
 }
