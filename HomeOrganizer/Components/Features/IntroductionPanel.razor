@@ -100,6 +100,78 @@
             </MudPaper>
         </MudItem>
 
+        <MudItem xs="6">
+            <MudPaper Height="300px" Class="pa-2">
+                <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+                    <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
+                        <div class="d-flex" style="height:100%">
+                            <MudImage Src="images/introduction/szczyrk.jpg"
+                                      ObjectFit="ObjectFit.Cover"
+                                      Style="width:100%;" Height="200" />
+                        </div>
+                    </MudCarouselItem>
+                    <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
+                        <div class="d-flex" style="height:100%">
+                            <MudImage Src="images/introduction/szkryczne.jpg"
+                                      ObjectFit="ObjectFit.Cover"
+                                      Style="width:100%;" Height="200" />
+                        </div>
+                    </MudCarouselItem>
+                    <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
+                        <div class="d-flex" style="height:100%">
+                            <MudImage Src="images/introduction/ojcow.jpg"
+                                      ObjectFit="ObjectFit.Cover"
+                                      Style="width:100%;" Height="200" />
+                        </div>
+                    </MudCarouselItem>
+                </MudCarousel>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="3">
+            <MudPaper Height="600px" Class="pa-2">
+                <MudText Typo="Typo.body1">
+                    Grocery list
+                </MudText>
+                @if (groceryList.Count > 0)
+                {
+                    <MudList Clickable="true" Dense="true" DisableGutters="false">
+                        @foreach (var groceryItem in groceryList)
+                        {
+                            <MudListItem Value="@groceryItem" Icon="@Icons.Material.Filled.BookmarkBorder" IconColor="MudBlazor.Color.Secondary">
+                                <MudText Typo="Typo.caption">
+                                    @groceryItem
+                                </MudText>
+                            </MudListItem>
+                        }
+                    </MudList>
+
+                }
+
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="6">
+            <MudPaper Height="600px" Class="pa-2 mud-theme-transparent">
+                <MudStack Justify="Justify.SpaceBetween">
+                    <MudPaper Height="250px" Class="pa-2">
+                        <MudText Typo="Typo.body1">
+                            Multiple panels fun
+                        </MudText>
+                    </MudPaper>
+                    <MudPaper Height="250px" Class="pa-2 ">
+                        <MudText Typo="Typo.body1">
+                            Multiple panels fun
+                        </MudText>
+                    </MudPaper>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="6">
+
+        </MudItem>
+
     </MudGrid>
 
 </MudStack>
@@ -109,6 +181,15 @@
     [Parameter]
     public FeatureBase? Feature { get; set; }
     private Introduction? introduction = null;
+
+    private class GroceryListItem
+    {
+        public string Name { get; set; } = string.Empty;
+        public int Count { get; set; } = 0;
+        public bool Checked { get; set; } = false;
+    }
+
+    private HashSet<string> groceryList = new HashSet<string>();
 
     private ApexChart<SinglePoint> chart;
 
