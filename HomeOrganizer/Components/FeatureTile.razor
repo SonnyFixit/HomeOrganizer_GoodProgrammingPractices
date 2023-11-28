@@ -9,7 +9,7 @@
 
 @if (Feature == null) return;
 
-<MudItem xs="12" sm="6" md="3" xl="3" Class="@dragClass" Style="height:200px;">
+<MudItem xs="12" sm="6" md="3" xl="3" Class="@hoverClass" Style="height:200px;">
     <MudPaper Class="mud-theme-transparent" Style="width:100%; height:100%;"
               Elevation="0"
               draggable="true"
@@ -22,8 +22,7 @@
               @ondragend="HandleDragEnd"
               @onclick="OpenFeature"
               @ondrop="HandleDrop">
-        <MudCard Style="@($"height:100%; cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}; {outlineStyle} {marginStyle}")"
-                 Class="d-flex flex-column flex-grow-1 align-stretch">
+        <MudCard Style="@($"height:100%; cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}; {dragStyle}")">
             <MudCardHeader>
                 <CardHeaderContent>
                     <MudStack Spacing="0">
@@ -79,9 +78,8 @@
     private bool dragDropTarget = false;
 
     private int onHoverCounter = 0;
-    private string outlineStyle = string.Empty;
-    private string marginStyle = string.Empty;
-    private string dragClass = "pa-4";
+    private string dragStyle = string.Empty;
+    private string hoverClass = "pa-4";
 
     // protected override async Task OnAfterRenderAsync(bool firstRender)
     // {
@@ -133,8 +131,8 @@
     private void ClearHoverData()
     {
         onHoverCounter = 0;
-        outlineStyle = string.Empty;
-        marginStyle = string.Empty;
+        dragStyle = string.Empty;
+        hoverClass = "pa-4";
     }
 
     private void HandleDrop(DragEventArgs e)
@@ -166,14 +164,13 @@
     private void HandleDragStart(DragEventArgs e)
     {
         userService.DraggedFeatureTile = Feature;
-        dragClass = "pa-6";
+        dragStyle = "opacity: 0.25;";
     }
 
     private void HandleDragEnd(DragEventArgs e)
     {
         ClearHoverData();
         ChangeHoverClass();
-        dragClass = "pa-4";
 
         userService.LoggedUser.OpenedFeature = null;
         userService.DraggedFeatureTile = null;
@@ -181,13 +178,7 @@
 
     private void ChangeHoverClass()
     {
-        string outlineColor = IsDarkMode ? "#A8A8A8" : "#3d3d3d";
-        outlineStyle = onHoverCounter > 0 ? $"outline: 2px dashed {outlineColor};" : string.Empty;
-
-        if (Feature == null || userService.DraggedFeatureTile == null) return;
-        // DragPosition > DropPosition -> direction
-        string marginSide = userService.DraggedFeatureTile.TileData.Position > Feature.TileData.Position ? "left" : "right";
-        marginStyle = onHoverCounter > 0 ? $"margin-{marginSide}:50px !important;" : string.Empty;
+        hoverClass = onHoverCounter > 0 ? "pa-6" : "pa-4";
     }
 
     private void HandleDragEnter(DragEventArgs e)
