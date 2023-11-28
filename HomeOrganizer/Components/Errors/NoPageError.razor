@@ -1,38 +1,40 @@
 ﻿@using HomeOrganizer.Models.User;
 @inject NavigationManager navigationManager
-@inject UserService userService
 
-@if (User == null)
-{
-    <HomeOrganizer.Components.Errors.NoFeatureError />
-    return;
-}
 
 
 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Style="height:100%; width:100%;" Spacing="0">
-
-    <MudPaper Width="500px" Class="pa-4 mt-16">
+    <MudPaper Width="500px" Height="400px" Class="pa-4 mt-16">
         <MudText Typo="Typo.h6">
-            Whoops... Something went really really wrong!
+            Wow! How did you get here?
         </MudText>
-
         <MudText Typo="Typo.body1" Class="mt-3">
-            We cannot recognize this user setting panel.
+            Sorry but there's nothing for you :(
         </MudText>
-
+        @if (pageAdress.Length > 0)
+        {
+            <MudText Typo="Typo.body1" Class="mt-3">
+                Did you wanted to find <b><i>@pageAdress</i></b> feature?
+                <br />
+                Contact us if you want to see one!
+            </MudText>
+        }
         <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-10" Elevation="0">
+
             <MudButton OnClick="GoHome" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
                 Back home
             </MudButton>
         </MudPaper>
     </MudPaper>
-
 </MudStack>
 
 @code {
-    [Parameter]
-    public UserData? User { get; set; } = null;
+    string pageAdress = string.Empty;
 
+    protected override void OnInitialized()
+    {
+        pageAdress = navigationManager.Uri.Substring(navigationManager.BaseUri.Length);
+    }
 
     private void GoHome()
     {

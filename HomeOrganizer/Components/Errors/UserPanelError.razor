@@ -1,6 +1,7 @@
 ﻿@inject NavigationManager navigationManager
 
-<MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent" Elevation="0">
+<MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Style="height:100%; width:100%;" Spacing="0">
+
     <MudPaper Width="500px" Height="200px" Class="pa-4 mt-16">
         <MudText Typo="Typo.h6">
             Whoops... Something went really really wrong!
@@ -14,7 +15,8 @@
             </MudButton>
         </MudPaper>
     </MudPaper>
-</MudPaper>
+
+</MudStack>
 
 @code {
 

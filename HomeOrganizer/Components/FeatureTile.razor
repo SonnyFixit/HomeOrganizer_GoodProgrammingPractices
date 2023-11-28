@@ -9,19 +9,19 @@
 
 @if (Feature == null) return;
 
-<MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5" Style="height:200px;">
+<MudItem xs="12" sm="6" md="3" xl="3" Class="@dragClass" Style="height:200px;">
     <MudPaper Class="mud-theme-transparent" Style="width:100%; height:100%;"
               Elevation="0"
               draggable="true"
               dropzone="move"
               id="@($"FeatureTile{Feature.TileData.Position}")"
               ondragover="event.preventDefault();"
-    @ondragstart="HandleDragStart"
-    @ondragenter="HandleDragEnter"
-    @ondragleave="HandleDragLeave"
-    @ondragend="HandleDragEnd"
-    @onclick="OpenFeature"
-    @ondrop="HandleDrop">
+              @ondragstart="HandleDragStart"
+              @ondragenter="HandleDragEnter"
+              @ondragleave="HandleDragLeave"
+              @ondragend="HandleDragEnd"
+              @onclick="OpenFeature"
+              @ondrop="HandleDrop">
         <MudCard Style="@($"height:100%; cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}; {outlineStyle} {marginStyle}")"
                  Class="d-flex flex-column flex-grow-1 align-stretch">
             <MudCardHeader>
@@ -81,7 +81,7 @@
     private int onHoverCounter = 0;
     private string outlineStyle = string.Empty;
     private string marginStyle = string.Empty;
-    private string dragStyle = string.Empty;
+    private string dragClass = "pa-4";
 
     // protected override async Task OnAfterRenderAsync(bool firstRender)
     // {
@@ -140,7 +140,6 @@
     private void HandleDrop(DragEventArgs e)
     {
         ClearHoverData();
-        dragStyle = "";
 
         if (userService.DraggedFeatureTile == null) return;
         if (userService.DraggedFeatureTile == Feature) return;
@@ -159,6 +158,7 @@
         sortedFeatures[dragPosition].TileData.Position = dropPosition;
         UserData tmpUser = userService.LoggedUser;
         tmpUser.Features = sortedFeatures;
+        tmpUser.OpenedFeature = null;
         userService.LoggedUser = tmpUser;
         userService.DraggedFeatureTile = null;
     }
@@ -166,12 +166,17 @@
     private void HandleDragStart(DragEventArgs e)
     {
         userService.DraggedFeatureTile = Feature;
+        dragClass = "pa-6";
     }
 
     private void HandleDragEnd(DragEventArgs e)
     {
         ClearHoverData();
         ChangeHoverClass();
+        dragClass = "pa-4";
+
+        userService.LoggedUser.OpenedFeature = null;
+        userService.DraggedFeatureTile = null;
     }
 
     private void ChangeHoverClass()
