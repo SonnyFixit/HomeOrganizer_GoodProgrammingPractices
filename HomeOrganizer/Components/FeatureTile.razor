@@ -28,7 +28,7 @@
                 <CardHeaderContent>
                     <MudStack Spacing="0">
                         <MudText Typo="Typo.h6">
-                            @Feature.TileData.UserGivenName [@Feature.TileData.Position][@onHoverCounter]
+                            @Feature.TileData.UserGivenName
                         </MudText>
                         <MudText Typo="Typo.caption">
                             <i>
@@ -81,14 +81,15 @@
     private int onHoverCounter = 0;
     private string outlineStyle = string.Empty;
     private string marginStyle = string.Empty;
+    private string dragStyle = string.Empty;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await javascript.InvokeVoidAsync("addCustomListener", $"FeatureTile{Feature.TileData.Position}");
-        }
-    }
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         await javascript.InvokeVoidAsync("addCustomListener", $"FeatureTile{Feature.TileData.Position}");
+    //     }
+    // }
 
     private async Task EditFeature()
     {
@@ -136,35 +137,13 @@
         marginStyle = string.Empty;
     }
 
-    public void HandleDragStartFromJS(int featurePosition)
-    {
-        Console.WriteLine("JS");
-        if (userService.LoggedUser == null) return;
-        if (userService.DraggedFeatureTile != null) return;
-        if (featurePosition < 0 || featurePosition >= userService.LoggedUser.Features.Count) return;
-
-        ClearHoverData();
-        userService.DraggedFeatureTile = userService.LoggedUser.Features.OrderBy(f => f.TileData.Position).ToArray()[featurePosition];
-
-        StateHasChanged();
-    }
-
     private void HandleDrop(DragEventArgs e)
     {
         ClearHoverData();
+        dragStyle = "";
 
-        if (userService.DraggedFeatureTile == null)
-        {
-            Console.WriteLine("DraggedFeatureTile jest null");
-            return;
-        };
-        if (userService.DraggedFeatureTile == Feature)
-        {
-            Console.WriteLine("DraggedFeatureTile jest Feature");
-            return;
-        };
-
-        Console.WriteLine($"Swap drag[{userService.DraggedFeatureTile.TileData.Position}] with drop[{Feature.TileData.Position}]");
+        if (userService.DraggedFeatureTile == null) return;
+        if (userService.DraggedFeatureTile == Feature) return;
 
         var sortedFeatures = userService.LoggedUser.Features.OrderBy(f => f.TileData.Position).ToList();
         int dragPosition = userService.DraggedFeatureTile.TileData.Position;
@@ -186,24 +165,24 @@
 
     private void HandleDragStart(DragEventArgs e)
     {
-        ClearHoverData();
         userService.DraggedFeatureTile = Feature;
     }
 
     private void HandleDragEnd(DragEventArgs e)
     {
         ClearHoverData();
+        ChangeHoverClass();
     }
 
     private void ChangeHoverClass()
     {
-        string outlineColor = IsDarkMode ? "#bababa" : "#3d3d3d";
+        string outlineColor = IsDarkMode ? "#A8A8A8" : "#3d3d3d";
         outlineStyle = onHoverCounter > 0 ? $"outline: 2px dashed {outlineColor};" : string.Empty;
 
         if (Feature == null || userService.DraggedFeatureTile == null) return;
         // DragPosition > DropPosition -> direction
         string marginSide = userService.DraggedFeatureTile.TileData.Position > Feature.TileData.Position ? "left" : "right";
-        marginStyle = onHoverCounter > 0 ? $"margin-{marginSide}:100px !important;" : string.Empty;
+        marginStyle = onHoverCounter > 0 ? $"margin-{marginSide}:50px !important;" : string.Empty;
     }
 
     private void HandleDragEnter(DragEventArgs e)
@@ -215,7 +194,7 @@
 
     private async Task HandleDragLeave(DragEventArgs e)
     {
-        await Task.Delay(100);
+        await Task.Delay(50);
         if (onHoverCounter > 0)
             onHoverCounter--;
 
