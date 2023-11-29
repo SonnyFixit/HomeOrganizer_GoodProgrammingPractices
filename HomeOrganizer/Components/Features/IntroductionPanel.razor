@@ -89,11 +89,11 @@
                     @foreach (var series in DataSeries)
                     {
                         <ApexPointSeries TItem="SinglePoint"
-                                         Items="@series.Value"
-                                         Name="@series.Key"
-                                         SeriesType="SeriesType.Bar"
-                                         XValue="e => e.CreateDateText()"
-                                         YValue="e=> (decimal)e.Value" />
+                                     Items="@series.Value"
+                                     Name="@series.Key"
+                                     SeriesType="SeriesType.Bar"
+                                     XValue="e => e.CreateDateText()"
+                                     YValue="e=> (decimal)e.Value" />
                     }
 
                 </ApexChart>
@@ -101,27 +101,27 @@
         </MudItem>
 
         <MudItem xs="6">
-            <MudPaper Height="300px" Class="pa-2">
-                <MudCarousel Class="mud-width-full" Style="height:200px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+            <MudPaper Height="300px" Class="overflow-hidden">
+                <MudCarousel Class="mud-width-full" Style="height:300px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
                     <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
                         <div class="d-flex" style="height:100%">
                             <MudImage Src="images/introduction/szczyrk.jpg"
                                       ObjectFit="ObjectFit.Cover"
-                                      Style="width:100%;" Height="200" />
+                                      Style="width:100%;" Height="300" />
                         </div>
                     </MudCarouselItem>
                     <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
                         <div class="d-flex" style="height:100%">
-                            <MudImage Src="images/introduction/szkryczne.jpg"
+                            <MudImage Src="images/introduction/skrzyczne.jpg"
                                       ObjectFit="ObjectFit.Cover"
-                                      Style="width:100%;" Height="200" />
+                                      Style="width:100%;" Height="300" />
                         </div>
                     </MudCarouselItem>
                     <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
                         <div class="d-flex" style="height:100%">
                             <MudImage Src="images/introduction/ojcow.jpg"
                                       ObjectFit="ObjectFit.Cover"
-                                      Style="width:100%;" Height="200" />
+                                      Style="width:100%;" Height="300" />
                         </div>
                     </MudCarouselItem>
                 </MudCarousel>
@@ -129,37 +129,67 @@
         </MudItem>
 
         <MudItem xs="3">
-            <MudPaper Height="600px" Class="pa-2">
-                <MudText Typo="Typo.body1">
-                    Grocery list
-                </MudText>
-                @if (groceryList.Count > 0)
-                {
-                    <MudList Clickable="true" Dense="true" DisableGutters="false">
-                        @foreach (var groceryItem in groceryList)
-                        {
-                            <MudListItem Value="@groceryItem" Icon="@Icons.Material.Filled.BookmarkBorder" IconColor="MudBlazor.Color.Secondary">
-                                <MudText Typo="Typo.caption">
-                                    @groceryItem
-                                </MudText>
-                            </MudListItem>
-                        }
-                    </MudList>
+            <MudPaper Height="500px" Class="pa-2">
+                <MudStack Style="height:100%;">
 
-                }
+                    <MudText Typo="Typo.body1">
+                        Grocery list
+                    </MudText>
+
+                    @if (groceryList.Count > 0)
+                    {
+
+                        <MudPaper MaxHeight="450px" Class="mud-theme-transparent overflow-scroll" Elevation="0">
+
+                            <MudList Clickable="true" Dense="true" DisableGutters="false" SelectedValue="@selectedValue" SelectedValueChanged="CrossGroceryItem">
+                                @foreach (var groceryItem in groceryList)
+                                {
+                                    string icon = groceryItem.Value ? Icons.Material.Filled.Bookmark : Icons.Material.Filled.BookmarkBorder;
+                                    string textStyle = groceryItem.Value ? "text-decoration: line-through;" : string.Empty;
+
+                                    <MudListItem Value="@groceryItem.Key" Icon="@icon" IconColor="MudBlazor.Color.Secondary">
+                                        <MudText Typo="Typo.body1" Style="@textStyle">
+                                            @groceryItem.Key
+                                        </MudText>
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        </MudPaper>
+
+                    }
+
+                    <MudSpacer />
+
+                    <MudPaper Height="80px" Class="mud-theme-transparent" Elevation="0">
+
+                        <MudTextField @bind-Value="newGroceryItem"
+                                      For="@(() => newGroceryItem)"
+                                      @ref="addGroceryItemField"
+                                      Immediate="true"
+                                      Placeholder="New item to buy"
+                                      Error="@(addGroceryItemError.Length > 0)"
+                                      ErrorText="@addGroceryItemError"
+                                      Label="New item" Variant="Variant.Text"
+                                      InputType="@InputType.Text" Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.Add" OnAdornmentClick="AddGroceryItem"
+                                      AdornmentAriaLabel="Add item"
+                                      OnKeyDown="AddGroceryItemEnter"
+                                      OnKeyUp="AddGroceryItemEnter" />
+                    </MudPaper>
+                </MudStack>
 
             </MudPaper>
         </MudItem>
 
         <MudItem xs="6">
-            <MudPaper Height="600px" Class="pa-2 mud-theme-transparent">
-                <MudStack Justify="Justify.SpaceBetween">
-                    <MudPaper Height="250px" Class="pa-2">
+            <MudPaper Height="500px" Class="px-2 mud-theme-transparent" Elevation="0">
+                <MudStack Justify="Justify.SpaceBetween" Style="height:100%;">
+                    <MudPaper Height="240px" Class="pa-2">
                         <MudText Typo="Typo.body1">
                             Multiple panels fun
                         </MudText>
                     </MudPaper>
-                    <MudPaper Height="250px" Class="pa-2 ">
+                    <MudPaper Height="240px" Class="pa-2 ">
                         <MudText Typo="Typo.body1">
                             Multiple panels fun
                         </MudText>
@@ -182,15 +212,61 @@
     public FeatureBase? Feature { get; set; }
     private Introduction? introduction = null;
 
-    private class GroceryListItem
+    #region Grocery List
+    MudTextField<string> addGroceryItemField;
+    private string newGroceryItem = string.Empty;
+    private string addGroceryItemError = string.Empty;
+    private Dictionary<string, bool> groceryList = new Dictionary<string, bool>();
+    private string selectedValue = string.Empty;
+    private async Task AddGroceryItemEnter(KeyboardEventArgs args)
     {
-        public string Name { get; set; } = string.Empty;
-        public int Count { get; set; } = 0;
-        public bool Checked { get; set; } = false;
+        if (args.Code == "Enter" && addGroceryItemField != null)
+        {
+            await AddGroceryItem();
+            return;
+        }
+
+        if (!groceryList.ContainsKey(newGroceryItem))
+            addGroceryItemError = string.Empty;
+        else
+            addGroceryItemError = $"{newGroceryItem} already exists!";
+    }
+    private async Task AddGroceryItem()
+    {
+        if (groceryList.ContainsKey(newGroceryItem))
+        {
+            addGroceryItemError = $"{newGroceryItem} already exists!";
+            return;
+        }
+        if (newGroceryItem.Length == 0)
+            return;
+
+
+        addGroceryItemField.TextUpdateSuppression = false;
+
+        groceryList.Add(newGroceryItem, false);
+
+        newGroceryItem = string.Empty;
+        await InvokeAsync(StateHasChanged);
+        await Task.Run(async () =>
+        {
+            await Task.Delay(150);
+            addGroceryItemField.TextUpdateSuppression = true;
+        });
     }
 
-    private HashSet<string> groceryList = new HashSet<string>();
+    private void CrossGroceryItem(object selectedGroceryItem)
+    {
+        if (selectedGroceryItem is not string groceryItem) return;
+        if (!groceryList.ContainsKey(groceryItem)) return;
 
+        groceryList[groceryItem] = !groceryList[groceryItem];
+        selectedValue = string.Empty;
+        StateHasChanged();
+    }
+    #endregion
+
+    #region Chart
     private ApexChart<SinglePoint> chart;
 
     ApexChartOptions<SinglePoint> options = new ApexCharts.ApexChartOptions<SinglePoint>()
@@ -225,6 +301,8 @@
             return $"{Date.Month}/{Date.Year}";
         }
     }
+
+    #endregion
 
     protected override void OnInitialized()
     {
