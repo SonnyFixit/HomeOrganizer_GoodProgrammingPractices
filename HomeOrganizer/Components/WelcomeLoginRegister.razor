@@ -29,8 +29,8 @@
                         {
 
                             <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Dense="true" Class="mt-1"
-                              OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
-                              CloseIconClicked="(()=>{showResetPassword = false;})">
+                                      OnClick="ResetPassword" Style="cursor:pointer;" ShowCloseIcon="true"
+                                      CloseIconClicked="(()=>{showResetPassword = false;})">
                                 Reset your password
                             </MudAlert>
                         }
@@ -38,8 +38,8 @@
                         if (showUserNotFound)
                         {
                             <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Dense="true" Class=""
-                              OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
-                              CloseIconClicked="(()=>{showUserNotFound = false;})">
+                                      OnClick="QuickRegister" Style="cursor:pointer;" ShowCloseIcon="true"
+                                      CloseIconClicked="(()=>{showUserNotFound = false;})">
                                 Click here for quick register!
                             </MudAlert>
                         }
@@ -135,7 +135,7 @@
         showUserNotFound = false;
         showResetPassword = false;
 
-        userService.LoggedUser = registeredUser;
+        await userService.UpdateUser(registeredUser);
     }
 
     private async Task ProcessDialogResult(DialogResult result)
@@ -154,7 +154,7 @@
             return;
         }
 
-        userService.LoggedUser = registeredUser;
+        await userService.UpdateUser(registeredUser);
         StateHasChanged();
     }
 

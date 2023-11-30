@@ -131,7 +131,7 @@
         if (response.Status)
         {
             snackbarService.Add("Details successfully changed!", MudBlazor.Severity.Success);
-            userService.LoggedUser = User;
+            await userService.UpdateUser(User);
         }
         else
         {

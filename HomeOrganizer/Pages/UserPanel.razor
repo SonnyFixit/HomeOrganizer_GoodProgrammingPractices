@@ -31,9 +31,9 @@ else
                     @if (!user.RightUserPanelNavigation)
                     {
                         <UserPanelNavigation IsRightSide="user.RightUserPanelNavigation"
-                                     CurrentPanel="@currentPanelValue"
-                                     OnSideChange="HandleSideChange"
-                                     OnNavigationChanged="HandleNavigationChanged" />
+                                             CurrentPanel="@currentPanelValue"
+                                             OnSideChange="HandleSideChange"
+                                             OnNavigationChanged="HandleNavigationChanged" />
                     }
 
                 </MudPaper>
@@ -53,9 +53,9 @@ else
                     @if (user.RightUserPanelNavigation)
                     {
                         <UserPanelNavigation IsRightSide="user.RightUserPanelNavigation"
-                                     CurrentPanel="@currentPanelValue"
-                                     OnSideChange="HandleSideChange"
-                                     OnNavigationChanged="HandleNavigationChanged" />
+                                             CurrentPanel="@currentPanelValue"
+                                             OnSideChange="HandleSideChange"
+                                             OnNavigationChanged="HandleNavigationChanged" />
                     }
                 </MudPaper>
             </MudStack>
@@ -72,11 +72,11 @@ else
     private Type? selectedPanel = null;
     private Dictionary<string, object>? parameters = null;
 
-    private void HandleSideChange()
+    private async Task HandleSideChange()
     {
         if (user == null) return;
         user.RightUserPanelNavigation = !user.RightUserPanelNavigation;
-        userService.LoggedUser = user;
+        await userService.UpdateUser(user);
     }
 
     private void HandleNavigationChanged(UserPanelNavigationData changedTo)

@@ -27,15 +27,15 @@
             </MudText>
         </MudPaper>
         <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Toggled="@isDarkMode" Edge="Edge.End"
-                         Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
-                         ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
+                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
+                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
     }
     else
     {
         <MudPaper Class="mud-theme-transparent d-flex justify-center flex-grow-1 gap-4" Elevation="0" Style="width:300px">
             <MudToggleIconButton ToggledChanged="@UpdateUserTheme" Class="mx-0" Toggled="@isDarkMode"
-                             Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
-                             ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
+                                 Icon="@Icons.Material.Filled.NightsStay" Color="@Color.Tertiary" Title="Change theme to Dark"
+                                 ToggledIcon="@Icons.Material.Filled.WbSunny" ToggledColor="@Color.Tertiary" ToggledTitle="Change theme to Light" />
         </MudPaper>
     }
     <MudSpacer />
@@ -58,7 +58,7 @@
 </MudAppBar>
 
 @code {
-    private UserData user { get; set; }
+    private UserData? user { get; set; }
     private bool isDarkMode { get; set; } = false;
     private string welcome = string.Empty;
 
@@ -89,24 +89,24 @@
         userService.OnChange -= HandleUserUpdate;
     }
 
-    private void GoHome()
+    private async Task GoHome()
     {
         if (user != null)
         {
             user.OpenedFeature = null;
-            userService.LoggedUser = user;
+            await userService.UpdateUser(user);
         }
         navigationManager.NavigateTo("/");
     }
 
-    private void UpdateUserTheme()
+    private async Task UpdateUserTheme()
     {
         isDarkMode = !isDarkMode;
 
         if (user != null)
         {
             user.UseDarkTheme = isDarkMode;
-            userService.LoggedUser = user;
+            await userService.UpdateUser(user);
         }
         else
         {
@@ -114,9 +114,9 @@
         }
     }
 
-    private void OpenUserPanel()
+    private async Task OpenUserPanel()
     {
-        userService.LoggedUser = user;
+        await userService.UpdateUser(user);
         navigationManager.NavigateTo("/UserPanel");
     }
 
@@ -128,7 +128,7 @@
 
         // log out
         user = null;
-        userService.LoggedUser = null;
+        await userService.UpdateUser(user);
 
         navigationManager.NavigateTo("/");
     }

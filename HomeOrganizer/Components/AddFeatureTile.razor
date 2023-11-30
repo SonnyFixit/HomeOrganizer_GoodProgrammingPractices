@@ -56,7 +56,7 @@
         if (response.Status)
         {
             User.OpenedFeature = feature;
-            userService.LoggedUser = User;
+            await userService.UpdateUser(User);
         }
         else
         {

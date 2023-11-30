@@ -34,9 +34,9 @@
         user = userService.LoggedUser;
     }
 
-    private void ClearOpenedFeature()
+    private async Task ClearOpenedFeature()
     {
         user.OpenedFeature = null;
-        userService.LoggedUser = user;
+        await userService.UpdateUser(user);
     }
 }

@@ -23,6 +23,7 @@
 
     <MudGrid>
 
+        @* FIRST INTRODUCTION *@
         <MudItem xs="7">
             <MudPaper Height="200px" Class="pa-2">
                 <MudStack Spacing="3">
@@ -41,10 +42,12 @@
             </MudPaper>
         </MudItem>
 
+        @* 1 EMPTY SPACE *@
         <MudItem xs="1">
             <MudPaper Height="200px" Class="mud-theme-transparent" Elevation="0" />
         </MudItem>
 
+        @* IMAGE - DOG *@
         <MudItem xs="4">
             <MudPaper Height="200px" Style="overflow:hidden;" Elevation="0" Class="mud-theme-transparent" Square="true">
                 <MudImage Src="images/introduction/dog.jpg"
@@ -54,6 +57,7 @@
             </MudPaper>
         </MudItem>
 
+        @* IMAGE - SUNSET *@
         <MudItem xs="4">
             <MudPaper Height="200px" Style="overflow:hidden;">
                 <MudImage Src="images/introduction/sunset.jpg"
@@ -62,15 +66,18 @@
             </MudPaper>
         </MudItem>
 
+        @* 1 EMPTY SPACE *@
         <MudItem xs="1">
             <MudPaper Height="200px" Class="mud-theme-transparent" Elevation="0" />
         </MudItem>
 
+        @* ADD, EDIT, REMOVE TUTORIAL *@
         <MudItem xs="7">
             <MudPaper Height="200px" Class="pa-2">
                 <MudText Typo="Typo.body1">
                     You can edit this panel data from previous screen - home page.
                     Click <i>tile settings icon</i> (right top) and change something!
+                    You can also delete it (but be careful because it won't appear again)
                 </MudText>
                 <MudText Typo="Typo.body1">
                     You can add more panels in home screen by clicking bottom + button and chosing one!
@@ -81,53 +88,93 @@
             </MudPaper>
         </MudItem>
 
-        <MudItem xs="6">
-            <MudPaper Height="300px" Class="pa-2 overflow-scroll">
-                <ApexChart TItem="SinglePoint" Height="260" Width="1500" Options="@options" @ref="@chart"
-                           Title="Your expanses">
+        @* MUDBLAZOR DONUT CHART - 1 YEAR EXPANSES *@
+        <MudItem xs="3">
+            <MudPaper Height="400px" Class="pa-2">
+                <MudStack Style="height:100%; width:100%;" Row="true">
 
-                    @foreach (var series in DataSeries)
+                    <MudList Clickable="true" Dense="false" DisableGutters="false" SelectedValue="@selectedYear" SelectedValueChanged="ChangeYear">
+                        @foreach (int year in expansesData.First().Value.Select(ds => ds.Date.Year).Distinct().OrderByDescending(y => y))
+                        {
+                            <MudListItem Text="@year.ToString()" Value="@year" />
+                        }
+                    </MudList>
+
+                    @if (singleYearData.Length > 0 && singleYearLabels.Length > 0)
                     {
-                        <ApexPointSeries TItem="SinglePoint"
-                                     Items="@series.Value"
-                                     Name="@series.Key"
-                                     SeriesType="SeriesType.Bar"
-                                     XValue="e => e.CreateDateText()"
-                                     YValue="e=> (decimal)e.Value" />
+                        <MudPaper Class="pa-4">
+                            <MudChart ChartType="MudBlazor.ChartType.Donut" Width="300px" Height="300px" @bind-SelectedIndex="index" InputData="@singleYearData" InputLabels="@singleYearLabels"></MudChart>
+                        </MudPaper>
                     }
-
-                </ApexChart>
+                    @*                             <MudPaper Class="pa-4 mt-2 d-flex justify-center">
+                    <MudButton OnClick="AddDataSize" Variant="Variant.Filled" Color="MudBlazor.Color.Primary">Add</MudButton>
+                    <MudButton @onclick="RandomizeData" Variant="Variant.Filled" Class="mx-4">Randomize</MudButton>
+                    <MudButton OnClick="RemoveDataSize" Variant="Variant.Filled" Color="MudBlazor.Color.Secondary">Remove</MudButton>
+                    </MudPaper> *@
+                    @* <MudText Typo="Typo.h6">Selected portion of the chart: @index</MudText> *@
+                </MudStack>
             </MudPaper>
         </MudItem>
 
+        @* IMAGE CAROUSEL - TRAVELS *@
         <MudItem xs="6">
-            <MudPaper Height="300px" Class="overflow-hidden">
-                <MudCarousel Class="mud-width-full" Style="height:300px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+            <MudPaper Height="400px" Class="overflow-hidden">
+                <MudCarousel Class="mud-width-full" Style="height:400px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
                     <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
                         <div class="d-flex" style="height:100%">
                             <MudImage Src="images/introduction/szczyrk.jpg"
                                       ObjectFit="ObjectFit.Cover"
-                                      Style="width:100%;" Height="300" />
+                                      Style="width:100%;" Height="400" />
                         </div>
                     </MudCarouselItem>
                     <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
                         <div class="d-flex" style="height:100%">
                             <MudImage Src="images/introduction/skrzyczne.jpg"
                                       ObjectFit="ObjectFit.Cover"
-                                      Style="width:100%;" Height="300" />
+                                      Style="width:100%;" Height="400" />
                         </div>
                     </MudCarouselItem>
                     <MudCarouselItem Transition="Transition.Slide" Color="@MudBlazor.Color.Secondary">
                         <div class="d-flex" style="height:100%">
                             <MudImage Src="images/introduction/ojcow.jpg"
                                       ObjectFit="ObjectFit.Cover"
-                                      Style="width:100%;" Height="300" />
+                                      Style="width:100%;" Height="400" />
                         </div>
                     </MudCarouselItem>
                 </MudCarousel>
             </MudPaper>
         </MudItem>
 
+        @* APEX CHART DONUT CHART *@
+        <MudItem xs="3">
+            <MudPaper Height="400px" Class="pa-2">
+                <MudStack Style="height:100%; width:100%;" Row="true">
+
+                    <MudList Clickable="true" Dense="false" DisableGutters="false" SelectedValue="@selectedYear" SelectedValueChanged="ChangeYear">
+                        @foreach (int year in expansesData.First().Value.Select(ds => ds.Date.Year).Distinct().OrderByDescending(y => y))
+                        {
+                            <MudListItem Text="@year.ToString()" Value="@year" />
+                        }
+                    </MudList>
+
+                    <ApexChart TItem="AnnualExpanse"
+                               Title="Annual expanses"
+                    @ref="@annualChart" Height="300" Width="300"
+                               Options="annualChartOptions">
+
+                        <ApexPointSeries TItem="AnnualExpanse"
+                                         Items="annualExpanses"
+                                         SeriesType="SeriesType.Donut"
+                                         Name="Category Value"
+                                         XValue="@(e => e.Category)"
+                                         YValue="@(e => (decimal)e.Value)"
+                                         OrderByDescending="e=>e.Y" />
+                    </ApexChart>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        @* GROCERY LIST *@
         <MudItem xs="3">
             <MudPaper Height="500px" Class="pa-2">
                 <MudStack Style="height:100%;">
@@ -164,7 +211,7 @@
 
                         <MudTextField @bind-Value="newGroceryItem"
                                       For="@(() => newGroceryItem)"
-                                      @ref="addGroceryItemField"
+                        @ref="addGroceryItemField"
                                       Immediate="true"
                                       Placeholder="New item to buy"
                                       Error="@(addGroceryItemError.Length > 0)"
@@ -181,26 +228,43 @@
             </MudPaper>
         </MudItem>
 
+        @* 3 EMPTY SPACE *@
+        <MudItem xs="3">
+
+        </MudItem>
+
+        @* TWO LEVEL PANEL *@
+        @* EXPANSES CHART *@
+        @* TEXT *@
         <MudItem xs="6">
             <MudPaper Height="500px" Class="px-2 mud-theme-transparent" Elevation="0">
                 <MudStack Justify="Justify.SpaceBetween" Style="height:100%;">
-                    <MudPaper Height="240px" Class="pa-2">
-                        <MudText Typo="Typo.body1">
-                            Multiple panels fun
-                        </MudText>
+                    @* APEX LINE CHART - EXPANSES *@
+
+                    <MudPaper Height="320px" Class="pa-2 overflow-scroll">
+                        <ApexChart TItem="MonthlyExpanse" Height="260" Width="1500" Options="fullChartOptions" @ref="@fullChart"
+                                   Title="Your expanses">
+
+                            @foreach (var series in expansesData)
+                            {
+                                <ApexPointSeries TItem="MonthlyExpanse"
+                                                 Items="@series.Value"
+                                                 Name="@series.Key"
+                                                 SeriesType="SeriesType.Bar"
+                                                 XValue="e => e.CreateDateText()"
+                                                 YValue="e=> (decimal)e.Value" />
+                            }
+
+                        </ApexChart>
                     </MudPaper>
-                    <MudPaper Height="240px" Class="pa-2 ">
-                        <MudText Typo="Typo.body1">
-                            Multiple panels fun
-                        </MudText>
+                    <MudPaper Height="170px" Class="pa-2">
+
                     </MudPaper>
                 </MudStack>
             </MudPaper>
         </MudItem>
 
-        <MudItem xs="6">
 
-        </MudItem>
 
     </MudGrid>
 
@@ -266,32 +330,33 @@
     }
     #endregion
 
-    #region Chart
-    private ApexChart<SinglePoint> chart;
+    #region Full Expanses Chart
+    private ApexChart<MonthlyExpanse> fullChart;
 
-    ApexChartOptions<SinglePoint> options = new ApexCharts.ApexChartOptions<SinglePoint>()
+    private ApexChartOptions<MonthlyExpanse> fullChartOptions = new ApexChartOptions<MonthlyExpanse>()
         {
-            Legend = new Legend()
-            {
-
-            },
             Theme = new Theme()
             {
                 Mode = Mode.Dark
-            }
+            },
+            Chart = new Chart()
+            {
+                Background = "transparent",
+            },
         };
 
-    private Dictionary<string, List<SinglePoint>> DataSeries { get; set; } = new Dictionary<string, List<SinglePoint>>()
+    private Dictionary<string, List<MonthlyExpanse>> expansesData { get; set; } = new Dictionary<string, List<MonthlyExpanse>>()
     {
-        {"Food", new List<SinglePoint>()},
-        {"Clothes", new List<SinglePoint>()},
-        {"Travels", new List<SinglePoint>()},
-        {"Games", new List<SinglePoint>()},
-        {"Subcriptions", new List<SinglePoint>()},
-        {"Other", new List<SinglePoint>()}
+        {"Food", new List<MonthlyExpanse>()},
+        {"Clothes", new List<MonthlyExpanse>()},
+        {"Travels", new List<MonthlyExpanse>()},
+        {"Games", new List<MonthlyExpanse>()},
+        {"Subcriptions", new List<MonthlyExpanse>()},
+        {"Other", new List<MonthlyExpanse>()}
     };
 
-    public class SinglePoint
+
+    public class MonthlyExpanse
     {
         public DateTime Date { get; set; }
         public double Value { get; set; }
@@ -304,21 +369,90 @@
 
     #endregion
 
-    protected override void OnInitialized()
+    #region Single Year Expanses Chart
+    private ApexChart<AnnualExpanse> annualChart;
+
+    private ApexChartOptions<AnnualExpanse> annualChartOptions = new ApexChartOptions<AnnualExpanse>()
+        {
+            Theme = new Theme()
+            {
+                Mode = Mode.Dark,
+            },
+            Chart = new Chart()
+            {
+                Background = "transparent",
+            },
+            Legend = new Legend()
+            {
+                Position = LegendPosition.Bottom
+            }
+        };
+
+
+
+    object selectedYear = DateTime.Now.Year;
+    private int index = -1; //default value cannot be 0 -> first selectedindex is 0.
+    private double[] singleYearData = Array.Empty<double>();
+    private string[] singleYearLabels = Array.Empty<string>();
+    private AnnualExpanse[] annualExpanses = Array.Empty<AnnualExpanse>();
+
+    private async Task ChangeYear(object newYear)
+    {
+        selectedYear = newYear;
+        await UpdateYearData();
+    }
+
+    private async Task UpdateYearData()
+    {
+        int year = (int)selectedYear;
+
+        singleYearLabels = expansesData.Keys.ToArray();
+        annualExpanses = new AnnualExpanse[singleYearLabels.Length];
+        singleYearData = new double[singleYearLabels.Length];
+
+        for (int i = 0; i < singleYearData.Length; i++)
+        {
+            singleYearData[i] = expansesData[singleYearLabels[i]].Where(d => d.Date.Year == year).Select(d => d.Value).Sum();
+            annualExpanses[i] = new AnnualExpanse(singleYearLabels[i], expansesData[singleYearLabels[i]], year);
+        }
+
+        if (annualChart != null)
+            await annualChart.UpdateSeriesAsync(false);
+        StateHasChanged();
+    }
+
+    public class AnnualExpanse
+    {
+        public string Category { get; set; }
+        public double Value { get; set; }
+
+        public AnnualExpanse()
+        {
+        }
+
+        public AnnualExpanse(string category, List<MonthlyExpanse> monthlyExpanses, int year)
+        {
+            Category = category;
+            Value = monthlyExpanses.Where(v => v.Date.Year == year).Select(v => v.Value).Sum();
+        }
+    }
+    #endregion
+
+    protected override async Task OnInitializedAsync()
     {
         if (Feature == null) return;
         if (Feature is not Introduction receivedFeature) return;
         introduction = receivedFeature;
 
-        userService.OnChange += HandleUserUpdate;
+        userService.AsyncOnChange += HandleUserUpdate;
 
         // last 3 years
         int months = 36;
         for (int i = 0; i < months; i++)
         {
-            foreach (var series in DataSeries)
+            foreach (var series in expansesData)
             {
-                series.Value.Add(new SinglePoint()
+                series.Value.Add(new MonthlyExpanse()
                     {
                         Date = DateTime.Now.AddMonths(-i),
                         Value = Random.Shared.Next(500) + Math.Round((double)Random.Shared.NextDouble(), 2)
@@ -326,21 +460,39 @@
             }
         }
 
+        await UpdateYearData();
+        await UpdateApexThemes();
+
         base.OnInitialized();
     }
 
     public void Dispose()
     {
-        userService.OnChange -= HandleUserUpdate;
+        userService.AsyncOnChange -= HandleUserUpdate;
     }
 
-    private void HandleUserUpdate()
+    private async Task HandleUserUpdate()
     {
         if (userService.LoggedUser == null) return;
 
-        options.Theme.Mode = userService.LoggedUser.UseDarkTheme ? Mode.Dark : Mode.Light;
-        StateHasChanged();
-        chart.UpdateOptionsAsync(false, false, false);
-        chart.RenderAsync();
+        await UpdateApexThemes();
+    }
+
+    private async Task UpdateApexThemes()
+    {
+        Mode apexTheme = userService.LoggedUser.UseDarkTheme ? Mode.Dark : Mode.Light;
+        fullChartOptions.Theme.Mode = apexTheme;
+        annualChartOptions.Theme.Mode = apexTheme;
+        if (fullChart != null)
+        {
+            await fullChart.UpdateOptionsAsync(false, false, false);
+            await fullChart.RenderAsync();
+        }
+        if (annualChart != null)
+        {
+            await annualChart.UpdateOptionsAsync(false, false, false);
+            await annualChart.RenderAsync();
+
+        }
     }
 }

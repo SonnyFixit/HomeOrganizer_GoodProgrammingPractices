@@ -9,29 +9,30 @@ namespace HomeOrganizer.Services
     public class UserService
     {
         private UserData? loggedUser;
-        public FeatureBase DraggedFeatureTile { get; set; }
+        public FeatureBase? DraggedFeatureTile { get; set; }
         public bool UnloggedDarkTheme = false;
 
         public UserData? LoggedUser
         {
             get => loggedUser;
-            set
-            {
-                loggedUser = value;
-                NotifyStateChanged();
-            }
+            private set { loggedUser = value; }
         }
 
         public event Action? OnChange;
+        public event Func<Task>? AsyncOnChange;
 
-        private void NotifyStateChanged()
+        public async Task UpdateUser(UserData user)
         {
+            LoggedUser = user;
+
             if (loggedUser != null)
             {
-                DbHandler.UpdateUser(loggedUser);
+                await DbHandler.UpdateUser(loggedUser);
                 UnloggedDarkTheme = loggedUser.UseDarkTheme;
             }
             OnChange?.Invoke();
+            if (AsyncOnChange != null)
+                await AsyncOnChange.Invoke();
         }
     }
 }

@@ -16,12 +16,12 @@
               dropzone="move"
               id="@($"FeatureTile{Feature.TileData.Position}")"
               ondragover="event.preventDefault();"
-              @ondragstart="HandleDragStart"
-              @ondragenter="HandleDragEnter"
-              @ondragleave="HandleDragLeave"
-              @ondragend="HandleDragEnd"
-              @onclick="OpenFeature"
-              @ondrop="HandleDrop">
+    @ondragstart="HandleDragStart"
+    @ondragenter="HandleDragEnter"
+    @ondragleave="HandleDragLeave"
+    @ondragend="HandleDragEnd"
+    @onclick="OpenFeature"
+    @ondrop="HandleDrop">
         <MudCard Style="@($"height:100%; cursor: pointer; overflow:hidden; background-color:{Constants.TileColorPalettes[IsDarkMode][Feature.TileData.ColorIndex]}; {dragStyle}")">
             <MudCardHeader>
                 <CardHeaderContent>
@@ -135,7 +135,7 @@
         hoverClass = "pa-0";
     }
 
-    private void HandleDrop(DragEventArgs e)
+    private async Task HandleDrop(DragEventArgs e)
     {
         ClearHoverData();
 
@@ -157,7 +157,7 @@
         UserData tmpUser = userService.LoggedUser;
         tmpUser.Features = sortedFeatures;
         tmpUser.OpenedFeature = null;
-        userService.LoggedUser = tmpUser;
+        await userService.UpdateUser(tmpUser);
         userService.DraggedFeatureTile = null;
     }
 

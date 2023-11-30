@@ -95,7 +95,7 @@ else
 
         if (response.Status)
         {
-            userService.LoggedUser = User;
+            await userService.UpdateUser(User);
         }
         else
         {
@@ -112,7 +112,7 @@ else
         Response response = await User.RemoveFeature(feature);
         if (response.Status)
         {
-            userService.LoggedUser = User;
+            await userService.UpdateUser(User);
         }
         else
         {

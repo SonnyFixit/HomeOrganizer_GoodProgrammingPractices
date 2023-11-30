@@ -111,7 +111,7 @@
         bool userUpdateResult = User.UpdateImage(avatarBase64);
         if (userUpdateResult)
         {
-            userService.LoggedUser = User;
+            await userService.UpdateUser(User);
             croppedAvatar = null;
         }
         else
