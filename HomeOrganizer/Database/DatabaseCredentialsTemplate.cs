@@ -1,6 +1,6 @@
 ﻿namespace HomeOrganizer.Database
 {
-    // Just remove 2 from class name and provide correct crudentials in fields
+    // Just remove "Template" from class name and provide correct crudentials in fields
     public static class DatabaseCredentialsTemplate
     {
         public static readonly string ConnectionString = "YourConnectionString";

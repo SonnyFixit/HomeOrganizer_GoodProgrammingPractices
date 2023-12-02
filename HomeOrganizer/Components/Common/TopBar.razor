@@ -62,7 +62,7 @@
     private bool isDarkMode { get; set; } = false;
     private string welcome = string.Empty;
 
-    private async void HandleUserUpdate()
+    private void HandleUserUpdate()
     {
         user = userService.LoggedUser;
         isDarkMode = user == null ? userService.UnloggedDarkTheme : user.UseDarkTheme;
