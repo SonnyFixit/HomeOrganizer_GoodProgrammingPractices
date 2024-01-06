@@ -1,6 +1,6 @@
 ﻿@page "/"
+@namespace HomeOrganizer
 @using Microsoft.AspNetCore.Components.Web
-@namespace HomeOrganizer.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
@@ -36,63 +36,6 @@
 
     <script>
 
-        // window.addCustomListener = (id) => {
-
-        //     document.getElementById(id).addEventListener("dragstart", function (e) {
-
-
-        //         var hideDragImage = this.cloneNode(true);
-        //         // hideDragImage.id = "hideDragImage-hide"
-
-        //         // var dragImage = this.cloneNode(true);
-        //         // dragImage.id = "draggeimage";
-        //         // dragImage.style.position = "absolute";
-        //         // dragImage.style.width = "350px";
-        //         // dragImage.style.height = "150px";
-
-        //         // hideDragImage.style.opacity = 0;
-        //         // document.body.appendChild(hideDragImage);
-        //         // document.body.appendChild(dragImage);
-        //         e.dataTransfer.setDragImage(hideDragImage, 0, 0);
-        //     }, false);
-
-        //     document.getElementById(id).addEventListener("dragend", function (e) {
-        //         // var hideDragImage = document.getElementById('hideDragImage-hide');
-        //         // var dragImage = document.getElementById('draggeimage');
-        //         // hideDragImage.remove()
-        //         // dragImage.remove()
-        //     }, false);
-
-        //     document.getElementById(id).addEventListener("drag", (event) => {
-        //         // dragImage = document.getElementById('draggeimage');
-        //         // if (dragImage) {
-        //         //     dragImage.style.left = event.pageX + "px";
-        //         //     dragImage.style.top = event.pageY + "px";
-        //         // }
-        //     })
-
-        //     document.getElementById(id).addEventListener("dragstart", function (e) {
-        //         let dragTile = this.cloneNode(true);
-        //         dragTile.className = "";
-
-        //         const w = document.getElementById(id).style.width;
-        //         dragTile.style.width = w;
-        //         dragTile.style.height = "200px";
-
-        //         dragTile.style.position = "absolute";
-        //         dragTile.style.top = "-100000px";
-        //         dragTile.style.left = "-100000px";
-
-
-        //         console.log(dragTile)
-        //         // document.body.appendChild(div);
-
-        //         document.body.append(dragTile);
-        //         // document.body.appendChild(crt);
-
-        //         e.dataTransfer.setDragImage(dragTile, 0, 100);
-        //     });
-        }
     </script>
 
 </body>

@@ -1,5 +1,6 @@
 ﻿@using HomeOrganizer.Common;
 @using HomeOrganizer.Components
+@using HomeOrganizer.Components.Common
 @using HomeOrganizer.Components.Dialogs;
 @using HomeOrganizer.Components.Errors
 @using HomeOrganizer.Components.Features;
@@ -38,9 +39,9 @@ else
                     if (feature == null || !feature.FeatureData.IsUsed) continue;
 
                     <FeatureTile IsDarkMode="@User.UseDarkTheme" Feature="@feature"
-                     OnOpenFeature="HandleOpenFeature"
-                     OnEditFeature="HandleEditFeature"
-                     OnRemoveFeature="HandleRemoveFeature" />
+                                 OnOpenFeature="HandleOpenFeature"
+                                 OnEditFeature="HandleEditFeature"
+                                 OnRemoveFeature="HandleRemoveFeature" />
                 }
 
             </MudGrid>

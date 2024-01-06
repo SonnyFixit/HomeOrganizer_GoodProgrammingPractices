@@ -10,10 +10,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Include="Components\Common\FeatureTopBar.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Blazor-ApexCharts" Version="2.1.0" />
 		<PackageReference Include="Chronos.Blazor.Cropper" Version="1.2.16" />
 		<PackageReference Include="FluentValidation" Version="11.8.0" />
