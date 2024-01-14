@@ -2,15 +2,19 @@
 @inject NavigationManager navigationManager
 
 
-
+<!-- Main container for displaying the error message and navigation button -->
 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Style="height:100%; width:100%;" Spacing="0">
     <MudPaper Width="500px" Height="400px" Class="pa-4 mt-16">
+
+        <!-- General message indicating the user has reached an unexpected location -->
         <MudText Typo="Typo.h6">
             Wow! How did you get here?
         </MudText>
         <MudText Typo="Typo.body1" Class="mt-3">
             Sorry but there's nothing for you :(
         </MudText>
+
+        <!-- Conditional message based on the attempted navigation address -->
         @if (pageAdress.Length > 0)
         {
             <MudText Typo="Typo.body1" Class="mt-3">
@@ -31,11 +35,17 @@
 @code {
     string pageAdress = string.Empty;
 
+    /// <summary>
+    /// Initializes the component, capturing the current navigation address.
+    /// </summary>
     protected override void OnInitialized()
     {
         pageAdress = navigationManager.Uri.Substring(navigationManager.BaseUri.Length);
     }
 
+    /// <summary>
+    /// Navigates the user back to the home page.
+    /// </summary>
     private void GoHome()
     {
         navigationManager.NavigateTo("/");

@@ -1,17 +1,21 @@
 ﻿@using HomeOrganizer.Models.Bases;
 @inject NavigationManager navigationManager
 
+<!-- Main container for displaying error messages and navigation button -->
 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Style="height:100%; width:100%;" Spacing="0">
 
+    <!-- General error message -->
     <MudPaper Width="500px" Class="pa-4 mt-16">
         <MudText Typo="Typo.h6">
             Whoops... Something went really really wrong!
         </MudText>
 
+        <!-- Specific error message for unrecognizable feature data -->
         <MudText Typo="Typo.body1" Class="mt-3">
             We cannot recognize feature data :(
         </MudText>
 
+        <!-- Additional conditional messages based on feature data availability -->
         @if (Feature == null)
         {
             <MudText Typo="Typo.body1" Class="mt-3">
@@ -26,6 +30,7 @@
             </MudText>
         }
 
+        <!-- Button to navigate back to the home view -->
         <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-10" Elevation="0">
             <MudButton OnClick="GoHome" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
                 Back home
@@ -43,6 +48,9 @@
     [Parameter]
     public string PanelName { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Navigates the user back to the home page.
+    /// </summary>
     private void GoHome()
     {
         navigationManager.NavigateTo("/");

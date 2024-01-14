@@ -20,6 +20,9 @@
 @code {
     private bool isDarkMode { get; set; } = false;
 
+    /// <summary>
+    /// Updates the component based on user theme preference changes.
+    /// </summary>
     private async void HandleUserUpdate()
     {
         isDarkMode = userService.LoggedUser == null ? userService.UnloggedDarkTheme : userService.LoggedUser.UseDarkTheme;
@@ -27,6 +30,9 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Initializes the component, setting up theme based on user preference.
+    /// </summary>
     protected override void OnInitialized()
     {
         isDarkMode = userService.LoggedUser == null ? userService.UnloggedDarkTheme : userService.LoggedUser.UseDarkTheme;
@@ -34,11 +40,17 @@
         userService.OnChange += HandleUserUpdate;
     }
 
+    /// <summary>
+    /// Detaches the event handler when the component is disposed.
+    /// </summary>
     public void Dispose()
     {
         userService.OnChange -= HandleUserUpdate;
     }
 
+    /// <summary>
+    /// Opens the Contact Us dialog and handles the user's input.
+    /// </summary>
     private async Task OpenContactUs()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = false };

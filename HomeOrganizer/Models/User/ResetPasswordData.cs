@@ -9,6 +9,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace HomeOrganizer.Models.User
 {
+    /// <summary>
+    /// Represents the data necessary for resetting a user's password.
+    /// </summary>
     public class ResetPasswordData
     {
         [BsonId]

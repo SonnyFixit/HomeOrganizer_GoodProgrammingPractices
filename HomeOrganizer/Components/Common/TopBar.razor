@@ -5,8 +5,10 @@
 @inject UserService userService
 @inject NavigationManager navigationManager
 
+<!-- Theme provider for the application -->
 <MudThemeProvider @bind-IsDarkMode="@isDarkMode" Theme="Constants.CustomTheme" />
 
+<!-- Main navigation bar -->
 <MudAppBar Color="Color.Inherit" Fixed="false" Dense="true">
     <MudPaper Class="mud-theme-transparent" Elevation="0" Style="width:170px">
         <MudButton StartIcon="@Icons.Material.Filled.Home" Color="Color.Inherit" ButtonType="ButtonType.Button" OnClick="GoHome">
@@ -62,6 +64,9 @@
     private bool isDarkMode { get; set; } = false;
     private string welcome = string.Empty;
 
+    /// <summary>
+    /// Handles updates to the user information.
+    /// </summary>
     private void HandleUserUpdate()
     {
         user = userService.LoggedUser;
@@ -76,6 +81,9 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Initializes the component, setting up user data and theme state.
+    /// </summary>
     protected override void OnInitialized()
     {
         user = userService.LoggedUser;
@@ -84,11 +92,17 @@
         userService.OnChange += HandleUserUpdate;
     }
 
+    /// <summary>
+    /// Disposes of the component, detaching event handlers.
+    /// </summary>
     public void Dispose()
     {
         userService.OnChange -= HandleUserUpdate;
     }
 
+    /// <summary>
+    /// Navigates to the home page.
+    /// </summary>
     private async Task GoHome()
     {
         if (user != null)
@@ -99,6 +113,9 @@
         navigationManager.NavigateTo("/");
     }
 
+    /// <summary>
+    /// Updates the theme based on user interaction.
+    /// </summary>
     private async Task UpdateUserTheme()
     {
         isDarkMode = !isDarkMode;
@@ -114,12 +131,18 @@
         }
     }
 
+    /// <summary>
+    /// Opens the user panel for profile management.
+    /// </summary>
     private async Task OpenUserPanel()
     {
         await userService.UpdateUser(user);
         navigationManager.NavigateTo("/UserPanel");
     }
 
+    /// <summary>
+    /// Handles user log out functionality.
+    /// </summary>
     private async Task LogOut()
     {
         // Update user data before log out

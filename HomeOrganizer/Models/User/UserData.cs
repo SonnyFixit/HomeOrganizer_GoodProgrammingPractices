@@ -13,6 +13,11 @@ namespace HomeOrganizer.Models.User
     [BsonIgnoreExtraElements]
     public class UserData
     {
+
+        /// <summary>
+        /// Represents the data associated with a user in the Home Organizer application.
+        /// This includes credentials, personal information, preferences, and features used.
+        /// </summary>
         [BsonId]
         public ObjectId Id { get; set; }
 
@@ -23,13 +28,19 @@ namespace HomeOrganizer.Models.User
         public bool UseDarkTheme { get; set; } = false;
         public bool RightUserPanelNavigation { get; set; } = false;
 
+        // Dictionary tracking usage count of different features.
         private Dictionary<string, int> featuresUsage = new Dictionary<string, int>();
 
+        // The feature currently opened by the user.
         [BsonIgnore]
         public FeatureBase? OpenedFeature { get; set; }
 
+        // List of features available to the user.
         public List<FeatureBase> Features { get; set; }
 
+        /// <summary>
+        /// Constructor for UserData. Initializes the list of features and sets up default usage.
+        /// </summary>
         public UserData()
         {
             Features = new List<FeatureBase>
@@ -40,6 +51,11 @@ namespace HomeOrganizer.Models.User
             featuresUsage[Features[0].FeatureData.Name] += 2; // Prevent from creating new Introduction tiles
         }
 
+
+        /// <summary>
+        /// Updates the user's name.
+        /// </summary>
+        /// <param name="name">New name for the user.</param>
         public void UpdateName(string name)
         {
             if (!string.IsNullOrEmpty(name) && Name != name)
@@ -48,6 +64,10 @@ namespace HomeOrganizer.Models.User
             }
         }
 
+        /// <summary>
+        /// Updates the user's email address.
+        /// </summary>
+        /// <param name="email">New email address for the user.</param>
         public void UpdateEmail(string email)
         {
             if (!string.IsNullOrEmpty(email))
@@ -56,6 +76,12 @@ namespace HomeOrganizer.Models.User
             }
         }
 
+        /// <summary>
+        /// Updates the user's avatar image.
+        /// </summary>
+        /// <param name="base64Image">Base64 string of the new image.</param>
+        /// <returns>True if the image was successfully updated, otherwise false.</returns>
+        /// 
         public bool UpdateImage(string base64Image)
         {
             if (string.IsNullOrEmpty(base64Image)) return false;
@@ -63,11 +89,22 @@ namespace HomeOrganizer.Models.User
             return true;
         }
 
+        /// <summary>
+        /// Resets the user's password.
+        /// </summary>
+        /// <param name="newPassword">New password for the user.</param>
         public void ResetPassword(string newPassword)
         {
             Credentials.ResetPassword(newPassword);
         }
 
+        /// <summary>
+        /// Sets the registration data for the user including login, password, email, and name.
+        /// </summary>
+        /// <param name="login">Login ID.</param>
+        /// <param name="password">Password.</param>
+        /// <param name="email">Email address.</param>
+        /// <param name="name">User's name.</param>
         public void SetRegisterData(string login, string password, string email, string name)
         {
             Credentials = new UserCredentials(login, password);
@@ -75,6 +112,11 @@ namespace HomeOrganizer.Models.User
             Name = name;
         }
 
+        /// <summary>
+        /// Adds a new feature to the user's list of features.
+        /// </summary>
+        /// <param name="feature">The feature to add.</param>
+        /// <returns>A response indicating success or failure with a message.</returns>
         public async Task<Response> AddFeature(FeatureBase feature)
         {
             if (feature == null)
@@ -123,6 +165,11 @@ namespace HomeOrganizer.Models.User
             return new Response(true, $"Created {feature.FeatureData.Name}");
         }
 
+        /// <summary>
+        /// Updates an existing feature in the user's list.
+        /// </summary>
+        /// <param name="feature">The feature to update.</param>
+        /// <returns>A response indicating success or failure with a message.</returns>
         public async Task<Response> UpdateFeature(FeatureBase feature)
         {
             if (feature == null || feature.FeatureData.Name.Length == 0)
@@ -136,6 +183,11 @@ namespace HomeOrganizer.Models.User
             return new Response(true, $"Feature {feature.FeatureData.Name}, {feature.TileData.UserGivenName} updated.");
         }
 
+        /// <summary>
+        /// Removes a feature from the user's list.
+        /// </summary>
+        /// <param name="feature">The feature to remove.</param>
+        /// <returns>A response indicating success or failure with a message.</returns>
         public async Task<Response> RemoveFeature(FeatureBase feature)
         {
             if (feature == null || feature.FeatureData.Name.Length == 0)
@@ -174,6 +226,10 @@ namespace HomeOrganizer.Models.User
             return new Response(true, $"Feature {feature.FeatureData.Name}, {feature.TileData.UserGivenName} is removed");
         }
 
+        /// <summary>
+        /// Retrieves a list of features available to the user.
+        /// </summary>
+        /// <returns>List of available feature names.</returns>
         public List<string> GetAvailableFeatures()
         {
             List<string> features = new List<string>();
@@ -188,6 +244,10 @@ namespace HomeOrganizer.Models.User
             return features;
         }
 
+        /// <summary>
+        /// Creates a new UserData instance with admin privileges.
+        /// </summary>
+        /// <returns>New instance of UserData with admin privileges.</returns>
         public static UserData CreateAdmin()
         {
             UserData admin = new UserData();

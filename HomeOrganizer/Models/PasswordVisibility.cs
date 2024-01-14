@@ -8,6 +8,9 @@ using MudBlazor;
 
 namespace HomeOrganizer.Models
 {
+    /// <summary>
+    /// Manages the visibility state of a password field, allowing toggling between hidden and visible states.
+    /// </summary>
     public class PasswordVisibility
     {
         public bool ShowPassword { get; set; } = false;

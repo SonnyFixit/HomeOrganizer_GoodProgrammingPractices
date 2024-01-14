@@ -3,8 +3,12 @@ using MudBlazor.Utilities;
 
 namespace HomeOrganizer.Common
 {
+    /// <summary>
+    /// Stores constants for UI elements such as tile icons and color palettes.
+    /// </summary>
     public static class Constants
     {
+        // Dictionary mapping names to MudBlazor icon identifiers.
         public static readonly Dictionary<string, string> TileIcons = new Dictionary<string, string>()
         {
             {"QuestionMark", Icons.Material.Filled.QuestionMark  },
@@ -18,12 +22,18 @@ namespace HomeOrganizer.Common
             {"Warning", Icons.Material.Filled.Warning       },
         };
 
+        /// <summary>
+        /// Retrieves the icon identifier for a given tile name.
+        /// </summary>
+        /// <param name="name">The name of the tile.</param>
+        /// <returns>The corresponding icon identifier.</returns>
         public static string GetTileIcon(string name)
         {
             if (TileIcons.ContainsKey(name)) return TileIcons[name];
             return TileIcons["QuestionMark"];
         }
 
+        // Dictionary defining color palettes for tiles based on the theme (light or dark).
         public static Dictionary<bool, MudColor[]> TileColorPalettes { get; } = new Dictionary<bool, MudColor[]>()
         {
             {false, new MudColor[]
@@ -82,7 +92,7 @@ namespace HomeOrganizer.Common
             }
         };
 
-
+        // The custom theme for the application, including both light and dark palettes.
         public static readonly MudTheme CustomTheme = new MudTheme()
         {
             Palette = CustomPalettes[false],

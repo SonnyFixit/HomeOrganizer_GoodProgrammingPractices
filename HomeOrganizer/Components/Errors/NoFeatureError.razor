@@ -6,17 +6,21 @@
     return;
 }
 
+<!-- Main stack container for the message and button -->
 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Style="height:100%; width:100%;" Spacing="0">
 
+    <!-- Paper container for the error message -->
     <MudPaper Width="500px" Class="pa-4 mt-16">
         <MudText Typo="Typo.h6">
             Whoops... Something went really really wrong!
         </MudText>
 
+        <!-- Display the error message -->
         <MudText Typo="Typo.body1" Class="mt-3">
             Cannot find feature '@user.OpenedFeature.FeatureData.Name', maybe it is under production?
         </MudText>
 
+        <!-- Button to navigate back to the home view -->
         <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-10" Elevation="0">
             <MudButton OnClick="ClearOpenedFeature" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
                 Back home
@@ -29,11 +33,17 @@
 @code {
     UserData? user = null;
 
+    /// <summary>
+    /// Initializes the component, setting the user data.
+    /// </summary>
     protected override void OnInitialized()
     {
         user = userService.LoggedUser;
     }
 
+    /// <summary>
+    /// Clears the currently opened feature and updates the user data.
+    /// </summary>
     private async Task ClearOpenedFeature()
     {
         user.OpenedFeature = null;

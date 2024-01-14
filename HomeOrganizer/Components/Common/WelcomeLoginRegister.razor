@@ -11,7 +11,7 @@
 @inject ISnackbar snackbar
 @inject NavigationManager navigationManager
 
-
+<!-- Login and registration UI component -->
 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Style="height:100%; width:100%;">
     <MudPaper Class="mt-16 mud-theme-transparent" Elevation="0">
         <MudPaper Class="pa-4" Width="400px">
@@ -90,13 +90,19 @@
     private string userLogin = string.Empty;
     private string userPassword = string.Empty;
 
+    // Flags for UI state management.
     private bool showUserNotFound = true;
     private bool loggingUser = false;
     private bool showResetPassword = false;
     private bool cannotLogin = false;
 
+    // Helper for managing password visibility.
     private PasswordVisibility passwordVisibility = new PasswordVisibility();
 
+    /// <summary>
+    /// Handles the Enter key press event for logging in.
+    /// </summary>
+    /// <param name="e">Keyboard event arguments.</param>
     private async Task OnLoginEnter(KeyboardEventArgs e)
     {
         if (e.Code != "Enter") return;
@@ -104,6 +110,9 @@
         await LoginUser();
     }
 
+    /// <summary>
+    /// Attempts to log the user in with provided credentials.
+    /// </summary>
     private async Task LoginUser()
     {
         if (userLogin.Length == 0) return;
@@ -138,6 +147,10 @@
         await userService.UpdateUser(registeredUser);
     }
 
+    /// <summary>
+    /// Processes the dialog result for registration and updates the user state.
+    /// </summary>
+    /// <param name="result">Result from the dialog.</param>
     private async Task ProcessDialogResult(DialogResult result)
     {
         if (result.Canceled) return;
@@ -158,6 +171,9 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Opens the registration dialog.
+    /// </summary>
     private async Task RegisterUser()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = false };
@@ -168,6 +184,9 @@
         await ProcessDialogResult(result);
     }
 
+    /// <summary>
+    /// Opens the quick registration dialog using the current login information.
+    /// </summary>
     private async Task QuickRegister()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true, DisableBackdropClick = false };
@@ -179,6 +198,9 @@
         await ProcessDialogResult(result);
     }
 
+    /// <summary>
+    /// Initiates the password reset process.
+    /// </summary>
     private async Task ResetPassword()
     {
         showResetPassword = false;

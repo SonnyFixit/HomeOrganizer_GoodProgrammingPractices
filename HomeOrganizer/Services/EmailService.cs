@@ -4,8 +4,12 @@ using System.Net.Mail;
 
 namespace HomeOrganizer.Services
 {
+    /// <summary>
+    /// Service for sending various types of emails related to the Home Organizer application.
+    /// </summary>
     public static class EmailService
     {
+        // HTML style to be applied to the email content.
         private static readonly string emailStyle = "<style>  " +
                 "body {" +
                 "font-family: Arial, sans-serif;" +
@@ -37,6 +41,14 @@ namespace HomeOrganizer.Services
                 "}" +
                 "</style>";
 
+
+        /// <summary>
+        /// Sends an email with the specified details.
+        /// </summary>
+        /// <param name="toEmail">Recipient's email address.</param>
+        /// <param name="toLogin">Recipient's login name.</param>
+        /// <param name="subject">Subject of the email.</param>
+        /// <param name="body">HTML body of the email.</param>
         private static async Task SendEmail(string toEmail, string toLogin, string subject, string body)
         {
             using var client = new SmtpClient();
@@ -57,6 +69,10 @@ namespace HomeOrganizer.Services
 
             await client.SendMailAsync(message);
         }
+
+
+        // Various public methods to send specific types of emails (password reset, email change, contact us, etc.)
+        // These methods construct the email's subject and body and use SendEmail for delivery.
 
         public static async Task SendResetPassword(string email, string login, string resetUrl)
         {

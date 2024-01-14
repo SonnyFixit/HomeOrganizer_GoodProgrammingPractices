@@ -9,6 +9,7 @@
 
 @if (Feature == null) return;
 
+<!-- Feature tile component -->
 <MudItem xs="12" sm="6" md="3" xl="3" Class="pa-5" Style="height:200px;">
 
     <MudPaper Class="@($"mud-theme-transparent {hoverClass}")" Width="100%" Height="100%" Elevation="0"
@@ -64,6 +65,7 @@
     [Parameter]
     public FeatureBase? Feature { get; set; }
 
+    // Event callbacks for various actions
     [Parameter]
     public EventCallback<FeatureBase> OnOpenFeature { get; set; }
 
@@ -75,8 +77,9 @@
 
     [Parameter]
     public bool IsDarkMode { get; set; } = false;
-    private bool dragDropTarget = false;
 
+    // Local state variables for drag-drop functionality and UI effects
+    private bool dragDropTarget = false;
     private int onHoverCounter = 0;
     private string dragStyle = string.Empty;
     private string hoverClass = "pa-0";
@@ -89,6 +92,9 @@
     //     }
     // }
 
+    /// <summary>
+    /// Handles feature editing process.
+    /// </summary>
     private async Task EditFeature()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth = true, MaxWidth = MaxWidth.Medium };
@@ -107,6 +113,9 @@
         await OnEditFeature.InvokeAsync(Feature);
     }
 
+    /// <summary>
+    /// Handles the removal of a feature.
+    /// </summary>
     private async Task RemoveFeature()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
@@ -122,11 +131,16 @@
         await OnRemoveFeature.InvokeAsync(Feature);
     }
 
+    /// <summary>
+    /// Opens the feature for viewing or further interaction.
+    /// </summary>
     private void OpenFeature()
     {
         if (userService.DraggedFeatureTile != null) return;
         OnOpenFeature.InvokeAsync(Feature);
     }
+
+    // Methods for handling drag-and-drop functionality
 
     private void ClearHoverData()
     {

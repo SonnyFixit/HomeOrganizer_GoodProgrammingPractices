@@ -9,6 +9,9 @@ using MongoDB.Bson;
 
 namespace HomeOrganizer.Models.User
 {
+    /// <summary>
+    /// Represents the data required for processing an email change request for a user.
+    /// </summary>
     public class ChangeEmailData
     {
         [BsonId]

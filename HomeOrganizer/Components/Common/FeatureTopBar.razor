@@ -2,6 +2,7 @@
 @using HomeOrganizer.Models.Bases;
 @inject UserService userService
 
+<!-- Feature tile component displaying feature information -->
 <MudPaper Height="46px" Width="100%" Elevation="0" Class="py-1 px-3"
           Style="@($"background-color:{Constants.TileColorPalettes[userService.LoggedUser.UseDarkTheme][Feature.TileData.ColorIndex]};")">
     <MudStack Row="true" AlignItems="AlignItems.Center" Style="height:100%;">
@@ -17,6 +18,7 @@
 </MudPaper>
 
 @code {
+    // Parameter to receive the feature data from the parent component.
     [Parameter]
     public FeatureBase Feature { get; set; }
 }

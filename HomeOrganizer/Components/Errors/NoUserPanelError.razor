@@ -2,24 +2,30 @@
 @inject NavigationManager navigationManager
 @inject UserService userService
 
+
+<!-- Check if the user data is available -->
 @if (User == null)
 {
+    <!-- Display a specific error component for no feature error -->
     <HomeOrganizer.Components.Errors.NoFeatureError />
     return;
 }
 
-
+<!-- Main container for displaying the error message and navigation button -->
 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Style="height:100%; width:100%;" Spacing="0">
 
+    <!-- Display a general error message -->
     <MudPaper Width="500px" Class="pa-4 mt-16">
         <MudText Typo="Typo.h6">
             Whoops... Something went really really wrong!
         </MudText>
 
+        <!-- Specific error message for unrecognizable user setting panel -->
         <MudText Typo="Typo.body1" Class="mt-3">
             We cannot recognize this user setting panel.
         </MudText>
 
+        <!-- Button to navigate back to the home view -->
         <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mud-theme-transparent mt-10" Elevation="0">
             <MudButton OnClick="GoHome" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.KeyboardBackspace">
                 Back home
@@ -33,7 +39,9 @@
     [Parameter]
     public UserData? User { get; set; } = null;
 
-
+    /// <summary>
+    /// Navigates the user back to the home page.
+    /// </summary>
     private void GoHome()
     {
         navigationManager.NavigateTo("/");

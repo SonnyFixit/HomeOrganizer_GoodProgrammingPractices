@@ -12,6 +12,7 @@
 @inject NavigationManager navigationManager
 
 
+<!-- User settings panel layout -->
 <MudPaper Class="d-flex align-content-space-between flex-wrap flex-grow-1" Width="100%" Height="100%" Elevation="0">
     <MudList @bind-SelectedValue="@CurrentPanel" Clickable="true" SelectedItemChanged="HandleItemChanged">
         <MudListSubheader>
@@ -23,6 +24,8 @@
         <MudListItem Icon="@Icons.Material.Filled.Notifications" Text="Notifications" Value="4" />
         <MudListItem Icon="@Icons.Material.Filled.FormatListNumbered" Text="Features" Value="5" />
     </MudList>
+
+    <!-- Button to change the side of the panel -->
     <MudStack Justify="Justify.Center" Row="true" Style="width: 100%; height: 40px;">
 
         @if (IsRightSide)
@@ -37,6 +40,8 @@
 </MudPaper>
 
 @code {
+
+    // Properties to control the behavior and state of the component.
     [Parameter]
     public bool IsRightSide { get; set; } = false;
 
@@ -49,12 +54,19 @@
     [Parameter]
     public EventCallback OnSideChange { get; set; }
 
+    /// <summary>
+    /// Handles the change of selected item in the settings list.
+    /// </summary>
+    /// <param name="selectedItem">The selected item.</param>
     private async Task HandleItemChanged(MudListItem selectedItem)
     {
         if (selectedItem == null) return;
         await OnNavigationChanged.InvokeAsync(new UserPanelNavigationData(selectedItem.Text, selectedItem.Value));
     }
 
+    /// <summary>
+    /// Triggers a side change of the panel.
+    /// </summary>
     private async Task ChangeSide()
     {
         await OnSideChange.InvokeAsync();

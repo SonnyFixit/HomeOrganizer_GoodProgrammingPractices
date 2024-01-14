@@ -12,6 +12,7 @@
 
 @if (User == null) return;
 
+<!-- Display an interactive area for adding new features -->
 <MudPaper Style="height: 120px" Class="mud-theme-transparent" Elevation="0">
     <MudMenu Style="width:100%;" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" Dense="true">
         <ActivatorContent>
@@ -21,6 +22,8 @@
                 </MudText>
             </MudPaper>
         </ActivatorContent>
+
+        <!-- Menu items for each available feature -->
         <ChildContent>
             @foreach (var featureName in User.GetAvailableFeatures())
             {
@@ -38,6 +41,10 @@
     [Parameter]
     public UserData User { get; set; }
 
+    /// <summary>
+    /// Initiates the process to add a new feature for the user.
+    /// </summary>
+    /// <param name="featureName">The name of the feature to add.</param>
     async Task AddFeature(string featureName)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true, FullWidth = true, MaxWidth = MaxWidth.Medium };
